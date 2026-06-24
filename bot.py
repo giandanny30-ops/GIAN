@@ -3560,9 +3560,19 @@ async def daily(i: discord.Interaction):
     quest_progress(i.user.id, "daily1")
     _poo_task_progress(i.guild.id if i.guild else 0, i.user.id, "daily")
     cd_label = f"za {cfg_d.get('cooldown_hours', 24)}h"
-    await i.response.send_message(embed=em_pro("<:e_gift:1519362618341462067> Daily Nagrada", "<:e_sparkles:1519363032185176198> Tvoj poklon je stigao!", color=COLORS["gold"], author=i.user, thumb=i.user.display_avatar.url, fields=[
-        ("<:e_coins2:1519362621206298666> Nagrada", f"```diff\n+ {reward} <:e_coins2:1519362621206298666>\n```", True), ("<:e_bank2:1519362662515871744> Balans", f"```yaml\n{d['balance']:,} <:e_coins2:1519362621206298666>\n```", True), ("<:e_time2:1519362726952964227> Sljedeći", cd_label, True),
-    ]))
+    _daily_e = discord.Embed(
+        title="<:e_gift:1519362618341462067>  Daily Nagrada",
+        description="<:e_sparkles:1519363032185176198> Tvoj poklon je stigao!",
+        color=COLORS["gold"],
+        timestamp=datetime.now(timezone.utc)
+    )
+    _daily_e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
+    _daily_e.set_thumbnail(url=i.user.display_avatar.url)
+    _daily_e.add_field(name="<:e_coins2:1519362621206298666>  Nagrada",  value=f"**+{reward:,}** <:e_coins2:1519362621206298666>",  inline=True)
+    _daily_e.add_field(name="<:e_bank2:1519362662515871744>  Balans",    value=f"**{d['balance']:,}** <:e_coins2:1519362621206298666>", inline=True)
+    _daily_e.add_field(name="<:e_time2:1519362726952964227>  Sljedeći",  value=f"**{cd_label}**",                                   inline=True)
+    _daily_e.set_footer(text=f"{BOT_NAME} {VERSION}")
+    await i.response.send_message(embed=_daily_e)
 
 @bot.tree.command(name="daj", description="<:e_shake:1519362947766554737> Pošalji pare drugaru")
 async def daj(i: discord.Interaction, korisnik: discord.Member, iznos: int):
@@ -4023,35 +4033,34 @@ def kaladont_start_embed(game: dict, mention: str):
     word    = game["word"]
     letters = game["letters"]
     req     = word[-letters:]
-    tezina_map = {1: "<:e_green:1519362769047126028> Lako · 1 slovo", 2: "<:e_green:1519362769047126028> Normalno · 2 slova", 3: "<:e_red:1519362782192210041> Teško · 3 slova"}
-    tezina = tezina_map.get(letters, f"<:e_gear:1519362652516782194>️ {letters} slova")
+    tezina_map = {1: "Lako · **1 slovo**", 2: "Normalno · **2 slova**", 3: "Teško · **3 slova**"}
+    tezina_label = tezina_map.get(letters, f"**{letters} slova**")
+    tezina_icon  = {1: "<:e_green:1519362769047126028>", 2: "<:e_green:1519362769047126028>", 3: "<:e_red:1519362782192210041>"}.get(letters, "<:e_gear:1519362652516782194>")
     e = discord.Embed(
         title="<:e_memo:1519363057199878144>  K A L A D O N T",
         description=(
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
-            f"<:e_sparkles:1519363032185176198>  Igra je počela! Prva riječ:\n"
-            f"## <:e_bubble:1519363307998417148>  **{word}**\n"
-            f"━━━━━━━━━━━━━━━━━━━━━"
+            f"Igra je počela! Prva riječ:\n"
+            f"## <:e_bubble:1519363307998417148>  **{word}**\n\n"
+            f"<:e_right:1519363367712591922>️  Sljedeća počinje sa : **`{req}`**\n"
+            f"{tezina_icon}  Težina — {tezina_label}\n"
+            f"<:e_link:1519363321458065408>  **Niz** #1"
         ),
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
     )
-    e.add_field(name="<:e_right:1519363367712591922>️  Sljedeća počinje sa", value=f"## **`{req}`**",   inline=True)
-    e.add_field(name="<:e_gear:1519362652516782194>️  Težina",              value=tezina,              inline=True)
-    e.add_field(name="<:e_link:1519363321458065408>  Niz",                 value="**#1**",            inline=True)
     e.add_field(
         name="<:e_help2:1519362723148726534>  Pravila igre",
         value=(
-            "<:icon_check:1519358376268533810>  Svaka riječ počinje traženim slovima\n"
-            "<:icon_ban:1519358278356959284>  Ista osoba **ne može** igrati iza sebe\n"
-            "<:e_repeat:1519363009883934740>  Ponavljanje iste riječi nije dozvoljeno\n"
-            "<:e_pencil:1519363059909398610>️  Minimalno **3 slova** po riječi\n"
-            "<:icon_warning:1519358274284032030>  Pritisni **Pomoć** za primjer riječi\n"
-            "<:e_trophy2:1519362624742232146>  Upiši **`KALADONT`** i osvoji **1500** <:e_coins2:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> XP!"
+            "Svaka riječ počinje traženim slovima\n"
+            "Ista osoba **ne može** igrati iza sebe\n"
+            "Ponavljanje iste riječi nije dozvoljeno\n"
+            "Minimalno **3 slova** po riječi\n"
+            "Pritisni **Pomoć** za primjer riječi\n"
+            "Upiši **`KALADONT`** i osvoji **1500** <:e_coins2:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> **XP**!"
         ),
         inline=False
     )
-    e.set_footer(text=f"<:e_memo:1519363057199878144> Pokrenuo/la: {mention}  •  <:e_target:1519363069925654609> Pritisni dugme za kraj")
+    e.set_footer(text=f"Pokrenuo/la: {mention}  •  Pritisni dugme za kraj  •  danas u {datetime.now().strftime('%H:%M')}")
     return e
 
 def kaladont_active_embed(game: dict):
@@ -4081,14 +4090,14 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
     e = discord.Embed(
         description=(
             f"## {icon}  **{word}**\n"
-            f"*<:e_speaker:1519363314524881048>️ {player}*  ·  {streak_fx} **niz #{count}**"
+            f"<:e_speaker:1519363314524881048>️ {player}  ·  {streak_fx} niz **#{count}**\n\n"
+            f"<:e_right:1519363367712591922>️  Sljedeća počinje sa  {streak_fx}  Niz\n"
+            f"## **`{req}`**\u2003\u2003**#{count}**"
         ),
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
     )
-    e.add_field(name="<:e_right:1519363367712591922>️  Sljedeća počinje sa",  value=f"## **`{req}`**",   inline=True)
-    e.add_field(name=f"{streak_fx}  Niz",        value=f"**#{count}**",     inline=True)
-    e.set_footer(text=f"GIAN Kaladont  •  #{count}")
+    e.set_footer(text=f"GIAN Kaladont  •  #{count}  •  danas u {datetime.now().strftime('%H:%M')}")
     return e
 
 # ── Kaladont pomoć cooldown: uid -> timestamp zadnjeg klika ──
@@ -4231,13 +4240,11 @@ async def kaladont_stop(i: discord.Interaction):
     del kaladont_games[i.channel.id]
     e = discord.Embed(
         title="<:e_stop:1519363022399995914> Kaladont zaustavljen",
-        description=(
-            f"Igru zaustavio: {i.user.mention}\n\n"
-            f"<:e_chart:1519362656568475880> **Riječi u nizu:** `{count}`\n"
-            f"<:e_memo:1519363057199878144> **Zadnja riječ:** `{last_word}`"
-        ),
+        description=f"Igru zaustavio: {i.user.mention}",
         color=COLORS["warning"], timestamp=datetime.now(timezone.utc)
     )
+    e.add_field(name="<:e_chart:1519362656568475880>  Riječi u nizu", value=f"**{count}**",        inline=True)
+    e.add_field(name="<:e_memo:1519363057199878144>  Zadnja riječ",   value=f"**`{last_word}`**",  inline=True)
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
