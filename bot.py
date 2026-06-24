@@ -774,29 +774,100 @@ bot = commands.Bot(command_prefix="-", intents=intents, help_command=None)
 
 # ═══════════════════════════════════════════
 #    PREFIX BRIDGE — .kpm radi kao /kpm
+#    Webhook-based: renderuje application emojije
 # ═══════════════════════════════════════════
+
+# Webhook cache: channel_id -> discord.Webhook
+_wh_cache: dict = {}
+
+async def _get_channel_webhook(channel) -> "discord.Webhook | None":
+    """Dohvati ili napravi webhook za kanal (za renderovanje app emojija)."""
+    try:
+        cid = channel.id
+        # Provjeri cache
+        if cid in _wh_cache:
+            return _wh_cache[cid]
+        # Provjeri postojeće webhooks u kanalu
+        try:
+            webhooks = await channel.webhooks()
+            for wh in webhooks:
+                if wh.user and wh.user.id == bot.user.id and wh.name == BOT_NAME:
+                    _wh_cache[cid] = wh
+                    return wh
+        except Exception:
+            pass
+        # Napravi novi webhook
+        wh = await channel.create_webhook(name=BOT_NAME)
+        _wh_cache[cid] = wh
+        return wh
+    except Exception:
+        return None
+
+async def _wh_send(channel, content=None, *, embed=None, embeds=None, view=None,
+                   ephemeral=False, delete_after=None, **kw):
+    """Pošalji poruku putem webhooks (renderuje app emojije) ili fallback na channel.send."""
+    kwargs: dict = {}
+    if content  is not None: kwargs["content"]  = content
+    if embed    is not None: kwargs["embed"]    = embed
+    if embeds   is not None: kwargs["embeds"]   = embeds
+    if view     is not None: kwargs["view"]     = view
+    if delete_after is not None: kwargs["delete_after"] = delete_after
+
+    # Pokušaj webhook (jedini način za app emoji u obicnim porukama)
+    wh = await _get_channel_webhook(channel)
+    if wh is not None:
+        try:
+            wh_kw = {k: v for k, v in kwargs.items() if k not in ("delete_after",)}
+            wh_kw["username"]   = bot.user.display_name
+            wh_kw["avatar_url"] = str(bot.user.display_avatar.url)
+            wh_kw["wait"]       = True
+            msg = await wh.send(**wh_kw)
+            if delete_after:
+                import asyncio as _aio
+                _aio.get_event_loop().call_later(delete_after, lambda: _aio.ensure_future(msg.delete()))
+            return msg
+        except Exception:
+            pass  # Fallback
+
+    # Fallback: channel.send (app emoji neće renderati, ali poruka će biti poslana)
+    return await channel.send(**kwargs)
+
 class _FakeResponse:
     def __init__(self, fake): self.fake = fake; self._sent = False
     async def send_message(self, content=None, *, embed=None, embeds=None, view=None, ephemeral=False, **kw):
-        kwargs = {}
-        if content is not None: kwargs["content"] = content
-        if embed is not None: kwargs["embed"] = embed
-        if embeds is not None: kwargs["embeds"] = embeds
-        if view is not None: kwargs["view"] = view
-        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower() if self.fake.message.content.startswith(".") else "")
+        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower()
+                    if self.fake.message.content.startswith(".") else "")
+        # Ephemeral help → DM
         if ephemeral and cmd_name == "help":
+            dm_kw: dict = {}
+            if content  is not None: dm_kw["content"]  = content
+            if embed    is not None: dm_kw["embed"]    = embed
+            if embeds   is not None: dm_kw["embeds"]   = embeds
+            if view     is not None: dm_kw["view"]     = view
             try:
-                msg = await self.fake.user.send(**kwargs)
+                msg = await self.fake.user.send(**dm_kw)
                 try: await self.fake.message.add_reaction("<:e_mail:1519362754732097546>")
                 except: pass
                 self.fake._original = msg; self._sent = True
                 return msg
             except: pass
+        # Ephemeral ostalo → kratko vidljivo, bez webhooks
         if ephemeral:
-            kwargs["delete_after"] = 10
-        msg = await self.fake.channel.send(**kwargs)
+            plain_kw: dict = {}
+            if content is not None: plain_kw["content"] = content
+            if embed   is not None: plain_kw["embed"]   = embed
+            if embeds  is not None: plain_kw["embeds"]  = embeds
+            if view    is not None: plain_kw["view"]    = view
+            plain_kw["delete_after"] = 10
+            msg = await self.fake.channel.send(**plain_kw)
+            self.fake._original = msg; self._sent = True
+            return msg
+        # Normalna poruka → webhook (renderuje app emojije!)
+        msg = await _wh_send(self.fake.channel, content,
+                             embed=embed, embeds=embeds, view=view)
         self.fake._original = msg; self._sent = True
         return msg
+
     async def defer(self, ephemeral=False, thinking=False): self._sent = True
     async def edit_message(self, **kw):
         try: await self.fake._original.edit(**{k:v for k,v in kw.items() if v is not None})
@@ -805,19 +876,31 @@ class _FakeResponse:
 
 class _FakeFollowup:
     def __init__(self, fake): self.fake = fake
-    async def send(self, content=None, *, embed=None, embeds=None, view=None, ephemeral=False, **kw):
-        kwargs = {}
-        if content is not None: kwargs["content"] = content
-        if embed is not None: kwargs["embed"] = embed
-        if embeds is not None: kwargs["embeds"] = embeds
-        if view is not None: kwargs["view"] = view
-        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower() if self.fake.message.content.startswith(".") else "")
+    async def send(self, content=None, *, embed=None, embeds=None, view=None,
+                   ephemeral=False, **kw):
+        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower()
+                    if self.fake.message.content.startswith(".") else "")
+        # Ephemeral help → DM
         if ephemeral and cmd_name == "help":
-            try: return await self.fake.user.send(**kwargs)
+            dm_kw: dict = {}
+            if content is not None: dm_kw["content"] = content
+            if embed   is not None: dm_kw["embed"]   = embed
+            if embeds  is not None: dm_kw["embeds"]  = embeds
+            if view    is not None: dm_kw["view"]    = view
+            try: return await self.fake.user.send(**dm_kw)
             except: pass
+        # Ephemeral ostalo → kratko vidljivo, bez webhooks
         if ephemeral:
-            kwargs["delete_after"] = 10
-        return await self.fake.channel.send(**kwargs)
+            plain_kw: dict = {}
+            if content is not None: plain_kw["content"] = content
+            if embed   is not None: plain_kw["embed"]   = embed
+            if embeds  is not None: plain_kw["embeds"]  = embeds
+            if view    is not None: plain_kw["view"]    = view
+            plain_kw["delete_after"] = 10
+            return await self.fake.channel.send(**plain_kw)
+        # Normalna poruka → webhook
+        return await _wh_send(self.fake.channel, content,
+                              embed=embed, embeds=embeds, view=view)
 
 class FakeInteraction:
     def __init__(self, message):
