@@ -2556,9 +2556,17 @@ async def on_message(message):
               or message.author.id == game.get("last_uid")
               or word[:letters] != req
               or word in game["used"]):
-            # Netačna riječ — samo <:icon_cross:1519358379917836508> reakcija, bez poruke
+            # Format greška (pogrešna slova, prekratko, isti igrač, već korištena) → ❌ reakcija
             try: await message.add_reaction("<:icon_cross:1519358379917836508>")
             except: pass
+        elif word != "KALADONT" and word not in KALADONT_DICT:
+            # Rijec nije u rjecniku — embed sa objasnjenjam i dugmetom Nova Rijec
+            try: await message.add_reaction("<:icon_cross:1519358379917836508>")
+            except: pass
+            await message.channel.send(
+                embed=kaladont_invalid_embed(word, req, game["letters"]),
+                view=KaladontInvalidView(message.channel.id)
+            )
         else:
             # ── Validna riječ — prihvata se ───────────────────────
             game["word"]             = word
@@ -4107,6 +4115,19 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
     e.set_footer(text=f"GIAN Kaladont  •  #{count}")
     return e
 
+
+def kaladont_invalid_embed(word: str, req: str, letters: int) -> discord.Embed:
+    """Embed koji se prikazuje kada rijec nije u rjecniku."""
+    e = discord.Embed(
+        description=(
+            f"<:icon_cross:1519358379917836508>  **{word}** nije u rječniku\n"
+            f"<:e_right:1519363367712591922>️  Treba počinjati sa  **`{req}`**  ·  klikni za novu startnu riječ"
+        ),
+        color=COLORS["error"],
+    )
+    e.set_footer(text="GIAN Kaladont  •  Nova Riječ resetuje startnu poziciju")
+    return e
+
 # ── Kaladont pomoć cooldown: uid -> timestamp zadnjeg klika ──
 _kaladont_help_cd: dict = {}
 KALADONT_HELP_CD = 15 * 60  # 15 minuta u sekundama
@@ -4197,6 +4218,43 @@ class KaladontWordView(discord.ui.View):
     @discord.ui.button(label="Pomoć", emoji="<:icon_warning:1519358274284032030>", style=discord.ButtonStyle.secondary)
     async def pomoc(self, i: discord.Interaction, b: discord.ui.Button):
         await _send_kaladont_help(i, self.channel_id)
+
+
+class KaladontInvalidView(discord.ui.View):
+    """View ispod invalid-word embeda — dugme Nova Rijec resetuje startnu poziciju."""
+    def __init__(self, channel_id: int):
+        super().__init__(timeout=120)
+        self.channel_id = channel_id
+
+    @discord.ui.button(label="Nova Riječ", emoji="<:e_refresh:1519362959187509461>", style=discord.ButtonStyle.primary)
+    async def nova_rijec(self, i: discord.Interaction, b: discord.ui.Button):
+        game = kaladont_games.get(self.channel_id)
+        if not game:
+            return await i.response.send_message(
+                embed=em("<:icon_cross:1519358379917836508>", "Nema aktivne igre.", color=COLORS["error"]), ephemeral=True)
+        # Odaberi novu startnu rijec koja nije vec koristena
+        available = [w for w in KALADONT_START_WORDS if w not in game["used"]]
+        if not available:
+            available = list(KALADONT_START_WORDS)
+        new_word = random.choice(available)
+        game["word"] = new_word
+        game["used"].add(new_word)
+        game["last_uid"] = None  # Reset — svako moze igrati
+        letters = game["letters"]
+        new_req = new_word[-letters:]
+        count = len(game["chain"])
+        for c in self.children:
+            c.disabled = True
+        nova_e = discord.Embed(
+            description=(
+                f"<:e_refresh:1519362959187509461>  Nova startna riječ: **{new_word}**\n"
+                f"<:e_right:1519363367712591922>️  Sljedeća počinje sa  **`{new_req}`**"
+            ),
+            color=KALADONT_COLOR,
+        )
+        nova_e.set_footer(text=f"GIAN Kaladont  •  #{count}")
+        await i.response.edit_message(embed=nova_e, view=self)
+        self.stop()
 
 
 @bot.tree.command(name="kaladont", description="<:e_memo:1519363057199878144> Pokretanje igre Kaladont — ulančaj riječi!")
