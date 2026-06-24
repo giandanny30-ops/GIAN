@@ -11180,7 +11180,6 @@ def _poo_task_progress(guild_id: int, uid: int, task_type: str, amount: int = 1)
     if new_stage != poo.get('stage', 0): poo['stage'] = new_stage
     if contributed: save_data()
 
-@bot.tree.command(name="poo_DISABLED_UKLONJENO", description="[uklonjeno]")
 async def poo_cmd(i: discord.Interaction):
     gid = i.guild.id if i.guild else 0
     poo = _get_poo_data(gid)
@@ -11235,8 +11234,6 @@ async def poo_cmd(i: discord.Interaction):
     e.set_footer(text=f'💩 POO igra • {BOT_NAME} • 24/7 aktivan • /poo-zadaci za zadatke')
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="poo_zadaci_DISABLED", description="[uklonjeno]")
-@app_commands.describe(stranica="Stranica 1-10")
 async def poo_zadaci_cmd(i: discord.Interaction, stranica: int = 1):
     gid = i.guild.id if i.guild else 0
     user_tasks = _get_poo_tasks(gid, i.user.id)
@@ -11263,7 +11260,6 @@ async def poo_zadaci_cmd(i: discord.Interaction, stranica: int = 1):
     e.set_footer(text=f'Stranica {stranica}/10 · Napredak: {done_count}/{len(POO_ZADACI)} · {BOT_NAME}')
     await i.response.send_message(embed=e, ephemeral=True)
 
-@bot.tree.command(name="poo_top_DISABLED", description="[uklonjeno]")
 async def poo_top_cmd(i: discord.Interaction):
     gid = i.guild.id if i.guild else 0
     poo = _get_poo_data(gid)
@@ -11288,7 +11284,6 @@ async def poo_top_cmd(i: discord.Interaction):
     e.set_footer(text=f'Budi aktivan i hrani Poo-a! · {BOT_NAME}')
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="poo_hrani_DISABLED", description="[uklonjeno]")
 async def poo_hrani_cmd(i: discord.Interaction):
     COST = 200
     gid = i.guild.id if i.guild else 0
@@ -11319,7 +11314,6 @@ async def poo_hrani_cmd(i: discord.Interaction):
         ('💩 Stage', f'{semo} {snm}', True),
     ]))
 
-@bot.tree.command(name="poo_info_DISABLED", description="[uklonjeno]")
 async def poo_info_cmd(i: discord.Interaction):
     gid = i.guild.id if i.guild else 0
     poo = _get_poo_data(gid)
