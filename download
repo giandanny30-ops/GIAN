@@ -1,0 +1,30 @@
+# Environment varijable — NIKAD ne pushaj ove fajlove!
+.env
+*.env
+
+# Bot data fajlovi
+oleun_data.json
+oleun_data.json.bak
+oleun_data.json.tmp
+data/
+/app/data/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS fajlovi
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
