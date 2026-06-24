@@ -2563,12 +2563,28 @@ async def on_message(message):
             # Rijec nije u rjecniku — embed sa objasnjenjam i dugmetom Nova Rijec
             try: await message.add_reaction("<:icon_cross:1519358379917836508>")
             except: pass
-            await message.channel.send(
+            # Deaktiviraj eventualni prethodni invalid embed u ovom kanalu
+            old_msg = _kaladont_invalid_msgs.pop(message.channel.id, None)
+            if old_msg:
+                try:
+                    for c in old_msg.components[0].children if old_msg.components else []:
+                        pass  # samo brisemo referencu, Discord sam deaktivira pri slanju novog
+                except: pass
+            inv_msg = await message.channel.send(
                 embed=kaladont_invalid_embed(word, req, game["letters"]),
-                view=KaladontInvalidView(message.channel.id)
+                view=KaladontInvalidView(message.channel.id, checkpoint_word=game["word"])
             )
+            _kaladont_invalid_msgs[message.channel.id] = inv_msg
         else:
             # ── Validna riječ — prihvata se ───────────────────────
+            # Deaktiviraj stari invalid embed ako postoji (igra nastavlja)
+            old_inv = _kaladont_invalid_msgs.pop(message.channel.id, None)
+            if old_inv:
+                try:
+                    diz_e = old_inv.embeds[0] if old_inv.embeds else discord.Embed(description="Igra nastavlja.", color=COLORS["warning"])
+                    diz_e.color = COLORS["warning"]
+                    await old_inv.edit(embed=diz_e, view=None)
+                except: pass
             game["word"]             = word
             game["last_uid"]         = message.author.id
             game["last_player_name"] = message.author.display_name
@@ -4211,31 +4227,52 @@ class KaladontWordView(discord.ui.View):
         await _send_kaladont_help(i, self.channel_id)
 
 
+_kaladont_invalid_msgs: dict = {}  # channel_id -> discord.Message (zadnji invalid embed)
+
 class KaladontInvalidView(discord.ui.View):
-    """View ispod invalid-word embeda — dugme Nova Rijec resetuje startnu poziciju."""
-    def __init__(self, channel_id: int):
+    """View ispod invalid-word embeda — dugme Nova Rijec resetuje startnu poziciju.
+    Čuva checkpoint_word kako bismo detektirali je li igra već nastavila bez nas."""
+    def __init__(self, channel_id: int, checkpoint_word: str):
         super().__init__(timeout=120)
-        self.channel_id = channel_id
+        self.channel_id     = channel_id
+        self.checkpoint_word = checkpoint_word  # game["word"] u trenutku greške
 
     @discord.ui.button(label="Nova Riječ", emoji="<:e_refresh:1519362959187509461>", style=discord.ButtonStyle.primary)
     async def nova_rijec(self, i: discord.Interaction, b: discord.ui.Button):
         game = kaladont_games.get(self.channel_id)
         if not game:
-            return await i.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>", "Nema aktivne igre.", color=COLORS["error"]), ephemeral=True)
-        # Odaberi novu startnu rijec koja nije vec koristena
+            for c in self.children: c.disabled = True
+            return await i.response.edit_message(
+                embed=em("<:icon_cross:1519358379917836508>", "Igra je završena.", color=COLORS["error"]), view=self)
+
+        # ── Provjera: je li igra već nastavila od kad je ova greška prikazana? ──
+        if game["word"] != self.checkpoint_word:
+            # Neko je već odigrao valjanu riječ — ne resetujemo, samo deaktiviramo dugme
+            for c in self.children: c.disabled = True
+            letters = game["letters"]
+            req = game["word"][-letters:]
+            zakasnio_e = discord.Embed(
+                description=(
+                    f"<:icon_warning:1519358274284032030>  Igra je već nastavila!\n"
+                    f"<:e_right:1519363367712591922>️  Trenutna riječ: **{game['word']}**  ·  Sljedeća počinje sa **`{req}`**"
+                ),
+                color=COLORS["warning"],
+            )
+            zakasnio_e.set_footer(text=f"GIAN Kaladont  •  #{len(game['chain'])}")
+            return await i.response.edit_message(embed=zakasnio_e, view=self)
+
+        # ── Resetuj na novu startnu riječ ──
         available = [w for w in KALADONT_START_WORDS if w not in game["used"]]
         if not available:
             available = list(KALADONT_START_WORDS)
         new_word = random.choice(available)
         game["word"] = new_word
         game["used"].add(new_word)
-        game["last_uid"] = None  # Reset — svako moze igrati
+        game["last_uid"] = None  # Reset — svako može igrati
         letters = game["letters"]
         new_req = new_word[-letters:]
         count = len(game["chain"])
-        for c in self.children:
-            c.disabled = True
+        for c in self.children: c.disabled = True
         nova_e = discord.Embed(
             description=(
                 f"<:e_refresh:1519362959187509461>  Nova startna riječ: **{new_word}**\n"
@@ -4244,6 +4281,7 @@ class KaladontInvalidView(discord.ui.View):
             color=KALADONT_COLOR,
         )
         nova_e.set_footer(text=f"GIAN Kaladont  •  #{count}")
+        _kaladont_invalid_msgs.pop(self.channel_id, None)
         await i.response.edit_message(embed=nova_e, view=self)
         self.stop()
 
