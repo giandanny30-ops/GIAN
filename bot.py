@@ -7755,36 +7755,6 @@ async def set_level_cmd(i: discord.Interaction, korisnik: discord.Member, level:
     await i.response.send_message(embed=e)
 
 # ═══════════════════════════════════════════
-#    SETCHANNEL  (Admin komanda)
-# ═══════════════════════════════════════════
-@bot.tree.command(name="setchannel", description="📌 [ADMIN] Postavi kanal za određenu kategoriju komandi/igara")
-@app_commands.describe(
-    kategorija="Kategorija (npr: kaladont, kviz, slots, casino, ekonomija, meme, bingo)",
-    kanal="Kanal koji postavljaš za ovu kategoriju"
-)
-@app_commands.default_permissions(manage_guild=True)
-async def setchannel_cmd(i: discord.Interaction, kategorija: str, kanal: discord.TextChannel):
-    cfg = get_guild_config(i.guild.id)
-    kat = kategorija.lower().strip()
-    cfg.setdefault("channel_overrides", {})[kat] = kanal.id
-    save_data()
-    e = discord.Embed(
-        description=(
-            f"## 📌 Kanal postavljen!\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🏷️ **Kategorija:** `{kat}`\n"
-            f"📺 **Kanal:** {kanal.mention}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"💡 Koristiti možeš: `kaladont`, `kviz`, `slots`,\n"
-            f"`casino`, `ekonomija`, `meme`, `bingo`, itd."
-        ),
-        color=COLORS["success"],
-        timestamp=datetime.now(timezone.utc)
-    )
-    e.set_footer(text=f"Postavio/la: {i.user.display_name} • {BOT_NAME}")
-    await i.response.send_message(embed=e, ephemeral=True)
-
-# ═══════════════════════════════════════════
 #    HELP
 # ═══════════════════════════════════════════
 @bot.tree.command(name="help", description="📖 Sve dostupne komande bota")
