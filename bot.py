@@ -1562,19 +1562,24 @@ async def _validate_app_emojis():
                     print(f"  [emoji-check] API odgovor: {resp.status} — provjera preskočena")
                     return
                 data_resp = await resp.json()
-                portal_emojis = {e["id"]: e["name"] for e in data_resp.get("items", data_resp if isinstance(data_resp, list) else [])}
-        # Pronađi sve <:name:id> u bot.py kodu (iz konstanti na vrhu)
+                raw = data_resp if isinstance(data_resp, list) else data_resp.get("items", [])
+                portal_emojis = {e["id"]: e["name"] for e in raw}
+        print(f"  ℹ️  Na developer portalu: {len(portal_emojis)} emojija")
+        # Pronađi sve <:name:id> u bot.py kodu
         with open(__file__, "r", encoding="utf-8") as _f:
             src = _f.read()
-        used = _re.findall(r'<:[\w]+:(\d+)>', src)
-        used_ids = set(used)
-        missing = [eid for eid in used_ids if eid not in portal_emojis]
+        used = _re.findall(r'<a?:([\w]+):(\d+)>', src)
+        used_ids = {eid: name for name, eid in used}
+        missing = {eid: name for eid, name in used_ids.items() if eid not in portal_emojis}
         ok = len(used_ids) - len(missing)
         print(f"  ✅ Emoji provjera: {ok}/{len(used_ids)} validni na developer portalu")
         if missing:
-            print(f"  ⚠️  Nedostaju na portalu ({len(missing)}): {', '.join(missing[:10])}{'...' if len(missing)>10 else ''}")
+            for eid, name in list(missing.items())[:5]:
+                print(f"  ⚠️  NEDOSTAJE: <:{name}:{eid}>")
+            if len(missing) > 5:
+                print(f"  ⚠️  ... i još {len(missing)-5} nedostaje")
         else:
-            print(f"  ✅ Dupla zaštita: svi emojiji potvrđeni na developer portalu!")
+            print(f"  ✅ Svi emojiji potvrđeni na developer portalu!")
     except Exception as _e:
         print(f"  [emoji-check] Greška pri provjeri: {_e}")
 
@@ -3578,7 +3583,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     try:
         await msg.edit(embed=final_e)
     except Exception:
-        await i.followup.send(embed=final_e)
+        pass  # Ne šaljemo drugi embed — sprječavamo duplikate
 
 # /rulet uklonjeno (na zahtjev) — /flip i /8ball uklonjeni (v2.2) — pravimo mjesto za /mafia igru.
 # /meme uklonjeno (v2.1) — vanjski sadržaj može vratiti NSFW u SFW kanal.
