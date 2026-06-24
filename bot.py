@@ -67,12 +67,12 @@ COLORS = {
 }
 
 # ── Custom animirani emoji (već postoje na serveru) — za ljepši izgled igara ──
-E_FIRE1 = "<a:vatrice1:1500466044429664256>"
-E_FIRE2 = "<a:vatrice2:1500466048418185246>"
-E_FIRE3 = "<a:vatrice3:1500466039782113352>"
-E_FIRE4 = "<a:vatrice4:1500466061970247741>"
-E_GAME  = "<a:game1:1500459114931949568>"
-E_MUSIC = "<a:music2:1500459145382592602>"
+E_FIRE1 = "<:icon_fire:1519358312188088466>"
+E_FIRE2 = "<:e_fire2:1519362671491678280>"
+E_FIRE3 = "<:icon_fire:1519358312188088466>"
+E_FIRE4 = "<:e_fire2:1519362671491678280>"
+E_GAME  = "<:icon_game:1519358323667767346>"
+E_MUSIC = "<:icon_music:1519358320337752125>"
 
 # Akcentne boje po igri (premium izgled)
 GAME_COLORS = {
@@ -1863,10 +1863,10 @@ async def on_member_join(member):
 
     # ── Animirani vatrice emojiji ──
     VE = [
-        "<a:vatrice1:1500466044429664256>",
-        "<a:vatrice2:1500466048418185246>",
-        "<a:vatrice3:1500466039782113352>",
-        "<a:vatrice4:1500466061970247741>",
+        "<:icon_fire:1519358312188088466>",
+        "<:e_fire2:1519362671491678280>",
+        "<:icon_fire:1519358312188088466>",
+        "<:e_fire2:1519362671491678280>",
     ]
 
     # ── Kanali ──
@@ -2008,14 +2008,14 @@ async def on_member_join(member):
         if ch_game:
             wv.add_item(discord.ui.Button(
                 label="game",
-                emoji="<a:game1:1500459114931949568>",
+                emoji="<:icon_game:1519358323667767346>",
                 url=f"https://discord.com/channels/{member.guild.id}/{ch_game.id}",
                 style=discord.ButtonStyle.link
             ))
         if ch_mus:
             wv.add_item(discord.ui.Button(
                 label="music",
-                emoji="<a:music2:1500459145382592602>",
+                emoji="<:icon_music:1519358320337752125>",
                 url=f"https://discord.com/channels/{member.guild.id}/{ch_mus.id}",
                 style=discord.ButtonStyle.link
             ))
@@ -2646,10 +2646,10 @@ async def on_member_remove(member):
         chan = member.guild.get_channel(ch_id) if ch_id else discord.utils.get(member.guild.text_channels, name="welcome")
         if chan:
             VE_L = [
-                "<a:vatrice1:1500466044429664256>",
-                "<a:vatrice2:1500466048418185246>",
-                "<a:vatrice3:1500466039782113352>",
-                "<a:vatrice4:1500466061970247741>",
+                "<:icon_fire:1519358312188088466>",
+                "<:e_fire2:1519362671491678280>",
+                "<:icon_fire:1519358312188088466>",
+                "<:e_fire2:1519362671491678280>",
             ]
             member_count_l = sum(1 for m in member.guild.members if not m.bot)
             _pl = await get_panel_embed("leave")
@@ -3390,7 +3390,7 @@ async def kpm(i: discord.Interaction):
     await i.response.send_message(embed=em("<:e_ctrl:1519362682296209498> Kamen-Papir-Makaze", f"<:Hand:1517941308927246461>  {i.user.mention}, odaberi potez! <:e_time2:1519362726952964227>️ 30s", color=COLORS["balkan"]), view=v)
     v.msg = await i.original_response()
 
-@bot.tree.command(name="slots", description="<:e_slotm:1519362699014967297> Slot mašina — uloži od 20 do 1.000.000.000 <:e_euro:1519362907052183753>")
+@bot.tree.command(name="slots", description="Slot mašina — uloži od 20 do 1.000.000.000 eura")
 @app_commands.describe(ulog="Iznos uloga (min 20 — max 1.000.000.000)")
 @app_commands.checks.cooldown(1, 15, key=lambda i: i.user.id)
 async def slots(i: discord.Interaction, ulog: int = 100):
@@ -7475,10 +7475,10 @@ async def setup_welcome(i: discord.Interaction, kanal: discord.TextChannel):
         description=(
             f"**Kanal:** {kanal.mention}\n\n"
             f"Svaki novi član će dobiti embed sa:\n"
-            f"<a:vatrice1:1500466044429664256> chat · <a:vatrice2:1500466048418185246> info · "
-            f"<a:vatrice3:1500466039782113352> news · <a:vatrice4:1500466061970247741> gws\n"
+            f"<:icon_fire:1519358312188088466> chat · <:e_fire2:1519362671491678280> info · "
+            f"<:icon_fire:1519358312188088466> news · <:e_fire2:1519362671491678280> gws\n"
             f"<:e_feather:1519363362322907218> broj članova\n"
-            f"Dugmad: <a:game1:1500459114931949568> game · <a:music2:1500459145382592602> music"
+            f"Dugmad: <:icon_game:1519358323667767346> game · <:icon_music:1519358320337752125> music"
         ),
         color=COLORS["success"],
         timestamp=datetime.now(timezone.utc)
@@ -7532,7 +7532,7 @@ async def setup_leave(i: discord.Interaction, kanal: discord.TextChannel):
         description=(
             f"**Kanal:** {kanal.mention}\n\n"
             f"Kad član napusti server, bot će poslati embed sa:\n"
-            f"<a:vatrice1:1500466044429664256> **bye** ime člana\n"
+            f"<:icon_fire:1519358312188088466> **bye** ime člana\n"
             f"<:e_feather:1519363362322907218> broj članova\n"
             f"Thumbnail: avatar člana koji je otišao"
         ),
@@ -8499,7 +8499,7 @@ async def _post_vatrice_objava(guild: discord.Guild, davalac: discord.Member | N
     except (discord.Forbidden, discord.HTTPException):
         pass
 
-@vatrice_group.command(name="ember", description="<:e_fire2:1519362671491678280> [VLASNIK] Daj vatricu(e) članu — ažurira nick i šalje objavu")
+@vatrice_group.command(name="ember", description="[VLASNIK] Daj vatricu(e) članu — ažurira nick i šalje objavu")
 @app_commands.describe(korisnik="Kome daješ vatricu?", kolicina="Koliko vatrica dati (default 1, max 100)")
 async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolicina: int = 1):
     if not _vatrice_owner_only(i):
@@ -8656,7 +8656,7 @@ async def vatrice_oblik(i: discord.Interaction, emoji: str = None):
         ephemeral=True,
     )
 
-@vatrice_group.command(name="start", description="<:e_fire2:1519362671491678280> [VLASNIK] Aktiviraj početak — svi članovi dobiju po 1 vatricu + nick")
+@vatrice_group.command(name="start", description="[VLASNIK] Aktiviraj početak — svi članovi dobiju po 1 vatricu + nick")
 async def vatrice_start(i: discord.Interaction):
     if not _vatrice_owner_only(i):
         return await i.response.send_message(
@@ -8835,7 +8835,7 @@ async def active_member_week():
 async def _aotw_wait(): await bot.wait_until_ready()
 
 # ─── <:e_target:1519363069925654609> RUČNI BINGO ───
-@bot.tree.command(name="bingo", description="<:e_target:1519363069925654609> Pokreni Bingo — klikni dugme, unesi 5 brojeva i osvoji nagradu!")
+@bot.tree.command(name="bingo", description="Pokreni Bingo — klikni dugme, unesi 5 brojeva i osvoji nagradu!")
 async def bingo_cmd(i: discord.Interaction):
     if i.user.id not in OWNER_IDS:
         return await i.response.send_message(
