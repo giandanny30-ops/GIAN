@@ -3560,19 +3560,16 @@ async def daily(i: discord.Interaction):
     quest_progress(i.user.id, "daily1")
     _poo_task_progress(i.guild.id if i.guild else 0, i.user.id, "daily")
     cd_label = f"za {cfg_d.get('cooldown_hours', 24)}h"
-    _daily_e = discord.Embed(
-        title="<:e_gift:1519362618341462067>  Daily Nagrada",
-        description="<:e_sparkles:1519363032185176198> Tvoj poklon je stigao!",
+    await i.response.send_message(embed=em(
+        "<:e_gift:1519362618341462067> Daily Nagrada",
+        f"<:e_sparkles:1519363032185176198>  Tvoj poklon je stigao!",
         color=COLORS["gold"],
-        timestamp=datetime.now(timezone.utc)
-    )
-    _daily_e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
-    _daily_e.set_thumbnail(url=i.user.display_avatar.url)
-    _daily_e.add_field(name="<:e_coins3:1519362621206298666>  Nagrada",  value=f"**+{reward:,}** <:e_coins3:1519362621206298666>",  inline=True)
-    _daily_e.add_field(name="<:e_bank2:1519362662515871744>  Balans",    value=f"**{d['balance']:,}** <:e_coins3:1519362621206298666>", inline=True)
-    _daily_e.add_field(name="<:e_time2:1519362726952964227>  Sljedeći",  value=f"**{cd_label}**",                                   inline=True)
-    _daily_e.set_footer(text=f"{BOT_NAME} {VERSION}")
-    await i.response.send_message(embed=_daily_e)
+        fields=[
+            ("<:e_coins3:1519362621206298666> Nagrada", f"`+{reward:,} <:e_coins3:1519362621206298666>`", True),
+            ("<:e_bank2:1519362662515871744> Balans",   f"`{d['balance']:,} <:e_coins3:1519362621206298666>`", True),
+            ("<:e_time2:1519362726952964227> Sljedeći", f"`{cd_label}`", True),
+        ]
+    ))
 
 @bot.tree.command(name="daj", description="<:e_shake:1519362947766554737> Pošalji pare drugaru")
 async def daj(i: discord.Interaction, korisnik: discord.Member, iznos: int):
@@ -3711,16 +3708,24 @@ class KPM(discord.ui.View):
 
     async def play(self, i, choice):
         if i.user != self.user: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Nije tvoja igra!", color=COLORS["error"]), ephemeral=True)
-        bot_c = random.choice(["<:e_hammer:1519362836671762494> Kamen", "<:e_memo:1519363057199878144> Papir", "<:e_sword2:1519362631146930317>️ Makaze"])
+        bot_c = random.choice(["<:e_hammer:1519362836671762494> Kamen", "<:e_memo:1519363057199878144> Papir", "<:e_sword2:1519362631146930317> Makaze"])
         win_map = {("Kamen","Makaze"),("Papir","Kamen"),("Makaze","Papir")}
         cw, bw = choice.split()[1], bot_c.split()[1]
-        if choice == bot_c: res, color = "<:e_shake:1519362947766554737> Nerešeno!", COLORS["warning"]
-        elif (cw, bw) in win_map: res, color = "<:e_trophy2:1519362624742232146> Pobedio si!", COLORS["success"]
-        else: res, color = "<:e_skull:1519362992502997125> Izgubio si!", COLORS["error"]
+        if choice == bot_c:   res, color = "<:e_shake:1519362947766554737> Nerješeno!", COLORS["warning"]
+        elif (cw, bw) in win_map: res, color = "<:e_trophy2:1519362624742232146> Pobijedio si!", COLORS["success"]
+        else:                 res, color = "<:e_skull:1519362992502997125> Izgubio si!", COLORS["error"]
         for c in self.children: c.disabled = True
-        await i.response.edit_message(embed=em(f"<:e_ctrl:1519362682296209498> KPM — {res}", color=color, fields=[
-            ("<:e_user:1519363093736718518> Ti", choice, True), ("<:e_gear:1519362652516782194> Bot", bot_c, True), ("<:e_chart:1519362656568475880> Rezultat", res, False),
-        ]), view=self); self.stop()
+        _kpm_res = discord.Embed(
+            title=f"<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze",
+            description=f"{res}",
+            color=color,
+            timestamp=datetime.now(timezone.utc)
+        )
+        _kpm_res.add_field(name="<:e_user:1519363093736718518>  Ti",            value=choice, inline=True)
+        _kpm_res.add_field(name="<:e_gear:1519362652516782194>  Bot",           value=bot_c,  inline=True)
+        _kpm_res.add_field(name="<:e_chart:1519362656568475880>  Rezultat",     value=res,    inline=False)
+        _kpm_res.set_footer(text=f"{BOT_NAME} {VERSION}")
+        await i.response.edit_message(embed=_kpm_res, view=self); self.stop()
 
     @discord.ui.button(label="Kamen",  emoji="<:e_hammer:1519362836671762494>", style=discord.ButtonStyle.primary)
     async def r(self, i, b): await self.play(i, "<:e_hammer:1519362836671762494> Kamen")
@@ -3732,7 +3737,17 @@ class KPM(discord.ui.View):
 @bot.tree.command(name="kpm", description="<:e_ctrl:1519362682296209498> Kamen-Papir-Makaze")
 async def kpm(i: discord.Interaction):
     v = KPM(i.user)
-    await i.response.send_message(embed=em("<:e_ctrl:1519362682296209498> Kamen-Papir-Makaze", f"<:e_shake:1519362947766554737>  {i.user.mention}, odaberi potez! <:e_time2:1519362726952964227>️ 30s", color=COLORS["balkan"]), view=v)
+    _kpm_e = discord.Embed(
+        title="<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze",
+        description=f"<:e_shake:1519362947766554737>  {i.user.mention}, odaberi potez!",
+        color=COLORS["balkan"],
+        timestamp=datetime.now(timezone.utc)
+    )
+    _kpm_e.add_field(name="<:e_hammer:1519362836671762494>  Kamen", value="Pobjeđuje Makaze",  inline=True)
+    _kpm_e.add_field(name="<:e_memo:1519363057199878144>  Papir",  value="Pobjeđuje Kamen",   inline=True)
+    _kpm_e.add_field(name="<:e_sword2:1519362631146930317>  Makaze", value="Pobjeđuju Papir", inline=True)
+    _kpm_e.set_footer(text=f"{BOT_NAME} {VERSION}  •  Imaš 30 sekundi")
+    await i.response.send_message(embed=_kpm_e, view=v)
     v.msg = await i.original_response()
 
 @bot.tree.command(name="slots", description="Slot mašina — uloži od 20 do 1.000.000.000 eura")
@@ -4043,24 +4058,19 @@ def kaladont_start_embed(game: dict, mention: str):
             f"## <:e_bubble:1519363307998417148>  **{word}**\n\n"
             f"<:e_right:1519363367712591922>️  Sljedeća počinje sa : **`{req}`**\n"
             f"{tezina_icon}  Težina — {tezina_label}\n"
-            f"<:e_link:1519363321458065408>  **Niz** #1"
+            f"<:e_link:1519363321458065408>  **Niz** #1\n\n"
+            f"<:e_help2:1519362723148726534>  **Pravila igre**\n"
+            f"<:icon_check:1519358376268533810>  Svaka riječ počinje traženim slovima\n"
+            f"<:icon_ban:1519358278356959284>  Ista osoba **ne može** igrati iza sebe\n"
+            f"<:e_repeat:1519363009883934740>  Ponavljanje iste riječi nije dozvoljeno\n"
+            f"<:e_pencil:1519363059909398610>  Minimalno **3 slova** po riječi\n"
+            f"<:icon_help:1519358364889383084>  Pritisni **Pomoć** za primjer riječi\n"
+            f"<:icon_trophy:1519358248942047342>  Upiši **`KALADONT`** i osvoji **1500** <:e_coins3:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> **XP**!"
         ),
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
     )
-    e.add_field(
-        name="<:e_help2:1519362723148726534>  Pravila igre",
-        value=(
-            "<:icon_check:1519358376268533810>  Svaka riječ počinje traženim slovima\n"
-            "<:icon_ban:1519358278356959284>  Ista osoba **ne može** igrati iza sebe\n"
-            "<:e_repeat:1519363009883934740>  Ponavljanje iste riječi nije dozvoljeno\n"
-            "<:e_pencil:1519363059909398610>  Minimalno **3 slova** po riječi\n"
-            "<:icon_help:1519358364889383084>  Pritisni **Pomoć** za primjer riječi\n"
-            "<:icon_trophy:1519358248942047342>  Upiši **`KALADONT`** i osvoji **1500** <:e_coins3:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> **XP**!"
-        ),
-        inline=False
-    )
-    e.set_footer(text=f"Pokrenuo/la: {mention}  •  Pritisni dugme za kraj  •  danas u {datetime.now().strftime('%H:%M')}")
+    e.set_footer(text=f"Pokrenuo/la: {mention}  •  Pritisni dugme za kraj")
     return e
 
 def kaladont_active_embed(game: dict):
@@ -4089,15 +4099,12 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
     e = discord.Embed(
         description=(
-            f"## {icon}  **{word}**\n"
-            f"<:e_speaker:1519363314524881048>️ {player}  ·  {streak_fx} niz **#{count}**\n\n"
-            f"<:e_right:1519363367712591922>️  Sljedeća počinje sa  {streak_fx}  Niz\n"
-            f"## **`{req}`**\u2003\u2003**#{count}**"
+            f"{icon}  **{word}**  ·  <:e_speaker:1519363314524881048>️ {player}  ·  {streak_fx} **#{count}**\n"
+            f"<:e_right:1519363367712591922>️  Sljedeća: **`{req}`**"
         ),
         color=KALADONT_COLOR,
-        timestamp=datetime.now(timezone.utc)
     )
-    e.set_footer(text=f"GIAN Kaladont  •  #{count}  •  danas u {datetime.now().strftime('%H:%M')}")
+    e.set_footer(text=f"GIAN Kaladont  •  #{count}")
     return e
 
 # ── Kaladont pomoć cooldown: uid -> timestamp zadnjeg klika ──
