@@ -1016,23 +1016,18 @@ _orig_embed_add_field = discord.Embed.add_field
 def _styled_add_field(self, *, name, value, inline=False):
     """Primjeni > __ stil na field name i value (ako embed nije _nostyle)."""
     if not getattr(self, '_nostyle', False):
-        # Field name → __podvuceno__
-        if name and not name.startswith("__") and name != "\u200b":
+        # Field name → __podvuceno__ (bez > jer Discord već prikazuje bold)
+        if name and not name.startswith("__") and name != "​":
             name = f"__{name}__"
-        # Field value → > __linija__ za svaki red, ali preskoči ``` code blokove
-        if value and value != "\u200b":
+        # Field value → > __linija__ za svaki red
+        if value and value != "​":
             styled = []
-            _in_code = False
             for _fline in str(value).split("\n"):
-                if _fline.strip().startswith("```"):
-                    _in_code = not _in_code
-                    styled.append(_fline)
-                    continue
                 stripped = _fline.strip()
-                if _in_code or not stripped or _fline.lstrip().startswith(">"):
-                    styled.append(_fline)
-                else:
+                if stripped and not _fline.lstrip().startswith(">"):
                     styled.append(f"> __{_fline}__")
+                elif _fline:
+                    styled.append(_fline)
             value = "\n".join(styled) if styled else value
     return _orig_embed_add_field(self, name=name, value=value, inline=inline)
 
