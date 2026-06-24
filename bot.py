@@ -276,7 +276,7 @@ MEMES = [
     "Balkan parking: dvije linije? Staju četiri auta. <:e_car:1519362749598269510><:e_sparkles:1519363032185176198>",
     "Fritula je rješenje za sve životne probleme. <:e_plate:1519362791591378975><:e_heart2:1519362668644012133>",
     "Kad dođe familija iznenada a kuća nije čista. <:e_skull:1519362992502997125><:e_broom:1519362900681298000>",
-    "Svako putovanje počinje sa 'imaš li pare za autoput?'. <:e_taxi:1519363380513603615>️<:e_coins2:1519362621206298666>",
+    "Svako putovanje počinje sa 'imaš li pare za autoput?'. <:e_taxi:1519363380513603615>️<:e_coins3:1519362621206298666>",
     "Baka na kafi: zna sve o svima u gradu. <:e_grandma:1519362798189150370><:e_coffee:1519362856884371526><:e_clipboard:1519363052871614627>",
     "Balkanska statistika: 9 od 10 problema se rješava uz kafu. <:e_coffee:1519362856884371526><:e_chart:1519362656568475880>",
     "'Otišao sam samo po hleb' — vratio se sa pola marketa. <:e_cart:1519362665347153930><:e_dizzy:1519362812554510509>",
@@ -1505,11 +1505,11 @@ EMOJI_TO_BOX = {
     "<:e_time2:1519362726952964227>": "<:e_time2:1519362726952964227>",
     "<:e_pause:1519363038107406447>️": "<:e_pause:1519363038107406447>",
     "<:e_pause:1519363038107406447>": "<:e_pause:1519363038107406447>",
-    "<:e_bank2:1519362662515871744>": "<:e_coins2:1519362621206298666>",
-    "<:e_coins2:1519362621206298666>": "<:e_coins2:1519362621206298666>",
-    "<:e_coins2:1519362621206298666>": "<:e_coins2:1519362621206298666>",
-    "<:e_coins2:1519362621206298666>": "<:e_coins2:1519362621206298666>",
-    "<:e_moneywing:1519362955437805771>": "<:e_coins2:1519362621206298666>",
+    "<:e_bank2:1519362662515871744>": "<:e_coins3:1519362621206298666>",
+    "<:e_coins3:1519362621206298666>": "<:e_coins3:1519362621206298666>",
+    "<:e_coins3:1519362621206298666>": "<:e_coins3:1519362621206298666>",
+    "<:e_coins3:1519362621206298666>": "<:e_coins3:1519362621206298666>",
+    "<:e_moneywing:1519362955437805771>": "<:e_coins3:1519362621206298666>",
     "<:e_shield2:1519362627795554374>️": "<:e_shield2:1519362627795554374>",
     "<:e_shield2:1519362627795554374>": "<:e_shield2:1519362627795554374>",
     "<:e_crown2:1519363047163166922>": "<:e_crown2:1519363047163166922>",
@@ -2395,7 +2395,7 @@ async def on_member_update(before, after):
         )
         e.add_field(name="<:e_rocket2:1519363332266524813> Boostova", value=f"`{boosts}`",        inline=True)
         e.add_field(name="<:e_medal3:1519363547514015764> Tier",     value=f"`Lvl {tier}`",      inline=True)
-        e.add_field(name="<:e_gift:1519362618341462067> Nagrada",  value=f"`+{BOOST_REWARD:,} <:e_coins2:1519362621206298666>`", inline=True)
+        e.add_field(name="<:e_gift:1519362618341462067> Nagrada",  value=f"`+{BOOST_REWARD:,} <:e_coins3:1519362621206298666>`", inline=True)
         e.set_thumbnail(url=after.display_avatar.url)
         e.set_footer(text=f"{BOT_NAME} • Hvala na podršci <:e_flower:1519362984818901173>")
         await chan.send(content=after.mention, embed=e)
@@ -2496,7 +2496,7 @@ async def on_message(message):
             add_xp(message.author.id, 50); save_data()
             await message.channel.send(
                 embed=em(f"<:e_target:1519363069925654609> Milestone {num}!",
-                         f"{message.author.mention} dostigao broj **{num}**!\n`+100 <:e_coins2:1519362621206298666>` `+50 XP`",
+                         f"{message.author.mention} dostigao broj **{num}**!\n`+100 <:e_coins3:1519362621206298666>` `+50 XP`",
                          color=COLORS["gold"]),
                 delete_after=10
             )
@@ -2538,7 +2538,7 @@ async def on_message(message):
         completed = quest_progress(message.author.id, "msgs20")
         if completed:
             await message.channel.send(
-                embed=em(f"<:icon_check:1519358376268533810> Quest završen! {completed['name']}", f"+**{completed['reward']} <:e_coins2:1519362621206298666>**!", color=COLORS["gold"]),
+                embed=em(f"<:icon_check:1519358376268533810> Quest završen! {completed['name']}", f"+**{completed['reward']} <:e_coins3:1519362621206298666>**!", color=COLORS["gold"]),
                 delete_after=8
             )
 
@@ -2587,7 +2587,7 @@ async def on_message(message):
                 )
                 win_e.add_field(name="<:e_trophy2:1519362624742232146>  Pobjednik/ca",  value=f"**{message.author.display_name}**", inline=True)
                 win_e.add_field(name="<:e_chart:1519362656568475880>  Riječi u nizu", value=f"**{count}**",                       inline=True)
-                win_e.add_field(name="<:e_coins2:1519362621206298666>  Nagrada",       value=f"**+{nagrada:,} <:e_coins2:1519362621206298666>**",               inline=True)
+                win_e.add_field(name="<:e_coins3:1519362621206298666>  Nagrada",       value=f"**+{nagrada:,} <:e_coins3:1519362621206298666>**",               inline=True)
                 win_e.add_field(name="<:e_star2:1519363084253266031>  XP",            value=f"**+200**",                          inline=True)
                 win_e.set_thumbnail(url=message.author.display_avatar.url)
                 win_e.set_footer(text=f"{BOT_NAME} • Kaladont pobjeda")
@@ -3075,7 +3075,7 @@ async def change_status():
         discord.Activity(type=discord.ActivityType.watching,  name="tvojim /hunt resultatima <:e_arrow:1519363399845154958>"),
         discord.Activity(type=discord.ActivityType.playing,   name="sa životinjama u zoo-u <:e_lion:1519363402890346658>"),
         discord.Activity(type=discord.ActivityType.competing, name="battle turniru <:e_sword2:1519362631146930317>️"),
-        discord.CustomActivity(name="<:e_coins2:1519362621206298666> Ekonomija • <:e_ctrl:1519362682296209498> Igre • <:e_wolf:1519363412625326161> OWO"),
+        discord.CustomActivity(name="<:e_coins3:1519362621206298666> Ekonomija • <:e_ctrl:1519362682296209498> Igre • <:e_wolf:1519363412625326161> OWO"),
         discord.CustomActivity(name=f"<:e_flower:1519362984818901173> {BOT_NAME}"),
         discord.Activity(type=discord.ActivityType.listening, name="/help za sve komande"),
     ]
@@ -3114,7 +3114,7 @@ async def userinfo(i: discord.Interaction, korisnik: discord.Member = None):
         ("🆔 ID",          f"`{u.id}`",                                            True),
         ("<:e_cal:1519362659676455046> Pridružio",   u.joined_at.strftime("%d.%m.%Y.") if u.joined_at else "N/A", True),
         ("<:e_label:1519363326109417613>️ Top uloga",  u.top_role.mention,                                    True),
-        ("<:e_coins2:1519362621206298666> Balans",      f"`{eco['balance']:,} <:e_coins2:1519362621206298666>`",                            True),
+        ("<:e_coins3:1519362621206298666> Balans",      f"`{eco['balance']:,} <:e_coins3:1519362621206298666>`",                            True),
         ("<:e_level2:1519362739749785610> Level",       f"`{xpd['level']}`",                                   True),
         ("<:icon_warning:1519358274284032030>️ Upozorenja",  f"`{warns}`",                                           True),
     ]))
@@ -3212,7 +3212,7 @@ async def brojanje_postavi(i: discord.Interaction, kanal: discord.TextChannel, p
            f"• Pišite brojeve redom (1, 2, 3, …)\n"
            f"• Ne smiješ brojati dvaput zaredom\n"
            f"• Ko pogriješi → reset na 0\n"
-           f"• Svaki **50.** broj = `+100 <:e_coins2:1519362621206298666>` `+50 XP` <:e_target:1519363069925654609>",
+           f"• Svaki **50.** broj = `+100 <:e_coins3:1519362621206298666>` `+50 XP` <:e_target:1519363069925654609>",
            color=COLORS["success"])
     await i.response.send_message(embed=e)
 
@@ -3507,13 +3507,13 @@ async def clear(i: discord.Interaction, kolicina: int = 10):
 # ═══════════════════════════════════════════
 #    EKONOMIJA & LEVEL
 # ═══════════════════════════════════════════
-@bot.tree.command(name="baki", description="<:e_coins2:1519362621206298666> Provjeri stanje novca")
+@bot.tree.command(name="baki", description="<:e_coins3:1519362621206298666> Provjeri stanje novca")
 async def baki(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     d = get_economy(u.id)
     last = time.strftime("%H:%M", time.localtime(d["last_work"])) if d["last_work"] else "Nikad"
-    await i.response.send_message(embed=em_pro(f"<:e_coins2:1519362621206298666> Novčanik", f"<:e_diamond2:1519362640961474601> Stanje računa za {u.mention}", color=COLORS["gold"], thumb=u.display_avatar.url, author=u, fields=[
-        ("<:e_coins2:1519362621206298666> Balans", f"```yaml\n{d['balance']:,} <:e_coins2:1519362621206298666>\n```", True), ("<:e_job:1519362615069904977> Poslednji posao", f"`{last}`", True),
+    await i.response.send_message(embed=em_pro(f"<:e_coins3:1519362621206298666> Novčanik", f"<:e_diamond2:1519362640961474601> Stanje računa za {u.mention}", color=COLORS["gold"], thumb=u.display_avatar.url, author=u, fields=[
+        ("<:e_coins3:1519362621206298666> Balans", f"```yaml\n{d['balance']:,} <:e_coins3:1519362621206298666>\n```", True), ("<:e_job:1519362615069904977> Poslednji posao", f"`{last}`", True),
     ]))
 
 @bot.tree.command(name="posao", description="<:e_job:1519362615069904977> Radi i zaradi (svakih 30 min)")
@@ -3528,7 +3528,7 @@ async def posao(i: discord.Interaction):
     quest_progress(i.user.id, "work3")
     _poo_task_progress(i.guild.id if i.guild else 0, i.user.id, "work")
     await i.response.send_message(embed=em("<:e_job:1519362615069904977> Posao završen!", f"*{random.choice(JOBS)}*", color=COLORS["success"], fields=[
-        ("<:e_coins2:1519362621206298666> Zarada", f"`+{earn} <:e_coins2:1519362621206298666>`", True), ("<:e_bank2:1519362662515871744> Balans", f"`{d['balance']:,} <:e_coins2:1519362621206298666>`", True), ("<:e_time2:1519362726952964227> Sledeći", "za 30 min", True),
+        ("<:e_coins3:1519362621206298666> Zarada", f"`+{earn} <:e_coins3:1519362621206298666>`", True), ("<:e_bank2:1519362662515871744> Balans", f"`{d['balance']:,} <:e_coins3:1519362621206298666>`", True), ("<:e_time2:1519362726952964227> Sledeći", "za 30 min", True),
     ]))
 
 @bot.tree.command(name="daily", description="<:e_gift:1519362618341462067> Dnevna nagrada")
@@ -3568,8 +3568,8 @@ async def daily(i: discord.Interaction):
     )
     _daily_e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
     _daily_e.set_thumbnail(url=i.user.display_avatar.url)
-    _daily_e.add_field(name="<:e_coins2:1519362621206298666>  Nagrada",  value=f"**+{reward:,}** <:e_coins2:1519362621206298666>",  inline=True)
-    _daily_e.add_field(name="<:e_bank2:1519362662515871744>  Balans",    value=f"**{d['balance']:,}** <:e_coins2:1519362621206298666>", inline=True)
+    _daily_e.add_field(name="<:e_coins3:1519362621206298666>  Nagrada",  value=f"**+{reward:,}** <:e_coins3:1519362621206298666>",  inline=True)
+    _daily_e.add_field(name="<:e_bank2:1519362662515871744>  Balans",    value=f"**{d['balance']:,}** <:e_coins3:1519362621206298666>", inline=True)
     _daily_e.add_field(name="<:e_time2:1519362726952964227>  Sljedeći",  value=f"**{cd_label}**",                                   inline=True)
     _daily_e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=_daily_e)
@@ -3579,10 +3579,10 @@ async def daj(i: discord.Interaction, korisnik: discord.Member, iznos: int):
     if iznos <= 0: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Greška", "Iznos mora biti pozitivan!", color=COLORS["error"]), ephemeral=True)
     if korisnik.id == i.user.id: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Greška", "Ne možeš sebi slati!", color=COLORS["error"]), ephemeral=True)
     s, r = get_economy(i.user.id), get_economy(korisnik.id)
-    if s["balance"] < iznos: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Nemaš dovoljno", f"Imaš samo `{s['balance']:,} <:e_coins2:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
+    if s["balance"] < iznos: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Nemaš dovoljno", f"Imaš samo `{s['balance']:,} <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
     s["balance"] -= iznos; r["balance"] += iznos; save_data()
     await i.response.send_message(embed=em("<:e_shake:1519362947766554737> Transakcija uspešna", color=COLORS["success"], fields=[
-        ("<:e_box:1519363099478458498> Od", i.user.mention, True), ("<:e_inbox:1519363351354937497> Za", korisnik.mention, True), ("<:e_coins2:1519362621206298666> Iznos", f"`{iznos:,} <:e_coins2:1519362621206298666>`", True),
+        ("<:e_box:1519363099478458498> Od", i.user.mention, True), ("<:e_inbox:1519363351354937497> Za", korisnik.mention, True), ("<:e_coins3:1519362621206298666> Iznos", f"`{iznos:,} <:e_coins3:1519362621206298666>`", True),
     ]))
 
 @bot.tree.command(name="kradi", description="<:e_search:1519363103064723547>️ Pokušaj ukrasti (rizično!)")
@@ -3604,13 +3604,13 @@ async def kradi(i: discord.Interaction, korisnik: discord.Member):
     if random.random() < success_rate:
         r["balance"] -= amount; s["balance"] += amount
         e = em("<:e_search:1519363103064723547>️ Krađa uspješna!", "Niko te nije video. Za sad... <:e_eyes:1519362845970530577>", color=COLORS["gold"], fields=[
-            ("<:e_coins2:1519362621206298666> Ukradeno", f"`{amount:,} <:e_coins2:1519362621206298666>`", True), ("<:e_user:1519363093736718518> Žrtva", korisnik.mention, True), ("<:e_bank2:1519362662515871744> Balans", f"`{s['balance']:,} <:e_coins2:1519362621206298666>`", True),
+            ("<:e_coins3:1519362621206298666> Ukradeno", f"`{amount:,} <:e_coins3:1519362621206298666>`", True), ("<:e_user:1519363093736718518> Žrtva", korisnik.mention, True), ("<:e_bank2:1519362662515871744> Balans", f"`{s['balance']:,} <:e_coins3:1519362621206298666>`", True),
         ])
     else:
         fine = random.randint(100, 350)
         s["balance"] = max(0, s["balance"] - fine)
         e = em("<:e_taxi:1519363380513603615> Uhvaćen si!", f"{korisnik.mention} te je prijavio policiji! <:e_devil:1519362989470253187>", color=COLORS["error"], fields=[
-            ("<:e_moneywing:1519362955437805771> Kazna", f"`{fine:,} <:e_coins2:1519362621206298666>`", True), ("<:e_bank2:1519362662515871744> Balans", f"`{s['balance']:,} <:e_coins2:1519362621206298666>`", True),
+            ("<:e_moneywing:1519362955437805771> Kazna", f"`{fine:,} <:e_coins3:1519362621206298666>`", True), ("<:e_bank2:1519362662515871744> Balans", f"`{s['balance']:,} <:e_coins3:1519362621206298666>`", True),
         ])
     save_data(); await i.followup.send(embed=e)
 
@@ -3676,7 +3676,7 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
 VERS_CHANNEL_ID = 1498983966005268520
 
 @bot.tree.command(name="leaderboard", description="<:e_medal3:1519363547514015764> Top lista servera")
-@app_commands.choices(tip=[app_commands.Choice(name="XP & Leveli", value="xp"), app_commands.Choice(name="Novac <:e_coins2:1519362621206298666>", value="novac")])
+@app_commands.choices(tip=[app_commands.Choice(name="XP & Leveli", value="xp"), app_commands.Choice(name="Novac <:e_coins3:1519362621206298666>", value="novac")])
 async def leaderboard(i: discord.Interaction, tip: str = "xp"):
     await i.response.defer()
     medals = ["<:e_star2:1519363084253266031>", "<:icon_rank2:1519358512336212091>", "<:icon_rank3:1519358517633355919>"]
@@ -3694,7 +3694,7 @@ async def leaderboard(i: discord.Interaction, tip: str = "xp"):
         for n, (uid, d) in enumerate(srt):
             try: user = await bot.fetch_user(int(uid)); name = user.display_name
             except: name = f"#{uid[:4]}"
-            lines.append(f"{medals[n] if n<3 else f'`{n+1}.`'} **{name}** — `{d['balance']:,} <:e_coins2:1519362621206298666>`")
+            lines.append(f"{medals[n] if n<3 else f'`{n+1}.`'} **{name}** — `{d['balance']:,} <:e_coins3:1519362621206298666>`")
         e = em("<:e_medal3:1519363547514015764> Top Lista — Bogatstvo", "\n".join(lines) or "Nema podataka.", color=COLORS["gold"])
     await i.followup.send(embed=e)
 
@@ -3745,12 +3745,12 @@ async def slots(i: discord.Interaction, ulog: int = 100):
 
     if ulog < SLOTS_MIN:
         return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Premali ulog", f"Minimalan ulog je **{SLOTS_MIN:,} <:e_coins2:1519362621206298666>**.", color=COLORS["error"]),
+            embed=em("<:icon_cross:1519358379917836508> Premali ulog", f"Minimalan ulog je **{SLOTS_MIN:,} <:e_coins3:1519362621206298666>**.", color=COLORS["error"]),
             ephemeral=True
         )
     if ulog > SLOTS_MAX:
         return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Preveliki ulog", f"Maksimalan ulog je **{SLOTS_MAX:,} <:e_coins2:1519362621206298666>**.", color=COLORS["error"]),
+            embed=em("<:icon_cross:1519358379917836508> Preveliki ulog", f"Maksimalan ulog je **{SLOTS_MAX:,} <:e_coins3:1519362621206298666>**.", color=COLORS["error"]),
             ephemeral=True
         )
 
@@ -3759,7 +3759,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         return await i.response.send_message(
             embed=em(
                 "<:icon_cross:1519358379917836508> Nemaš dovoljno",
-                f"Trebaš **{ulog:,} <:e_coins2:1519362621206298666>** a imaš samo **{d['balance']:,} <:e_coins2:1519362621206298666>**.",
+                f"Trebaš **{ulog:,} <:e_coins3:1519362621206298666>** a imaš samo **{d['balance']:,} <:e_coins3:1519362621206298666>**.",
                 color=COLORS["error"]
             ),
             ephemeral=True
@@ -3799,7 +3799,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
             color=0xF1C40F,
             timestamp=datetime.now(timezone.utc)
         )
-        e.add_field(name="<:e_coins2:1519362621206298666> Ulog", value=f"`{ulog:,} <:e_coins2:1519362621206298666>`", inline=True)
+        e.add_field(name="<:e_coins3:1519362621206298666> Ulog", value=f"`{ulog:,} <:e_coins3:1519362621206298666>`", inline=True)
         e.add_field(name="⏳ Status", value=subtitle, inline=True)
         e.set_footer(text=f"{i.user.display_name} • {BOT_NAME}")
         return e
@@ -3835,11 +3835,11 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         color = COLORS["gold"]
         if sym in ("<:e_diamond2:1519362640961474601>", "7️⃣"):
             title  = "<:e_diamond2:1519362640961474601>  M E G A  J A C K P O T  <:e_diamond2:1519362640961474601>"
-            result = f"<:e_coins2:1519362621206298666> **+{win:,} <:e_coins2:1519362621206298666>** *(×{multiplier:.0f})*"
+            result = f"<:e_coins3:1519362621206298666> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.0f})*"
             footer_extra = "<:e_trophy2:1519362624742232146> NEVJEROVATAN POGODAK!"
         else:
             title  = "<:e_party:1519363028334674070>  J A C K P O T  <:e_party:1519363028334674070>"
-            result = f"<:e_confetti2:1519363348288901221> **+{win:,} <:e_coins2:1519362621206298666>** *(×{multiplier:.1f})*"
+            result = f"<:e_confetti2:1519363348288901221> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
             footer_extra = "Sva tri ista!"
         outcome = "jackpot"
 
@@ -3852,12 +3852,12 @@ async def slots(i: discord.Interaction, ulog: int = 100):
             d["balance"] += net
             color  = COLORS["success"]
             title  = "<:e_sparkles:1519363032185176198>  D O B I T A K  <:e_sparkles:1519363032185176198>"
-            result = f"<:e_grheart:1519363074824343592> **+{win:,} <:e_coins2:1519362621206298666>** *(×{multiplier:.1f})*"
+            result = f"<:e_grheart:1519363074824343592> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
         else:
             d["balance"] = max(0, d["balance"] + net)
             color  = COLORS["warning"]
             title  = "<:e_dizzy:1519362812554510509>  M A L I  G U B I T A K"
-            result = f"<:e_green:1519362769047126028> **{net:,} <:e_coins2:1519362621206298666>** *(×{multiplier:.1f})*"
+            result = f"<:e_green:1519362769047126028> **{net:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
         footer_extra = "Dva ista simbola — par!"
         outcome = "pair"
 
@@ -3865,7 +3865,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         d["balance"] = max(0, d["balance"] - ulog)
         color  = COLORS["error"]
         title  = "<:e_moneywing:1519362955437805771>  N I Š T A . . ."
-        result = f"<:icon_cross:1519358379917836508> **−{ulog:,} <:e_coins2:1519362621206298666>**"
+        result = f"<:icon_cross:1519358379917836508> **−{ulog:,} <:e_coins3:1519362621206298666>**"
         footer_extra = "Nema sreće ovaj put"
         outcome = "loss"
 
@@ -3881,7 +3881,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         final_desc = f"{slot_line}\n\n<:e_cry:1519362944717160530> Nema kombinacije. Pokušaj ponovo!"
 
     final_e = discord.Embed(
-        description=f"{final_desc}\n\n<:e_coins2:1519362621206298666> `{ulog:,} <:e_coins2:1519362621206298666>` ulog  ·  {result}  ·  <:e_bank2:1519362662515871744> `{d['balance']:,} <:e_coins2:1519362621206298666>`",
+        description=f"{final_desc}\n\n<:e_coins3:1519362621206298666> `{ulog:,} <:e_coins3:1519362621206298666>` ulog  ·  {result}  ·  <:e_bank2:1519362662515871744> `{d['balance']:,} <:e_coins3:1519362621206298666>`",
         color=color,
         timestamp=datetime.now(timezone.utc)
     )
@@ -4051,12 +4051,12 @@ def kaladont_start_embed(game: dict, mention: str):
     e.add_field(
         name="<:e_help2:1519362723148726534>  Pravila igre",
         value=(
-            "Svaka riječ počinje traženim slovima\n"
-            "Ista osoba **ne može** igrati iza sebe\n"
-            "Ponavljanje iste riječi nije dozvoljeno\n"
-            "Minimalno **3 slova** po riječi\n"
-            "Pritisni **Pomoć** za primjer riječi\n"
-            "Upiši **`KALADONT`** i osvoji **1500** <:e_coins2:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> **XP**!"
+            "<:icon_check:1519358376268533810>  Svaka riječ počinje traženim slovima\n"
+            "<:icon_ban:1519358278356959284>  Ista osoba **ne može** igrati iza sebe\n"
+            "<:e_repeat:1519363009883934740>  Ponavljanje iste riječi nije dozvoljeno\n"
+            "<:e_pencil:1519363059909398610>  Minimalno **3 slova** po riječi\n"
+            "<:icon_help:1519358364889383084>  Pritisni **Pomoć** za primjer riječi\n"
+            "<:icon_trophy:1519358248942047342>  Upiši **`KALADONT`** i osvoji **1500** <:e_coins3:1519362621206298666> + **200** <:e_sparkles:1519363032185176198> **XP**!"
         ),
         inline=False
     )
@@ -4316,7 +4316,7 @@ def _wordle_embed(game: dict, user, *, finished: bool = False, won: bool = False
         title = f"{E_GAME}  W O R D L E  —  P O B J E D A !  {E_FIRE4}"
         footer = f"<:e_trophy2:1519362624742232146> Pogodio/la {user.display_name} • {used}/{maxg} pokušaja"
         extra = (f"\n\n{E_FIRE1}{E_FIRE2}{E_FIRE3} Riječ je bila **{game['word']}**!\n"
-                 f"<:e_coins2:1519362621206298666> Nagrada: **+{reward:,} <:e_coins2:1519362621206298666>**   •   <:e_star2:1519363084253266031> XP: **+{xp}**")
+                 f"<:e_coins3:1519362621206298666> Nagrada: **+{reward:,} <:e_coins3:1519362621206298666>**   •   <:e_star2:1519363084253266031> XP: **+{xp}**")
     elif finished:
         color = COLORS["error"]
         title = "<:e_red:1519362782192210041>  W O R D L E  —  K R A J"
@@ -5336,8 +5336,8 @@ def _pk_lobby_embed(g):
         title="<:e_cards2:1519362702835712010> POKER — Texas Hold'em",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"<:e_coins2:1519362621206298666> **Ulog po igraču:** `{g['ulog']:,} <:e_coins2:1519362621206298666>`\n"
-            f"<:e_trophy2:1519362624742232146> **Trenutni pot:** `{g['pot']:,} <:e_coins2:1519362621206298666>`\n"
+            f"<:e_coins3:1519362621206298666> **Ulog po igraču:** `{g['ulog']:,} <:e_coins3:1519362621206298666>`\n"
+            f"<:e_trophy2:1519362624742232146> **Trenutni pot:** `{g['pot']:,} <:e_coins3:1519362621206298666>`\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"<:e_users:1519363096601301120> **Igrači ({len(g['players'])}/9):**\n{plist}\n\n"
             f"▸ Klikni **Ulazi u igru** da se pridružiš\n"
@@ -5367,7 +5367,7 @@ def _pk_game_embed(g):
     desc = (
         f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         f"<:e_cards2:1519362702835712010> **Zajedničke kartice:**\n{community_str}\n"
-        f"<:e_coins2:1519362621206298666> **Pot:** `{g['pot']:,} <:e_coins2:1519362621206298666>`\n"
+        f"<:e_coins3:1519362621206298666> **Pot:** `{g['pot']:,} <:e_coins3:1519362621206298666>`\n"
         f"━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
         f"<:e_users:1519363096601301120> **Aktivni:**\n{act_str}\n"
     )
@@ -5380,7 +5380,7 @@ def _pk_game_embed(g):
         color=0x000000,
         timestamp=datetime.now(timezone.utc)
     )
-    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Klikni 'Vidi kartice' za svoju ruku • Pot: {g['pot']:,} <:e_coins2:1519362621206298666>")
+    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Klikni 'Vidi kartice' za svoju ruku • Pot: {g['pot']:,} <:e_coins3:1519362621206298666>")
     return e
 
 class PokerLobbyView(discord.ui.View):
@@ -5403,7 +5403,7 @@ class PokerLobbyView(discord.ui.View):
         bal  = _pk_get_bal(g["guild_id"], uid)
         if bal < ulog:
             return await interaction.response.send_message(
-                f"<:icon_cross:1519358379917836508> Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins2:1519362621206298666>`, a imaš `{bal:,} <:e_coins2:1519362621206298666>`.", ephemeral=True)
+                f"<:icon_cross:1519358379917836508> Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins3:1519362621206298666>`, a imaš `{bal:,} <:e_coins3:1519362621206298666>`.", ephemeral=True)
         _pk_set_bal(g["guild_id"], uid, bal - ulog)
         save_data()
         g["players"][uid] = {"name": interaction.user.display_name, "hole": [], "folded": False}
@@ -5413,7 +5413,7 @@ class PokerLobbyView(discord.ui.View):
         except Exception:
             pass
         await interaction.response.send_message(
-            f"<:icon_check:1519358376268533810> Ušao/la si u igru! Skinuto `{ulog:,} <:e_coins2:1519362621206298666>`. Pot: `{g['pot']:,} <:e_coins2:1519362621206298666>`", ephemeral=True)
+            f"<:icon_check:1519358376268533810> Ušao/la si u igru! Skinuto `{ulog:,} <:e_coins3:1519362621206298666>`. Pot: `{g['pot']:,} <:e_coins3:1519362621206298666>`", ephemeral=True)
 
     @discord.ui.button(label="Počni igru <:e_right:1519363367712591922>️", style=discord.ButtonStyle.primary, row=0)
     async def start_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -5454,8 +5454,8 @@ class PokerLobbyView(discord.ui.View):
                 except Exception:
                     pass
 
-class PokerRaiseModal(discord.ui.Modal, title="<:e_coins2:1519362621206298666> Raise / Podigni ulog"):
-    iznos = discord.ui.TextInput(label="Koliko podižeš (<:e_coins2:1519362621206298666>)?", placeholder="npr. 100", max_length=10)
+class PokerRaiseModal(discord.ui.Modal, title="<:e_coins3:1519362621206298666> Raise / Podigni ulog"):
+    iznos = discord.ui.TextInput(label="Koliko podižeš (<:e_coins3:1519362621206298666>)?", placeholder="npr. 100", max_length=10)
 
     def __init__(self, channel_id: int):
         super().__init__()
@@ -5480,11 +5480,11 @@ class PokerRaiseModal(discord.ui.Modal, title="<:e_coins2:1519362621206298666> R
                 embed=em("<:icon_cross:1519358379917836508>","Mora biti broj!", color=COLORS["error"]), ephemeral=True)
         if amt < 10:
             return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Min raise je `10 <:e_coins2:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
+                embed=em("<:icon_cross:1519358379917836508>","Min raise je `10 <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
         bal = _pk_get_bal(g["guild_id"], uid)
         if bal < amt:
             return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nemaš dovoljno!", f"Imaš `{bal:,} <:e_coins2:1519362621206298666>`, treba `{amt:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]),
+                embed=em("<:icon_cross:1519358379917836508>","Nemaš dovoljno!", f"Imaš `{bal:,} <:e_coins3:1519362621206298666>`, treba `{amt:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]),
                 ephemeral=True)
         _pk_set_bal(g["guild_id"], uid, bal - amt)
         g["pot"] += amt
@@ -5493,7 +5493,7 @@ class PokerRaiseModal(discord.ui.Modal, title="<:e_coins2:1519362621206298666> R
         active = [u for u, p in g["players"].items() if not p["folded"] and u != uid]
         g["needs_action"] = set(active)
         await interaction.response.send_message(
-            embed=em("<:e_coins2:1519362621206298666> Raise!", f"Podigao/la si **`{amt:,} <:e_coins2:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Novi pot: **`{g['pot']:,} <:e_coins2:1519362621206298666>`**\n<:e_time2:1519362726952964227> Ostali igrači moraju reagovati.",
+            embed=em("<:e_coins3:1519362621206298666> Raise!", f"Podigao/la si **`{amt:,} <:e_coins3:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Novi pot: **`{g['pot']:,} <:e_coins3:1519362621206298666>`**\n<:e_time2:1519362726952964227> Ostali igrači moraju reagovati.",
                      color=COLORS.get("gold", 0xFFD700)),
             ephemeral=False
         )
@@ -5568,7 +5568,7 @@ class PokerActionView(discord.ui.View):
             f"<:icon_cross:1519358379917836508> Foldo/la si! Ostalo **{len(active_left)}** aktivnih igrača.", ephemeral=True)
         await _pk_check_advance(self.channel_id)
 
-    @discord.ui.button(label="<:e_coins2:1519362621206298666> Raise", style=discord.ButtonStyle.primary, row=1)
+    @discord.ui.button(label="<:e_coins3:1519362621206298666> Raise", style=discord.ButtonStyle.primary, row=1)
     async def raise_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         g = poker_games.get(self.channel_id)
         if not g or g["phase"] in ("join", "showdown"):
@@ -5606,7 +5606,7 @@ class PokerActionView(discord.ui.View):
         active = [u for u, p in g["players"].items() if not p["folded"] and u != uid]
         g["needs_action"] = set(active)
         await interaction.response.send_message(
-            embed=em("<:e_fire2:1519362671491678280> ALL-IN!", f"**{interaction.user.display_name}** ide ALL-IN sa **`{bal:,} <:e_coins2:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Pot: **`{g['pot']:,} <:e_coins2:1519362621206298666>`**",
+            embed=em("<:e_fire2:1519362671491678280> ALL-IN!", f"**{interaction.user.display_name}** ide ALL-IN sa **`{bal:,} <:e_coins3:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Pot: **`{g['pot']:,} <:e_coins3:1519362621206298666>`**",
                      color=COLORS["error"]),
             ephemeral=False
         )
@@ -5759,12 +5759,12 @@ async def _pk_showdown(channel_id: int):
             + "\n\n".join(lines) +
             f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"<:e_trophy2:1519362624742232146> **Pobjednik:** {winner_str}{tie_note}\n"
-            f"<:e_coins2:1519362621206298666> **Dobitak:** `{split:,} <:e_coins2:1519362621206298666>` po pobjedniku"
+            f"<:e_coins3:1519362621206298666> **Dobitak:** `{split:,} <:e_coins3:1519362621206298666>` po pobjedniku"
         ),
         color=COLORS.get("gold", 0xFFD700),
         timestamp=datetime.now(timezone.utc)
     )
-    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Poker završen • Ukupni pot: {pot:,} <:e_coins2:1519362621206298666>")
+    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Poker završen • Ukupni pot: {pot:,} <:e_coins3:1519362621206298666>")
     try:
         msg = g.get("msg")
         if msg:
@@ -5795,7 +5795,7 @@ async def _pk_end_game(channel_id: int, winner_ids: list, skip_embed: bool = Fal
                 title="<:e_trophy2:1519362624742232146> Poker — Pobjednik!",
                 description=(
                     f"<:e_trophy2:1519362624742232146> **{name}** pobijedio/la jer su svi ostali foldali!\n"
-                    f"<:e_coins2:1519362621206298666> **Dobitak:** `{pot:,} <:e_coins2:1519362621206298666>`"
+                    f"<:e_coins3:1519362621206298666> **Dobitak:** `{pot:,} <:e_coins3:1519362621206298666>`"
                 ),
                 color=COLORS.get("gold", 0xFFD700),
                 timestamp=datetime.now(timezone.utc)
@@ -5811,7 +5811,7 @@ async def _pk_end_game(channel_id: int, winner_ids: list, skip_embed: bool = Fal
     poker_games.pop(channel_id, None)
 
 @bot.tree.command(name="poker", description="<:e_cards2:1519362702835712010> Pokreni Texas Hold'em Poker za pravi novac (2–9 igrača)")
-@app_commands.describe(ulog="Iznos uloga po igraču u <:e_coins2:1519362621206298666> (default: 200, min: 50, max: 50000)")
+@app_commands.describe(ulog="Iznos uloga po igraču u <:e_coins3:1519362621206298666> (default: 200, min: 50, max: 50000)")
 async def poker_cmd(i: discord.Interaction, ulog: int = 200):
     ok, left = _check_game_cooldown(i.user, i.guild_id, "poker")
     if not ok:
@@ -5821,15 +5821,15 @@ async def poker_cmd(i: discord.Interaction, ulog: int = 200):
             embed=em("<:icon_cross:1519358379917836508>", "Poker igra je već aktivna u ovom kanalu!", color=COLORS["error"]), ephemeral=True)
     if ulog < 50:
         return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", "Minimalni ulog je `50 <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+            embed=em("<:icon_cross:1519358379917836508>", "Minimalni ulog je `50 <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     if ulog > 50000:
         return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", "Maksimalni ulog je `50,000 <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+            embed=em("<:icon_cross:1519358379917836508>", "Maksimalni ulog je `50,000 <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     uid = i.user.id
     bal = _pk_get_bal(i.guild.id, uid)
     if bal < ulog:
         return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins2:1519362621206298666>`, a imaš `{bal:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]),
+            embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins3:1519362621206298666>`, a imaš `{bal:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]),
             ephemeral=True)
     _pk_set_bal(i.guild.id, uid, bal - ulog)
     save_data()
@@ -6156,7 +6156,7 @@ async def hunt(i: discord.Interaction):
         timestamp=datetime.now(timezone.utc)
     )
     e.add_field(name="<:e_chart:1519362656568475880> Imaš ukupno", value=f"`{zoo[animal]}x {emoji} {animal}`", inline=True)
-    e.add_field(name="<:e_coins2:1519362621206298666> Vrijednost",   value=f"`{value} <:e_coins2:1519362621206298666>`",                       inline=True)
+    e.add_field(name="<:e_coins3:1519362621206298666> Vrijednost",   value=f"`{value} <:e_coins3:1519362621206298666>`",                       inline=True)
     e.set_footer(text=f"{i.user.display_name} • {BOT_NAME} {VERSION}")
     await i.followup.send(embed=e)
 
@@ -6233,12 +6233,12 @@ async def battle(i: discord.Interaction, korisnik: discord.Member):
     )
     e.add_field(name="<:e_trophy2:1519362624742232146> Pobjednik",  value=f"**{winner.mention}**",      inline=True)
     e.add_field(name="<:e_skull:1519362992502997125> Poražen",    value=f"{loser.mention}",           inline=True)
-    e.add_field(name="<:e_coins2:1519362621206298666> Nagrada",    value=f"`+{reward} <:e_coins2:1519362621206298666>`",            inline=False)
+    e.add_field(name="<:e_coins3:1519362621206298666> Nagrada",    value=f"`+{reward} <:e_coins3:1519362621206298666>`",            inline=False)
     e.set_thumbnail(url=winner.display_avatar.url)
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.followup.send(embed=e)
 
-@bot.tree.command(name="sell", description="<:e_coins2:1519362621206298666> Prodaj životinje iz zoo-a (kao owo sell)")
+@bot.tree.command(name="sell", description="<:e_coins3:1519362621206298666> Prodaj životinje iz zoo-a (kao owo sell)")
 @app_commands.describe(zivotinja="Ime životinje (npr. Riba)", kolicina="Koliko prodaješ (default 1)")
 async def sell(i: discord.Interaction, zivotinja: str, kolicina: int = 1):
     name = zivotinja.strip().capitalize()
@@ -6259,10 +6259,10 @@ async def sell(i: discord.Interaction, zivotinja: str, kolicina: int = 1):
     get_economy(i.user.id)["balance"] += total_earn
     save_data()
     await i.response.send_message(embed=em(
-        f"<:e_coins2:1519362621206298666> Prodato!",
-        f"Prodao si `{kolicina}x {emoji} {name}` za **{total_earn} <:e_coins2:1519362621206298666>**!",
+        f"<:e_coins3:1519362621206298666> Prodato!",
+        f"Prodao si `{kolicina}x {emoji} {name}` za **{total_earn} <:e_coins3:1519362621206298666>**!",
         color=COLORS["success"],
-        fields=[("<:e_bank2:1519362662515871744> Balans", f"`{get_economy(i.user.id)['balance']:,} <:e_coins2:1519362621206298666>`", True)]
+        fields=[("<:e_bank2:1519362662515871744> Balans", f"`{get_economy(i.user.id)['balance']:,} <:e_coins3:1519362621206298666>`", True)]
     ))
 
 @bot.tree.command(name="animals", description="<:e_clipboard:1519363052871614627> Listu svih životinja i raritet (kao owo animals)")
@@ -6271,7 +6271,7 @@ async def animals_cmd(i: discord.Interaction):
     for rarity in RARITY_ORDER:
         ri    = RARITY_EMOJI[rarity]
         pool  = [(n, d[0], d[2], d[3]) for n, d in ANIMALS.items() if d[1] == rarity]
-        lines = [f"{em2} **{n}** — <:e_sword2:1519362631146930317>️`{pw}` <:e_coins2:1519362621206298666>`{val}`" for n, em2, pw, val in pool]
+        lines = [f"{em2} **{n}** — <:e_sword2:1519362631146930317>️`{pw}` <:e_coins3:1519362621206298666>`{val}`" for n, em2, pw, val in pool]
         e.add_field(name=f"{ri} {rarity.capitalize()}", value="\n".join(lines), inline=True)
     e.set_footer(text=f"{BOT_NAME} {VERSION} • /hunt za loviti!")
     await i.response.send_message(embed=e)
@@ -6284,9 +6284,9 @@ async def pray(i: discord.Interaction, korisnik: discord.Member):
     get_economy(korisnik.id)["balance"] += bonus
     save_data()
     msgs = [
-        f"<:e_pray:1519363406078021863> {i.user.mention} moli se za {korisnik.mention}! Nebo čuje — `+{bonus} <:e_coins2:1519362621206298666>` palo s neba!",
-        f"<:e_sparkles:1519363032185176198> {i.user.mention} šalje dobre vibracije {korisnik.mention}! `+{bonus} <:e_coins2:1519362621206298666>` u džep!",
-        f"<:e_feather:1519363362322907218>️ Zbog molitve {i.user.mention}, {korisnik.mention} je blagosloven sa `{bonus} <:e_coins2:1519362621206298666>`!",
+        f"<:e_pray:1519363406078021863> {i.user.mention} moli se za {korisnik.mention}! Nebo čuje — `+{bonus} <:e_coins3:1519362621206298666>` palo s neba!",
+        f"<:e_sparkles:1519363032185176198> {i.user.mention} šalje dobre vibracije {korisnik.mention}! `+{bonus} <:e_coins3:1519362621206298666>` u džep!",
+        f"<:e_feather:1519363362322907218>️ Zbog molitve {i.user.mention}, {korisnik.mention} je blagosloven sa `{bonus} <:e_coins3:1519362621206298666>`!",
     ]
     e = discord.Embed(description=random.choice(msgs), color=0x000000, timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
@@ -6667,7 +6667,7 @@ def _bj_embed(player, dealer, oklada, note="", hide=True):
     e.add_field(name=f"Dealer  {'(?)' if hide else f'({_bj_val(dealer)})'}", value=_bj_str(dealer, hide), inline=False)
     if note:
         e.add_field(name="Rezultat", value=note, inline=False)
-    e.set_footer(text=f"Oklada: {oklada:,} <:e_coins2:1519362621206298666> • {BOT_NAME}")
+    e.set_footer(text=f"Oklada: {oklada:,} <:e_coins3:1519362621206298666> • {BOT_NAME}")
     return e
 
 class BjView(discord.ui.View):
@@ -6692,7 +6692,7 @@ class BjView(discord.ui.View):
         self.player.append(self.deck.pop())
         val = _bj_val(self.player)
         if val > 21:
-            await self._finish(i, f"<:e_bomb:1519363456334168255> **BUST!** Izgubio/la si `{self.oklada:,} <:e_coins2:1519362621206298666>`", -self.oklada, COLORS["error"])
+            await self._finish(i, f"<:e_bomb:1519363456334168255> **BUST!** Izgubio/la si `{self.oklada:,} <:e_coins3:1519362621206298666>`", -self.oklada, COLORS["error"])
         elif val == 21:
             await self.stand.callback(self, i, b)
         else:
@@ -6706,23 +6706,23 @@ class BjView(discord.ui.View):
             self.dealer.append(self.deck.pop())
         pv, dv = _bj_val(self.player), _bj_val(self.dealer)
         if dv > 21 or pv > dv:
-            await self._finish(i, f"<:e_trophy2:1519362624742232146> **Pobijedio/la si!** `+{self.oklada:,} <:e_coins2:1519362621206298666>`", self.oklada, COLORS["success"])
+            await self._finish(i, f"<:e_trophy2:1519362624742232146> **Pobijedio/la si!** `+{self.oklada:,} <:e_coins3:1519362621206298666>`", self.oklada, COLORS["success"])
         elif pv == dv:
             await self._finish(i, "<:e_shake:1519362947766554737> **Nerješeno!** Oklada vraćena.", 0, COLORS["warning"])
         else:
-            await self._finish(i, f"<:e_cry:1519362944717160530> **Dealer pobijedio!** `-{self.oklada:,} <:e_coins2:1519362621206298666>`", -self.oklada, COLORS["error"])
+            await self._finish(i, f"<:e_cry:1519362944717160530> **Dealer pobijedio!** `-{self.oklada:,} <:e_coins3:1519362621206298666>`", -self.oklada, COLORS["error"])
 
     async def on_timeout(self):
         self.clear_items()
 
 @bot.tree.command(name="blackjack", description="<:e_cards2:1519362702835712010> Igraj Blackjack protiv dilera!")
-@app_commands.describe(oklada="Koliko <:e_coins2:1519362621206298666> ulažeš (min 10)")
+@app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (min 10)")
 async def blackjack(i: discord.Interaction, oklada: int):
     eco = get_economy(i.user.id)
     if oklada < 10:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum oklada je `10 <:e_coins2:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum oklada je `10 <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
     if eco["balance"] < oklada:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     deck = _new_deck()
     player = [deck.pop(), deck.pop()]
     dealer = [deck.pop(), deck.pop()]
@@ -6730,7 +6730,7 @@ async def blackjack(i: discord.Interaction, oklada: int):
         won = int(oklada * 1.5)
         eco["balance"] += won
         save_data()
-        e = _bj_embed(player, dealer, oklada, f"<:e_party:1519363028334674070> **BLACKJACK!** `+{won:,} <:e_coins2:1519362621206298666>`!", hide=False)
+        e = _bj_embed(player, dealer, oklada, f"<:e_party:1519363028334674070> **BLACKJACK!** `+{won:,} <:e_coins3:1519362621206298666>`!", hide=False)
         e.color = COLORS["gold"]
         return await i.response.send_message(embed=e)
     view = BjView(deck, player, dealer, oklada, i.user.id)
@@ -6798,27 +6798,27 @@ class TriviaView(discord.ui.View):
                     e = discord.Embed(
                         title=f"{E_GAME} {self.title}",
                         description=(
-                            f"<:icon_check:1519358376268533810> **Tačno!** `+{reward:,} <:e_coins2:1519362621206298666>` `+{xp_gain} XP`\n"
+                            f"<:icon_check:1519358376268533810> **Tačno!** `+{reward:,} <:e_coins3:1519362621206298666>` `+{xp_gain} XP`\n"
                             f"{combo_fx} **Combo:** `x{self.combo}` → sljedeće `x{self.combo+1}`\n"
-                            f"<:e_coins2:1519362621206298666> **Ukupno osvojeno:** `{new_total:,} <:e_coins2:1519362621206298666>`\n\n"
+                            f"<:e_coins3:1519362621206298666> **Ukupno osvojeno:** `{new_total:,} <:e_coins3:1519362621206298666>`\n\n"
                             f"━━━━━━━━━━━━━━━━━━━━\n\n"
                             f"**{q}**"
                         ),
                         color=GAME_COLORS["kviz"], timestamp=datetime.now(timezone.utc)
                     )
-                    e.add_field(name="<:e_coins2:1519362621206298666> Oklada", value=f"`{self.oklada}`", inline=True)
+                    e.add_field(name="<:e_coins3:1519362621206298666> Oklada", value=f"`{self.oklada}`", inline=True)
                     e.add_field(name=f"{combo_fx} Combo", value=f"`x{self.combo+1}`", inline=True)
                     e.add_field(name="<:e_time2:1519362726952964227>️ Vrijeme", value="`20s`", inline=True)
                     e.set_footer(text=f"{BOT_NAME} • Nastavi nizom!")
                     return await i.response.edit_message(embed=e, view=new_view)
                 # fallback bez pool-a
-                result = em("<:icon_check:1519358376268533810> Tačno!", f"**{self.correct}**\n`+{reward} <:e_coins2:1519362621206298666>` i `+{xp_gain} XP`!", color=COLORS["success"])
+                result = em("<:icon_check:1519358376268533810> Tačno!", f"**{self.correct}**\n`+{reward} <:e_coins3:1519362621206298666>` i `+{xp_gain} XP`!", color=COLORS["success"])
             else:
                 eco["balance"] = max(0, eco["balance"] - self.oklada)
                 save_data()
-                desc = f"Tačan odgovor: **{self.correct}**\n`-{self.oklada} <:e_coins2:1519362621206298666>`"
+                desc = f"Tačan odgovor: **{self.correct}**\n`-{self.oklada} <:e_coins3:1519362621206298666>`"
                 if self.combo > 1:
-                    desc += f"\n\n<:e_fire2:1519362671491678280> Combo prekinut na `x{self.combo}`!\n<:e_coins2:1519362621206298666> Osvojeno u nizu: `{self.total_won:,} <:e_coins2:1519362621206298666>`"
+                    desc += f"\n\n<:e_fire2:1519362671491678280> Combo prekinut na `x{self.combo}`!\n<:e_coins3:1519362621206298666> Osvojeno u nizu: `{self.total_won:,} <:e_coins3:1519362621206298666>`"
                 result = em("<:icon_cross:1519358379917836508> Netačno!", desc, color=COLORS["error"])
             await i.response.edit_message(embed=result, view=self)
         return cb
@@ -6827,13 +6827,13 @@ class TriviaView(discord.ui.View):
         self.clear_items()
 
 @bot.tree.command(name="kviz", description="<:e_brain:1519362849548406975> Odgovori na Balkan pitanje i osvoji pare!")
-@app_commands.describe(oklada="Koliko <:e_coins2:1519362621206298666> ulažeš (default 50)")
+@app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (default 50)")
 async def kviz(i: discord.Interaction, oklada: int = 50):
     eco = get_economy(i.user.id)
     if oklada < 10:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum je `10 <:e_coins2:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum je `10 <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
     if eco["balance"] < oklada:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     question, correct, wrong = random.choice(TRIVIA_QS)
     view = TriviaView(correct, wrong, oklada, i.user.id, pool=TRIVIA_QS, title="<:e_brain:1519362849548406975> Balkan Trivia")
     e = em_pro(
@@ -6842,7 +6842,7 @@ async def kviz(i: discord.Interaction, oklada: int = 50):
         color=GAME_COLORS["kviz"],
         author=i.user,
         fields=[
-            ("<:e_coins2:1519362621206298666> Oklada",        f"`{oklada:,} <:e_coins2:1519362621206298666>`", True),
+            ("<:e_coins3:1519362621206298666> Oklada",        f"`{oklada:,} <:e_coins3:1519362621206298666>`", True),
             (f"{E_FIRE2} Combo", "`x1`",            True),
             ("<:e_time2:1519362726952964227>️ Vrijeme",       "`20 sekundi`",     True),
         ],
@@ -6909,17 +6909,17 @@ GEOGRAFIJA_QS = [
 ]
 
 @bot.tree.command(name="geografija", description="<:e_globe2:1519362694887637004> Geografski kviz — pogodi i osvoji pare!")
-@app_commands.describe(oklada="Koliko <:e_coins2:1519362621206298666> ulažeš (default 50)")
+@app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (default 50)")
 async def geografija(i: discord.Interaction, oklada: int = 50):
     eco = get_economy(i.user.id)
     if oklada < 10:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum je `10 <:e_coins2:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Minimum je `10 <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
     if eco["balance"] < oklada:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     question, correct, wrong = random.choice(GEOGRAFIJA_QS)
     view = TriviaView(correct, wrong, oklada, i.user.id, pool=GEOGRAFIJA_QS, title="<:e_globe2:1519362694887637004> Geografija")
     e = discord.Embed(title="<:e_globe2:1519362694887637004> Geografija", description=f"<:e_globe2:1519362694887637004>  **{question}**", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
-    e.add_field(name="<:e_coins2:1519362621206298666> Oklada", value=f"`{oklada}`", inline=True)
+    e.add_field(name="<:e_coins3:1519362621206298666> Oklada", value=f"`{oklada}`", inline=True)
     e.add_field(name="<:e_time2:1519362726952964227>️ Vrijeme", value="`20 sekundi`", inline=True)
     e.set_footer(text=f"{BOT_NAME} • Putuj svijetom!")
     await i.response.send_message(embed=e, view=view)
@@ -6939,7 +6939,7 @@ SHOP_ITEMS = {
     "xp_boost":     {"name": "<:e_bolt:1519362674717102160> XP Boost",      "desc":"2× XP od poruka (1h)",               "price":1000, "duration":3600},
     "shield":       {"name": "<:e_shield2:1519362627795554374>️ Štit",         "desc":"Zaštita od krađe (24h)",             "price":600,  "duration":86400},
     "double_steal": {"name": "<:e_bomb:1519363456334168255> Bomba",         "desc":"Sljedeća krađa donosi duplo",        "price":400,  "duration":None},
-    "daily_boost":  {"name": "<:e_cal:1519362659676455046> Daily Boost",   "desc":"+500 <:e_coins2:1519362621206298666> bonusa na sljedeći /daily",  "price":350,  "duration":None},
+    "daily_boost":  {"name": "<:e_cal:1519362659676455046> Daily Boost",   "desc":"+500 <:e_coins3:1519362621206298666> bonusa na sljedeći /daily",  "price":350,  "duration":None},
 }
 
 def get_items(uid):
@@ -6963,7 +6963,7 @@ async def shop(i: discord.Interaction):
     e = discord.Embed(title="<:e_cart:1519362665347153930> GIAN Shop", description="Kupi predmete sa `/kupi <id>` komandom:", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     for key, item in SHOP_ITEMS.items():
         dur = "Jednom" if not item["duration"] else f"{item['duration']//3600}h" if item["duration"] >= 3600 else f"{item['duration']//60}min"
-        e.add_field(name=item["name"], value=f"**ID:** `{key}`\n{item['desc']}\n<:e_time2:1519362726952964227> `{dur}` • <:e_coins2:1519362621206298666> `{item['price']:,}`", inline=True)
+        e.add_field(name=item["name"], value=f"**ID:** `{key}`\n{item['desc']}\n<:e_time2:1519362726952964227> `{dur}` • <:e_coins3:1519362621206298666> `{item['price']:,}`", inline=True)
     e.set_footer(text=f"{BOT_NAME} • /kupi <id> za kupovinu")
     await i.response.send_message(embed=e)
 
@@ -6975,7 +6975,7 @@ async def kupi(i: discord.Interaction, predmet: str):
     item = SHOP_ITEMS[predmet]
     eco  = get_economy(i.user.id)
     if eco["balance"] < item["price"]:
-        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Trebaš `{item['price']:,} <:e_coins2:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
+        return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Trebaš `{item['price']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     eco["balance"] -= item["price"]
     items = get_items(i.user.id)
     items[predmet] = (time.time() + item["duration"]) if item["duration"] else True
@@ -6984,8 +6984,8 @@ async def kupi(i: discord.Interaction, predmet: str):
         f"<:icon_check:1519358376268533810> Kupovina Uspješna",
         f"<:e_gift:1519362618341462067> Nabavio si **{item['name']}**!\n*{item['desc']}*",
         color=COLORS["success"], author=i.user, thumb=i.user.display_avatar.url, fields=[
-            ("<:e_moneywing:1519362955437805771> Cijena", f"```diff\n- {item['price']:,} <:e_coins2:1519362621206298666>\n```", True),
-            ("<:e_bank2:1519362662515871744> Balans", f"```yaml\n{eco['balance']:,} <:e_coins2:1519362621206298666>\n```", True),
+            ("<:e_moneywing:1519362955437805771> Cijena", f"```diff\n- {item['price']:,} <:e_coins3:1519362621206298666>\n```", True),
+            ("<:e_bank2:1519362662515871744> Balans", f"```yaml\n{eco['balance']:,} <:e_coins3:1519362621206298666>\n```", True),
         ]
     ))
 
@@ -7042,7 +7042,7 @@ async def quests_cmd(i: discord.Interaction):
         check = "<:icon_check:1519358376268533810>" if done else "<:e_check2:1519362730057007268>"
         fill  = min(prog, quest["target"])
         bar   = f"`{'█' * fill}{'░' * (quest['target'] - fill)}`"
-        lines.append(f"{check} **{quest['name']}** — {quest['desc']}\n{bar} `{prog}/{quest['target']}` • <:e_coins2:1519362621206298666> `+{quest['reward']}`")
+        lines.append(f"{check} **{quest['name']}** — {quest['desc']}\n{bar} `{prog}/{quest['target']}` • <:e_coins3:1519362621206298666> `+{quest['reward']}`")
     done_count = sum(1 for qid in qd["assigned"] if qd["done"].get(qid))
     e = discord.Embed(
         title="<:e_clipboard:1519363052871614627> Dnevni Zadaci",
@@ -7258,9 +7258,9 @@ async def reset_gw_cmd(i: discord.Interaction, nagrada: str, kanal: discord.Text
     asyncio.create_task(_reset_gw_worker(chan, i.user, nagrada))
 
 # ═══════════════════════════════════════════
-#    <:e_coins2:1519362621206298666> OWNER-ONLY: DODAJ / ODUZMI NOVAC
+#    <:e_coins3:1519362621206298666> OWNER-ONLY: DODAJ / ODUZMI NOVAC
 # ═══════════════════════════════════════════
-@bot.tree.command(name="novac", description="<:e_coins2:1519362621206298666> [OWNER] Dodaj ili oduzmi coina korisniku")
+@bot.tree.command(name="novac", description="<:e_coins3:1519362621206298666> [OWNER] Dodaj ili oduzmi coina korisniku")
 @app_commands.describe(akcija="dodaj ili oduzmi", korisnik="Kome mijenjamo balans", iznos="Koliko coina")
 async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Member, iznos: int):
     if i.user.id not in OWNER_IDS:
@@ -7281,7 +7281,7 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
         eco["balance"] += iznos
         save_data()
         await i.response.send_message(embed=discord.Embed(
-            title="<:e_coins2:1519362621206298666> ᴅᴏᴅᴀɴᴏ ᴄᴏɪɴᴀ!",
+            title="<:e_coins3:1519362621206298666> ᴅᴏᴅᴀɴᴏ ᴄᴏɪɴᴀ!",
             description=(
                 f"```yaml\n"
                 f"Korisnik : {korisnik.display_name}\n"
@@ -7291,7 +7291,7 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
                 f"```"
             ),
             color=COLORS["aqua"], timestamp=datetime.now(timezone.utc)
-        ).set_footer(text=f"<:e_coins2:1519362621206298666> {BOT_NAME} • Owner Komanda"), ephemeral=True)
+        ).set_footer(text=f"<:e_coins3:1519362621206298666> {BOT_NAME} • Owner Komanda"), ephemeral=True)
     else:
         eco["balance"] = max(0, eco["balance"] - iznos)
         save_data()
@@ -8178,9 +8178,9 @@ async def help_cmd(i: discord.Interaction):
         inline=False,
     )
     e.add_field(
-        name="<:e_coins2:1519362621206298666>  EKONOMIJA",
+        name="<:e_coins3:1519362621206298666>  EKONOMIJA",
         value=(
-            f"<:e_coins2:1519362621206298666> `{px}baki` `{px}posao` `{px}daily` `{px}daj` `{px}kradi`\n"
+            f"<:e_coins3:1519362621206298666> `{px}baki` `{px}posao` `{px}daily` `{px}daj` `{px}kradi`\n"
             f"<:e_trophy2:1519362624742232146> `{px}rank` `{px}leaderboard` `{px}shop` `{px}kupi`\n"
             f"<:e_bank2:1519362662515871744> `{px}bank` `{px}lottery` `{px}heist`"
         ),
@@ -8205,7 +8205,7 @@ async def help_cmd(i: discord.Interaction):
             value=(
                 f"<:e_target:1519363069925654609> `{px}bingo` — Pokreni bingo rundu\n"
                 f"<:e_refresh:1519362959187509461> Auto-bingo svakih **3 sata** automatski!\n"
-                f"<:e_coins2:1519362621206298666> Nagrade: `2<:e_check2:1519362730057007268>=10k` · `3<:e_check2:1519362730057007268>=30k` · `4<:e_check2:1519362730057007268>=75k` · `5<:e_check2:1519362730057007268>=250k <:e_trophy2:1519362624742232146>`"
+                f"<:e_coins3:1519362621206298666> Nagrade: `2<:e_check2:1519362730057007268>=10k` · `3<:e_check2:1519362730057007268>=30k` · `4<:e_check2:1519362730057007268>=75k` · `5<:e_check2:1519362730057007268>=250k <:e_trophy2:1519362624742232146>`"
             ),
             inline=False,
         )
@@ -8313,8 +8313,8 @@ async def help_cmd(i: discord.Interaction):
     e.add_field(
         name="<:e_idea:1519363006599794799>  SAVJET",
         value=(
-            f"<:e_ticket3:1519362637534597221> Bingo tiket košta **500 coina** <:e_coins2:1519362621206298666>\n"
-            f"<:e_coins2:1519362621206298666> Koristi `{px}posao` i `{px}daily` za zaradu!\n"
+            f"<:e_ticket3:1519362637534597221> Bingo tiket košta **500 coina** <:e_coins3:1519362621206298666>\n"
+            f"<:e_coins3:1519362621206298666> Koristi `{px}posao` i `{px}daily` za zaradu!\n"
             f"<:e_bubble:1519363307998417148> Za pomoć: kontaktiraj staff servera"
         ),
         inline=False,
@@ -8406,7 +8406,7 @@ GAMES_CATALOG = [
     {
         "emoji": "<:e_slotm:1519362699014967297>", "name": "Slot Mašina", "cmd": "/slots",
         "img": "attached_assets/games/slots.png", "color": COLORS["gold"],
-        "desc": "Klasična slot mašina — uloži od 20 do 1.000.000.000 <:e_coins2:1519362621206298666> i okreni tri kotača!",
+        "desc": "Klasična slot mašina — uloži od 20 do 1.000.000.000 <:e_coins3:1519362621206298666> i okreni tri kotača!",
         "kako": "Postaviš ulog (npr. `.slots 50000`), vrtiš, čekaš kombinaciju.",
         "nagrada": "3x 7️⃣ = ×50 ulog! 3x <:e_diamond2:1519362640961474601> = ×15! Par vraća dio uloga."
     },
@@ -8478,7 +8478,7 @@ GAMES_CATALOG = [
         "img": "attached_assets/games/brojanje.png", "color": COLORS["info"],
         "desc": "Klasični sistem brojanja u kanalu — ne smiješ pogriješiti!",
         "kako": "Admin postavi kanal, svi pišu brojeve redom 1, 2, 3…",
-        "nagrada": "Svaki 50. broj = +100 <:e_coins2:1519362621206298666> +50 XP. Greška = reset!"
+        "nagrada": "Svaki 50. broj = +100 <:e_coins3:1519362621206298666> +50 XP. Greška = reset!"
     },
 ]
 
@@ -8501,7 +8501,7 @@ class GamesView(discord.ui.View):
             color=g["color"], timestamp=datetime.now(timezone.utc)
         )
         e.add_field(name="<:e_help2:1519362723148726534> Kako se igra", value=g["kako"], inline=False)
-        e.add_field(name="<:e_coins2:1519362621206298666> Nagrada", value=g["nagrada"], inline=False)
+        e.add_field(name="<:e_coins3:1519362621206298666> Nagrada", value=g["nagrada"], inline=False)
         e.set_footer(text=f"Igra {self.idx+1}/{len(GAMES_CATALOG)} • {BOT_NAME} {VERSION}")
         try:
             file = discord.File(g["img"], filename=f"game_{self.idx}.png")
@@ -8597,7 +8597,7 @@ async def bank_cmd(i: discord.Interaction, akcija: str = "balance", iznos: int =
         bnk["last_interest"] = int(time.time())
     a = akcija.lower()
     if a in ("balance", "bal", "stanje"):
-        return await i.response.send_message(embed=em("<:e_bank2:1519362662515871744> Banka", f"<:e_coins2:1519362621206298666> Wallet: `{eco['balance']:,}`\n<:e_bank2:1519362662515871744> Banka: `{bnk['saved']:,}`\n<:e_level2:1519362739749785610> Kamata: **5% / nedjeljno**", color=COLORS["info"]))
+        return await i.response.send_message(embed=em("<:e_bank2:1519362662515871744> Banka", f"<:e_coins3:1519362621206298666> Wallet: `{eco['balance']:,}`\n<:e_bank2:1519362662515871744> Banka: `{bnk['saved']:,}`\n<:e_level2:1519362739749785610> Kamata: **5% / nedjeljno**", color=COLORS["info"]))
     if a in ("deposit", "dep", "ulozi"):
         if iznos <= 0 or iznos > eco["balance"]:
             return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Nemaš toliko.", color=COLORS["error"]), ephemeral=True)
@@ -8625,7 +8625,7 @@ async def lottery_cmd(i: discord.Interaction, akcija: str = "info"):
         save_data()
         try:
             w = await bot.fetch_user(int(winner_uid))
-            await w.send(embed=em("<:e_party:1519363028334674070> LOTO POBJEDA!", f"Osvojio si **{prize:,}** coina! <:e_coins2:1519362621206298666>", color=COLORS["success"]))
+            await w.send(embed=em("<:e_party:1519363028334674070> LOTO POBJEDA!", f"Osvojio si **{prize:,}** coina! <:e_coins3:1519362621206298666>", color=COLORS["success"]))
         except: pass
     if a == "buy":
         eco = get_economy(i.user.id)
@@ -8634,27 +8634,27 @@ async def lottery_cmd(i: discord.Interaction, akcija: str = "info"):
         eco["balance"] -= 100; lot["pot"] += 100
         lot["tickets"][uid] = lot["tickets"].get(uid, 0) + 1
         save_data()
-        return await i.response.send_message(embed=em("<:e_ticket3:1519362637534597221> Tiket kupljen", f"Imaš `{lot['tickets'][uid]}` tiket(a).\n<:e_coins2:1519362621206298666> Pot: `{lot['pot']:,}`", color=COLORS["success"]))
+        return await i.response.send_message(embed=em("<:e_ticket3:1519362637534597221> Tiket kupljen", f"Imaš `{lot['tickets'][uid]}` tiket(a).\n<:e_coins3:1519362621206298666> Pot: `{lot['pot']:,}`", color=COLORS["success"]))
     total = sum(lot["tickets"].values())
     my = lot["tickets"].get(uid, 0)
     chance = (my/total*100) if total else 0
     next_draw = lot["last_draw"] + 7*86400
     e = discord.Embed(title="<:e_slotm:1519362699014967297> Sedmična Loto", color=COLORS["info"])
-    e.add_field(name="<:e_coins2:1519362621206298666> Pot", value=f"`{lot['pot']:,}` coina", inline=True)
+    e.add_field(name="<:e_coins3:1519362621206298666> Pot", value=f"`{lot['pot']:,}` coina", inline=True)
     e.add_field(name="<:e_ticket3:1519362637534597221> Tvoji tiketi", value=f"`{my}` / `{total}`", inline=True)
     e.add_field(name="<:e_target:1519363069925654609> Šansa", value=f"`{chance:.1f}%`", inline=True)
     e.add_field(name="<:e_time2:1519362726952964227> Sljedeći žrijeb", value=f"<t:{next_draw}:R>", inline=False)
     e.set_footer(text="/lottery buy — kupi tiket za 100 coina")
     await i.response.send_message(embed=e)
 
-# ─── <:e_coins2:1519362621206298666> HEIST (timski razboj) ───
-@bot.tree.command(name="heist", description="<:e_coins2:1519362621206298666> Timski razboj — okupi 3+ ljudi i dobijte 1000-5000")
+# ─── <:e_coins3:1519362621206298666> HEIST (timski razboj) ───
+@bot.tree.command(name="heist", description="<:e_coins3:1519362621206298666> Timski razboj — okupi 3+ ljudi i dobijte 1000-5000")
 async def heist_cmd(i: discord.Interaction):
     uid = str(i.user.id)
     cd = data["heist_cooldown"].get(uid, 0)
     if int(time.time()) < cd:
         return await i.response.send_message(embed=em("<:e_time2:1519362726952964227>", f"Pokušaj ponovo <t:{cd}:R>.", color=COLORS["warning"]), ephemeral=True)
-    e = discord.Embed(title="<:e_coins2:1519362621206298666> RAZBOJ U PRIPREMI", description=f"{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
+    e = discord.Embed(title="<:e_coins3:1519362621206298666> RAZBOJ U PRIPREMI", description=f"{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
     crew = {i.user.id}
     class HeistView(discord.ui.View):
         def __init__(self): super().__init__(timeout=30)
@@ -8675,7 +8675,7 @@ async def heist_cmd(i: discord.Interaction):
         per = random.randint(1000, 5000) // n
         for cid in crew: get_economy(cid)["balance"] += per
         save_data()
-        await i.followup.send(embed=em("<:e_party:1519363028334674070> USPJEŠAN RAZBOJ!", f"Ekipa od **{n}** članova podijelila plijen!\n<:e_coins2:1519362621206298666> Svako je dobio: `{per:,}` coina", color=COLORS["success"]))
+        await i.followup.send(embed=em("<:e_party:1519363028334674070> USPJEŠAN RAZBOJ!", f"Ekipa od **{n}** članova podijelila plijen!\n<:e_coins3:1519362621206298666> Svako je dobio: `{per:,}` coina", color=COLORS["success"]))
     else:
         for cid in crew:
             eco = get_economy(cid); eco["balance"] = max(0, eco["balance"] - 200)
@@ -9069,7 +9069,7 @@ async def auto_game_loop():
             title="<:e_target:1519363069925654609>  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  <:e_target:1519363069925654609>",
             description=(
                 "<:e_target:1519363069925654609> **Klikni dugme ispod i unesi 5 brojeva (1–75)!**\n"
-                "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins2:1519362621206298666>\n\n"
+                "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins3:1519362621206298666>\n\n"
                 "<:e_time2:1519362726952964227>️ Imaš **2 minute** za tiket — brzo! <:e_fire2:1519362671491678280>\n"
                 "<:e_mega2:1519362736566304818> Rezultati se objavljuju **javno** za sve <:e_globe2:1519362694887637004>"
             ),
@@ -9148,7 +9148,7 @@ async def active_member_week():
                 f"## {top_member.mention}\n\n"
                 f"<:e_bubble:1519363307998417148> Napisao/la **{top_count:,}** poruka u zadnjih 7 dana!\n"
                 f"━━━━━━━━━━━━━━━━━━━━━━\n"
-                f"<:e_gift:1519362618341462067> **Nagrada:** `+500 coina` <:e_coins2:1519362621206298666> + `+100 XP` <:e_bolt:1519362674717102160>\n"
+                f"<:e_gift:1519362618341462067> **Nagrada:** `+500 coina` <:e_coins3:1519362621206298666> + `+100 XP` <:e_bolt:1519362674717102160>\n"
                 f"<:e_flower:1519362984818901173> Hvala što si dio × GIAN porodice!"
             ),
             color=0x000000, timestamp=now
@@ -9194,7 +9194,7 @@ async def bingo_cmd(i: discord.Interaction):
         title="<:e_target:1519363069925654609>  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  <:e_target:1519363069925654609>",
         description=(
             "<:e_target:1519363069925654609> **Klikni dugme ispod i unesi 5 brojeva (1–75)!**\n"
-            "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins2:1519362621206298666>\n\n"
+            "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins3:1519362621206298666>\n\n"
             "<:e_time2:1519362726952964227>️ Imaš **2 minute** za tiket — brzo! <:e_fire2:1519362671491678280>\n"
             "<:e_mega2:1519362736566304818> Rezultati se objavljuju **javno** za sve <:e_globe2:1519362694887637004>"
         ),
@@ -9212,7 +9212,7 @@ async def bingo_cmd(i: discord.Interaction):
         ),
         inline=False,
     )
-    e.set_footer(text=f"<:e_target:1519363069925654609> × GIAN Bingo • danas u {now_str} UTC • Cijena tiketa: 500 coina <:e_coins2:1519362621206298666>")
+    e.set_footer(text=f"<:e_target:1519363069925654609> × GIAN Bingo • danas u {now_str} UTC • Cijena tiketa: 500 coina <:e_coins3:1519362621206298666>")
 
     view = AutoBingoPupView(session)
     await i.response.send_message(embed=e, view=view)
@@ -9323,7 +9323,7 @@ class PupModal(discord.ui.Modal, title="<:e_ticket3:1519362637534597221>️ Unes
             value=" ".join(f"`{n:02d}`" for n in sorted(odabrani)),
             inline=False,
         )
-        potvrda.add_field(name="<:e_coins2:1519362621206298666>  Plaćeno", value=f"**{PUP_CIJENA:,} coina** <:e_coins2:1519362621206298666>", inline=True)
+        potvrda.add_field(name="<:e_coins3:1519362621206298666>  Plaćeno", value=f"**{PUP_CIJENA:,} coina** <:e_coins3:1519362621206298666>", inline=True)
         potvrda.add_field(name="<:e_time2:1519362726952964227>  Rezultati", value="**za ~2 minute** — javno! <:e_mega2:1519362736566304818>", inline=True)
         potvrda.set_footer(text="<:e_target:1519363069925654609> × GIAN Bingo • Sreće ti! <:e_clover:1519363694549667881>")
         await i.response.send_message(embed=potvrda, ephemeral=True)
@@ -9391,7 +9391,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
     results.sort(key=lambda x: x["br"], reverse=True)
 
     # ── Napravi listu rezultata ──
-    icon = {0: "<:e_wind:1519362878300229883>", 1: "<:e_wind:1519362878300229883>", 2: "<:e_coins2:1519362621206298666>", 3: "<:e_coins2:1519362621206298666><:e_coins2:1519362621206298666>", 4: "<:e_coins2:1519362621206298666><:e_coins2:1519362621206298666><:e_coins2:1519362621206298666>", 5: "<:e_trophy2:1519362624742232146>"}
+    icon = {0: "<:e_wind:1519362878300229883>", 1: "<:e_wind:1519362878300229883>", 2: "<:e_coins3:1519362621206298666>", 3: "<:e_coins3:1519362621206298666><:e_coins3:1519362621206298666>", 4: "<:e_coins3:1519362621206298666><:e_coins3:1519362621206298666><:e_coins3:1519362621206298666>", 5: "<:e_trophy2:1519362624742232146>"}
     medal = {0: "▫️", 1: "▫️", 2: "<:icon_rank3:1519358517633355919>", 3: "<:icon_rank2:1519358512336212091>", 4: "<:e_star2:1519363084253266031>", 5: "<:e_crown2:1519363047163166922>"}
     rows = []
     for r in results:
@@ -9399,7 +9399,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
         med       = medal.get(r["br"], "▫️")
         odab_str  = " ".join(f"`{n:02d}`" for n in r["odabrani"])
         pogoc_str = " ".join(f"**`{n:02d}`**" for n in r["pogoci"]) if r["pogoci"] else "`—`"
-        nagrada_str = f"**+{r['nagrada']:,} coina** <:e_coins2:1519362621206298666>" if r["nagrada"] > 0 else "_bez nagrade_"
+        nagrada_str = f"**+{r['nagrada']:,} coina** <:e_coins3:1519362621206298666>" if r["nagrada"] > 0 else "_bez nagrade_"
         rows.append(
             f"{med} {br_icon} **{r['ime']}**  •  {r['br']}/5 <:e_check2:1519362730057007268>  •  {nagrada_str}\n"
             f"> <:e_chart:1519362656568475880> {odab_str}\n"
@@ -9424,7 +9424,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
     )
     e.add_field(name=f"<:e_clipboard:1519363052871614627>  Rezultati  ({len(results)} igrača)", value=results_txt[:1020], inline=False)
     if total_prizes > 0:
-        e.add_field(name="<:e_coins2:1519362621206298666>  Ukupno podijeljeno", value=f"**{total_prizes:,} coina** <:e_coins2:1519362621206298666>", inline=True)
+        e.add_field(name="<:e_coins3:1519362621206298666>  Ukupno podijeljeno", value=f"**{total_prizes:,} coina** <:e_coins3:1519362621206298666>", inline=True)
         e.add_field(name="<:e_medal3:1519363547514015764>  Pobjednici", value=f"**{sum(1 for r in results if r['nagrada'] > 0)}** igrača", inline=True)
     e.set_footer(text="<:e_target:1519363069925654609> × GIAN Bingo • Čestitamo pobjednicima! <:e_party:1519363028334674070>")
     try:
@@ -10329,7 +10329,7 @@ async def info_cmd(ctx: commands.Context):
 
     e.add_field(name=f"{BAR}\n<:e_ctrl:1519362682296209498>️ ═╡ K L A S I Č N E  I G R E ╞═ <:e_ctrl:1519362682296209498>️", value=(
         "<:e_hammer:1519362836671762494> `/kpm` `.kpm` — Kamen, Papir, Makaze\n"
-        "<:e_slotm:1519362699014967297> `/slots [ulog]` `.slots [ulog]` — Slot mašina (20–1.000.000.000 <:e_coins2:1519362621206298666>)\n"
+        "<:e_slotm:1519362699014967297> `/slots [ulog]` `.slots [ulog]` — Slot mašina (20–1.000.000.000 <:e_coins3:1519362621206298666>)\n"
         "<:e_arrow:1519363399845154958> `/rulet` `.rulet` — Ruski rulet, za hrabre!\n"
         "<:e_cards2:1519362702835712010> `/blackjack` `.blackjack` — Blackjack protiv dilera\n"
         "<:e_dice2:1519362633763913931> `/kocka` `.kocka` — Baci kocku protiv nekog igrača"
@@ -10381,13 +10381,13 @@ async def info_cmd(ctx: commands.Context):
         "<:e_arrow:1519363399845154958> `/hunt` `.hunt` — Lovi divlje životinje\n"
         "<:e_deer2:1519362689212874883> `/zoo` `.zoo` — Pogledaj svoju zbirku\n"
         "<:e_sword2:1519362631146930317>️ `/battle` `.battle` — Bori se sa drugim igračem\n"
-        "<:e_coins2:1519362621206298666> `/sell` `.sell` — Prodaj životinje za pare\n"
+        "<:e_coins3:1519362621206298666> `/sell` `.sell` — Prodaj životinje za pare\n"
         "<:e_clipboard:1519363052871614627> `/animals` `.animals` — Lista svih životinja i raritet\n"
         "<:e_pray:1519363406078021863> `/pray` `.pray` — Pomoli se za nekog *(boost sreće)*"
     ), inline=False)
 
-    e.add_field(name=f"{BAR}\n<:e_coins2:1519362621206298666> ═╡ E K O N O M I J A  &  X P ╞═ <:e_coins2:1519362621206298666>", value=(
-        "<:e_coins2:1519362621206298666> `/baki` `.baki` — Provjeri stanje novca\n"
+    e.add_field(name=f"{BAR}\n<:e_coins3:1519362621206298666> ═╡ E K O N O M I J A  &  X P ╞═ <:e_coins3:1519362621206298666>", value=(
+        "<:e_coins3:1519362621206298666> `/baki` `.baki` — Provjeri stanje novca\n"
         "<:e_hammer:1519362836671762494> `/posao` `.posao` — Radi i zaradi *(svaki sat)*\n"
         "<:e_gift:1519362618341462067> `/daily` `.daily` — Dnevna nagrada\n"
         "<:e_box:1519363099478458498> `/daj` `.daj` — Pošalji pare drugaru\n"
@@ -11604,7 +11604,7 @@ async def poo_cmd(i: discord.Interaction):
         '• Broji u kanalu za brojanje\n'
         '• Igraj igre: `/hunt` `/slots` `/kviz` `/blackjack`\n'
         '• Zaradjuj novac: `/posao` `/daily`\n'
-        '• Ili plati direktno: `/poo-hrani` (200 <:e_coins2:1519362621206298666>)'
+        '• Ili plati direktno: `/poo-hrani` (200 <:e_coins3:1519362621206298666>)'
     ), inline=False)
     e.set_footer(text=f'<:e_skull:1519362992502997125> POO igra • {BOT_NAME} • 24/7 aktivan • /poo-zadaci za zadatke')
     await i.response.send_message(embed=e)
@@ -11624,7 +11624,7 @@ async def poo_zadaci_cmd(i: discord.Interaction, stranica: int = 1):
         mini_bar = '▰' * bar_f + '▱' * (8 - bar_f)
         desc += f'{icon} **{tname}**\n'
         desc += f'> _{tdesc}_\n'
-        desc += f'> `{mini_bar}` `{prog}/{goal}` · <:e_skull:1519362992502997125>+{poo_contrib} · <:e_coins2:1519362621206298666>+{coin_r:,}\n\n'
+        desc += f'> `{mini_bar}` `{prog}/{goal}` · <:e_skull:1519362992502997125>+{poo_contrib} · <:e_coins3:1519362621206298666>+{coin_r:,}\n\n'
     done_count = sum(1 for r in POO_ZADACI if user_tasks.get(r[0], 0) >= r[4])
     e = discord.Embed(
         title=f'<:e_skull:1519362992502997125> POO Zadaci — Stranica {stranica}/10',
@@ -11666,7 +11666,7 @@ async def poo_hrani_cmd(i: discord.Interaction):
     if eco['balance'] < COST:
         return await i.response.send_message(
             embed=em('<:e_skull:1519362992502997125> Nemaš dovoljno',
-                     f'Hranjenje Poo-a koštá **{COST} <:e_coins2:1519362621206298666>**.\nImaš samo `{eco["balance"]:,} <:e_coins2:1519362621206298666>`.',
+                     f'Hranjenje Poo-a koštá **{COST} <:e_coins3:1519362621206298666>**.\nImaš samo `{eco["balance"]:,} <:e_coins3:1519362621206298666>`.',
                      color=COLORS['error']), ephemeral=True)
     eco['balance'] -= COST
     poo = _get_poo_data(gid)
@@ -11684,8 +11684,8 @@ async def poo_hrani_cmd(i: discord.Interaction):
     desc = f'Nahranio/la si Poo-a! +**{bonus} Poo XP** <:e_plate:1519362791591378975>\nPoo XP ukupno: **{poo["xp"]:,}**'
     if leveled: desc += f'\n\n<:e_party:1519363028334674070> **POO JE NAPREDOVAO NA NOVI STAGE!**\n{semo} **{snm}**'
     await i.response.send_message(embed=em('<:e_skull:1519362992502997125> Poo je sit!', desc, color=0x000000, fields=[
-        ('<:e_coins2:1519362621206298666> Potrošeno', f'`{COST} <:e_coins2:1519362621206298666>`', True),
-        ('<:e_bank2:1519362662515871744> Ostalo', f'`{eco["balance"]:,} <:e_coins2:1519362621206298666>`', True),
+        ('<:e_coins3:1519362621206298666> Potrošeno', f'`{COST} <:e_coins3:1519362621206298666>`', True),
+        ('<:e_bank2:1519362662515871744> Ostalo', f'`{eco["balance"]:,} <:e_coins3:1519362621206298666>`', True),
         ('<:e_skull:1519362992502997125> Stage', f'{semo} {snm}', True),
     ]))
 
