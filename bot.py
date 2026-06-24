@@ -1602,7 +1602,7 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
         styled = []
         for _line in str(desc).split("\n"):
             if _line.strip() and not _line.lstrip().startswith(">"):
-                styled.append(f"> __{_line}__")
+                styled.append(f"> **{_line}**")
             else:
                 styled.append(_line)
         desc = "\n".join(styled)
@@ -1727,6 +1727,14 @@ print("[auto-embed] aktivan — sve plain poruke (send/edit/reply/followup) auto
 # Premium embed za važne ekrane (profil, daily, level-up, pobjede, shop)
 def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb=None, image=None, author=None, accent=True):
     desc = _prepend_box(title, desc)
+    if desc:
+        _styled = []
+        for _line in str(desc).split("\n"):
+            if _line.strip() and not _line.lstrip().startswith(">"):
+                _styled.append(f"> **{_line}**")
+            else:
+                _styled.append(_line)
+        desc = "\n".join(_styled)
     sep = "˚｡⋆୨୧˚ ───────────── ˚୨୧⋆｡˚"
     if accent and desc:
         desc = f"{sep}\n{desc}\n{sep}"
@@ -1742,6 +1750,30 @@ def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb
     if thumb:  e.set_thumbnail(url=thumb)
     if image:  e.set_image(url=image)
     return e
+
+# ═══════════════════════════════════════════
+#    BOLD-BLOCKQUOTE EMBED PATCH
+#    Svaki discord.Embed automatski dobija > **bold** opis,
+#    OSIM slots embeda (boja 0xF1C40F).
+#    Linije koje već počinju sa ">" se preskačaju (em() ih već obradi).
+# ═══════════════════════════════════════════
+_SLOTS_COLOR = 0xF1C40F
+_orig_embed_init = discord.Embed.__init__
+
+def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
+    _color = color if color is not None else colour
+    if description and _color != _SLOTS_COLOR:
+        _styled = []
+        for _ln in str(description).split("\n"):
+            if _ln.strip() and not _ln.lstrip().startswith(">"):
+                _styled.append(f"> **{_ln}**")
+            else:
+                _styled.append(_ln)
+        description = "\n".join(_styled)
+    _orig_embed_init(self, title=title, description=description, color=color, colour=colour, **kwargs)
+
+discord.Embed.__init__ = _patched_embed_init
+print("[bold-embed] aktivan — svi embedi (osim slots) koriste > **bold** format")
 
 # ═══════════════════════════════════════════
 #    GIF HELPER (nekos.best)
