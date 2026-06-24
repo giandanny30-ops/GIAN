@@ -1006,6 +1006,38 @@ class _SafeMessage:
 #    INTENTS & BOT
 # ═══════════════════════════════════════════
 intents = discord.Intents.default()
+# ═══════════════════════════════════════════
+#    EMBED FIELD STYLE — > __ podvuci crtica
+#    Svaki field name/value dobija vizualni
+#    podvuceni stil osim _nostyle embeda
+# ═══════════════════════════════════════════
+_orig_embed_add_field = discord.Embed.add_field
+
+def _styled_add_field(self, *, name, value, inline=False):
+    """Primjeni > __ stil na field name i value (ako embed nije _nostyle)."""
+    if not getattr(self, '_nostyle', False):
+        # Field name → __podvuceno__
+        if name and not name.startswith("__") and name != "\u200b":
+            name = f"__{name}__"
+        # Field value → > __linija__ za svaki red, ali preskoči ``` code blokove
+        if value and value != "\u200b":
+            styled = []
+            _in_code = False
+            for _fline in str(value).split("\n"):
+                if _fline.strip().startswith("```"):
+                    _in_code = not _in_code
+                    styled.append(_fline)
+                    continue
+                stripped = _fline.strip()
+                if _in_code or not stripped or _fline.lstrip().startswith(">"):
+                    styled.append(_fline)
+                else:
+                    styled.append(f"> __{_fline}__")
+            value = "\n".join(styled) if styled else value
+    return _orig_embed_add_field(self, name=name, value=value, inline=inline)
+
+discord.Embed.add_field = _styled_add_field
+
 intents.message_content = True
 intents.members = True
 intents.presences = True  # potrebno za /vanity (čitanje custom statusa)
@@ -1597,15 +1629,6 @@ def _prepend_box(title, desc):
 
 def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=None, image=None):
     desc = _prepend_box(title, desc)
-    # Dodaj > crtica + podvuci za svaki neprazan red opisa
-    if desc:
-        styled = []
-        for _line in str(desc).split("\n"):
-            if _line.strip() and not _line.lstrip().startswith(">"):
-                styled.append(f"> __{_line}__")
-            else:
-                styled.append(_line)
-        desc = "\n".join(styled)
     e = discord.Embed(title=title, description=desc, color=color, timestamp=datetime.now(timezone.utc))
     if fields:
         for n, v, inline in fields:
@@ -1613,6 +1636,8 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
     e.set_footer(text=footer or f"{BOT_NAME} {VERSION}")
     if thumb:  e.set_thumbnail(url=thumb)
     if image:  e.set_image(url=image)
+    if color == COLORS.get("mafia") or color == COLORS.get("amogus") or color == COLORS.get("slots"):
+        e._nostyle = True  # Isključene igre zadržavaju stil
     return e
 
 # ═══════════════════════════════════════════
@@ -3741,6 +3766,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
             color=0xF1C40F,
             timestamp=datetime.now(timezone.utc)
         )
+        e._nostyle = True  # Slots zadržava originalni izgled
         e.add_field(name="<:e_coins2:1519362621206298666> Ulog", value=f"`{ulog:,} <:e_coins2:1519362621206298666>`", inline=True)
         e.add_field(name="⏳ Status", value=subtitle, inline=True)
         e.set_footer(text=f"{i.user.display_name} • {BOT_NAME}")
@@ -4610,6 +4636,7 @@ def _ag_lobby_embed(state):
     e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — Lobby", color=0x1B1B2F,
                       description="Pridruži se i čekaj da host pokrene igru!\n**Min 4 • Max 10 igrača**",
                       timestamp=datetime.now(timezone.utc))
+    e._nostyle = True  # Among Us zadržava stil
     e.add_field(name=f"<:e_users:1519363096601301120> Igrači ({len(players)}/10)",
                 value="\n".join(f"{p['color']} {p['name']}" for p in players.values()) or "*Čekamo...*",
                 inline=False)
@@ -4621,6 +4648,7 @@ def _ag_game_embed(state):
     ac = sum(1 for p in alive if p["role"]=="crewmate")
     ai = sum(1 for p in alive if p["role"]=="impostor")
     e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — U Toku", color=0x1B1B2F, timestamp=datetime.now(timezone.utc))
+    e._nostyle = True  # Among Us zadržava stil
     e.add_field(name="<:e_users:1519363096601301120> Igrači", value=_ag_player_list(state["players"]), inline=False)
     e.add_field(name="<:e_clipboard:1519363052871614627> Zadaci", value=_task_bar(state["done_tasks"], state["total_tasks"]), inline=True)
     e.add_field(name="<:e_masks:1519363003424706671> Živi", value=f"<:e_internet:1519363106395000994> {ac} crew | <:e_red:1519362782192210041> {ai} imp", inline=True)
@@ -5130,6 +5158,7 @@ class AmogusGameView(discord.ui.View):
 
 def _ag_meeting_embed(state, caller, reason):
     e = discord.Embed(title="<:e_report2:1519362714198347886> EMERGENCY MEETING!", color=0xFF0000,
+    e._nostyle = True  # Emergency meeting zadržava stil
                       description=f"**{caller}** je sazvao/la meeting!\n*{reason}*\n\n**Glasajte koga eliminišete!**",
                       timestamp=datetime.now(timezone.utc))
     alive = {k:v for k,v in state["players"].items() if v["alive"]}
