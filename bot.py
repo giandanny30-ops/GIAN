@@ -2560,30 +2560,30 @@ async def on_message(message):
             try: await message.add_reaction("<:icon_cross:1519358379917836508>")
             except: pass
         elif word != "KALADONT" and word not in KALADONT_DICT:
-            # Rijec nije u rjecniku — embed sa objasnjenjam i dugmetom Nova Rijec
+            # Rijec nije u rjecniku — samo ❌, a ember + dugme tek svake 10. greške
             try: await message.add_reaction("<:icon_cross:1519358379917836508>")
             except: pass
-            # Deaktiviraj eventualni prethodni invalid embed u ovom kanalu
-            old_msg = _kaladont_invalid_msgs.pop(message.channel.id, None)
-            if old_msg:
-                try:
-                    for c in old_msg.components[0].children if old_msg.components else []:
-                        pass  # samo brisemo referencu, Discord sam deaktivira pri slanju novog
-                except: pass
-            inv_msg = await message.channel.send(
-                embed=kaladont_invalid_embed(word, req, game["letters"]),
-                view=KaladontInvalidView(message.channel.id, checkpoint_word=game["word"])
-            )
-            _kaladont_invalid_msgs[message.channel.id] = inv_msg
+            cid = message.channel.id
+            _kaladont_invalid_count[cid] = _kaladont_invalid_count.get(cid, 0) + 1
+            if _kaladont_invalid_count[cid] >= 10:
+                _kaladont_invalid_count[cid] = 0
+                # Deaktiviraj prethodni invalid embed ako postoji
+                old_msg = _kaladont_invalid_msgs.pop(cid, None)
+                if old_msg:
+                    try: await old_msg.edit(view=None)
+                    except: pass
+                inv_msg = await message.channel.send(
+                    embed=kaladont_invalid_embed(word, req, game["letters"]),
+                    view=KaladontInvalidView(cid, checkpoint_word=game["word"])
+                )
+                _kaladont_invalid_msgs[cid] = inv_msg
         else:
             # ── Validna riječ — prihvata se ───────────────────────
-            # Deaktiviraj stari invalid embed ako postoji (igra nastavlja)
+            # Resetuj invalid counter i deaktiviraj stari invalid embed
+            _kaladont_invalid_count.pop(message.channel.id, None)
             old_inv = _kaladont_invalid_msgs.pop(message.channel.id, None)
             if old_inv:
-                try:
-                    diz_e = old_inv.embeds[0] if old_inv.embeds else discord.Embed(description="Igra nastavlja.", color=COLORS["warning"])
-                    diz_e.color = COLORS["warning"]
-                    await old_inv.edit(embed=diz_e, view=None)
+                try: await old_inv.edit(view=None)
                 except: pass
             game["word"]             = word
             game["last_uid"]         = message.author.id
@@ -4227,7 +4227,8 @@ class KaladontWordView(discord.ui.View):
         await _send_kaladont_help(i, self.channel_id)
 
 
-_kaladont_invalid_msgs: dict = {}  # channel_id -> discord.Message (zadnji invalid embed)
+_kaladont_invalid_msgs: dict = {}   # channel_id -> discord.Message (zadnji invalid embed)
+_kaladont_invalid_count: dict = {}  # channel_id -> int (broj uzastopnih nevalidnih rijeci)
 
 class KaladontInvalidView(discord.ui.View):
     """View ispod invalid-word embeda — dugme Nova Rijec resetuje startnu poziciju.
@@ -7512,18 +7513,23 @@ async def ticket_setup(i: discord.Interaction):
             ephemeral=True
         )
 
+    BAR = "━━━━━━━━━━━━━━━━━━━━"
     e = discord.Embed(
-        title="<:e_ticket3:1519362637534597221> Sistem Podrške",
+        title="<:e_ticket3:1519362637534597221>  Otvori Tiket",
         description=(
-            "Imaš problem ili pitanje? Klikni dugme ispod!\n\n"
-            "Otvorit će ti se privatni kanal sa timom.\n"
-            "Odgovorit ćemo što prije! <:e_pray:1519363406078021863>"
+            f"{BAR}\n"
+            f"📚  Trebaš pomoć? **Otvori tiket!**\n\n"
+            f"🎀  Popuni formu i naš staff će ti odgovoriti što prije.\n"
+            f"🔘  Prosječno vrijeme odgovora: **< 30 minuta**\n"
+            f"{BAR}\n\n"
+            f"🎁  **Šta ćeš dobiti**\n"
+            f"🎀  Privatni kanal samo za tebe i staff\n"
+            f"✅  Pomoć od iskusnog tima\n"
+            f"📸  Možeš priložiti slike/screenshote"
         ),
-        color=COLORS["info"], timestamp=datetime.now(timezone.utc)
+        color=0xFF69B4,
     )
-    if i.guild.icon:
-        e.set_thumbnail(url=i.guild.icon.url)
-    e.set_footer(text=f"{BOT_NAME} • Ticket Sistem")
+    e.set_footer(text=f"{BOT_NAME} Ticket Sistem")
     try:
         await i.channel.send(embed=e, view=TicketOpenView())
         await i.followup.send("<:icon_check:1519358376268533810> Ticket sistem postavljen uspješno!", ephemeral=True)
