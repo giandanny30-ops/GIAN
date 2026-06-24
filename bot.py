@@ -1602,7 +1602,12 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
         styled = []
         for _line in str(desc).split("\n"):
             if _line.strip() and not _line.lstrip().startswith(">"):
-                styled.append(f"> **{_line}**")
+                _has_md = any(m in _line for m in ("**", "__", "```", "`", "##", "||")) or _line.lstrip().startswith("*")
+                _has_word = any(c.isalpha() for c in _line)
+                if _has_md or not _has_word:
+                    styled.append(f"> {_line}")
+                else:
+                    styled.append(f"> **{_line}**")
             else:
                 styled.append(_line)
         desc = "\n".join(styled)
@@ -1728,13 +1733,18 @@ print("[auto-embed] aktivan — sve plain poruke (send/edit/reply/followup) auto
 def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb=None, image=None, author=None, accent=True):
     desc = _prepend_box(title, desc)
     if desc:
-        _styled = []
-        for _line in str(desc).split("\n"):
-            if _line.strip() and not _line.lstrip().startswith(">"):
-                _styled.append(f"> **{_line}**")
+        _pro_styled = []
+        for _ln in str(desc).split("\n"):
+            if _ln.strip() and not _ln.lstrip().startswith(">"):
+                _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
+                _has_word = any(c.isalpha() for c in _ln)
+                if _has_md or not _has_word:
+                    _pro_styled.append(f"> {_ln}")
+                else:
+                    _pro_styled.append(f"> **{_ln}**")
             else:
-                _styled.append(_line)
-        desc = "\n".join(_styled)
+                _pro_styled.append(_ln)
+        desc = "\n".join(_pro_styled)
     sep = "˚｡⋆୨୧˚ ───────────── ˚୨୧⋆｡˚"
     if accent and desc:
         desc = f"{sep}\n{desc}\n{sep}"
@@ -1752,10 +1762,11 @@ def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb
     return e
 
 # ═══════════════════════════════════════════
-#    BOLD-BLOCKQUOTE EMBED PATCH
-#    Svaki discord.Embed automatski dobija > **bold** opis,
-#    OSIM slots embeda (boja 0xF1C40F).
-#    Linije koje već počinju sa ">" se preskačaju (em() ih već obradi).
+#    SMART BOLD-BLOCKQUOTE EMBED PATCH
+#    Sve discord.Embed kreacije automatski dobijaju > **bold** opis.
+#    OSIM:  • slots boja (0xF1C40F)
+#           • linija koje već imaju markdown (**/__/##/`/*)  → samo > bez bold
+#           • linija bez slova (separator crte, emojis)     → samo > bez bold
 # ═══════════════════════════════════════════
 _SLOTS_COLOR = 0xF1C40F
 _orig_embed_init = discord.Embed.__init__
@@ -1763,17 +1774,22 @@ _orig_embed_init = discord.Embed.__init__
 def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
     _color = color if color is not None else colour
     if description and _color != _SLOTS_COLOR:
-        _styled = []
+        _e_styled = []
         for _ln in str(description).split("\n"):
             if _ln.strip() and not _ln.lstrip().startswith(">"):
-                _styled.append(f"> **{_ln}**")
+                _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
+                _has_word = any(c.isalpha() for c in _ln)
+                if _has_md or not _has_word:
+                    _e_styled.append(f"> {_ln}")
+                else:
+                    _e_styled.append(f"> **{_ln}**")
             else:
-                _styled.append(_ln)
-        description = "\n".join(_styled)
+                _e_styled.append(_ln)
+        description = "\n".join(_e_styled)
     _orig_embed_init(self, title=title, description=description, color=color, colour=colour, **kwargs)
 
 discord.Embed.__init__ = _patched_embed_init
-print("[bold-embed] aktivan — svi embedi (osim slots) koriste > **bold** format")
+print("[bold-embed] aktivan — sve embeds (osim slots) koriste > bold format")
 
 # ═══════════════════════════════════════════
 #    GIF HELPER (nekos.best)
