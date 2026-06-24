@@ -763,6 +763,242 @@ def get_kaladont_hint(req: str, used: set) -> list:
     random.shuffle(candidates)
     return candidates[:4]
 
+
+# ═══════════════════════════════════════════
+#    UNICODE EMOJI FALLBACK — prefix bridge
+#    channel.send() ne renderuje app emojije
+#    → zamjenjujemo ih Unicode ekvivalentima
+# ═══════════════════════════════════════════
+_EMOJI_UNICODE: dict[str, str] = {
+    "1519358244827697424": "🪙",
+    "1519358248942047342": "🏆",
+    "1519358252234707115": "🛡️",
+    "1519358255925825667": "⚔️",
+    "1519358259171950724": "🎲",
+    "1519358266738737274": "🎁",
+    "1519358274284032030": "⚠️",
+    "1519358278356959284": "🚫",
+    "1519358285902254242": "⚙️",
+    "1519358289173807246": "📈",
+    "1519358302285332540": "🏦",
+    "1519358309008674848": "❤️",
+    "1519358312188088466": "🔥",
+    "1519358316327997612": "⚡",
+    "1519358320337752125": "🎵",
+    "1519358323667767346": "🎮",
+    "1519358327140651029": "🎣",
+    "1519358331192344687": "🏹",
+    "1519358335068147836": "🧠",
+    "1519358339748855808": "🌍",
+    "1519358353208508566": "📋",
+    "1519358358010724352": "🔒",
+    "1519358364889383084": "❓",
+    "1519358368773308457": "⏰",
+    "1519358376268533810": "✅",
+    "1519358379917836508": "❌",
+    "1519358485647720510": "📊",
+    "1519358512336212091": "🥈",
+    "1519358517633355919": "🥉",
+    "1519362615069904977": "💼",
+    "1519362618341462067": "🎁",
+    "1519362621206298666": "🪙",
+    "1519362624742232146": "🏆",
+    "1519362627795554374": "🛡️",
+    "1519362631146930317": "⚔️",
+    "1519362633763913931": "🎲",
+    "1519362637534597221": "🎟️",
+    "1519362640961474601": "💎",
+    "1519362648972595289": "🔇",
+    "1519362652516782194": "⚙️",
+    "1519362656568475880": "📊",
+    "1519362659676455046": "📅",
+    "1519362662515871744": "🏦",
+    "1519362665347153930": "🛒",
+    "1519362668644012133": "💗",
+    "1519362671491678280": "🔥",
+    "1519362674717102160": "⚡",
+    "1519362679310127114": "🎵",
+    "1519362682296209498": "⌨️",
+    "1519362685957963940": "🐟",
+    "1519362689212874883": "🦌",
+    "1519362691813085386": "❓",
+    "1519362694887637004": "🌍",
+    "1519362699014967297": "🎰",
+    "1519362702835712010": "🃏",
+    "1519362710469476405": "📨",
+    "1519362714198347886": "📋",
+    "1519362717394403432": "🔒",
+    "1519362720506449960": "🔓",
+    "1519362723148726534": "❓",
+    "1519362726952964227": "⏰",
+    "1519362730057007268": "✅",
+    "1519362733613776967": "❌",
+    "1519362736566304818": "📣",
+    "1519362739749785610": "📊",
+    "1519362745772802078": "🔧",
+    "1519362749598269510": "🚗",
+    "1519362754732097546": "📧",
+    "1519362764244652122": "💪",
+    "1519362769047126028": "🟢",
+    "1519362782192210041": "🔴",
+    "1519362785291669644": "😴",
+    "1519362788462559323": "📱",
+    "1519362791591378975": "🍽️",
+    "1519362798189150370": "👵",
+    "1519362801703977110": "❄️",
+    "1519362812554510509": "💫",
+    "1519362825670230097": "📺",
+    "1519362828484477012": "🛋️",
+    "1519362833668772000": "🍴",
+    "1519362836671762494": "🔨",
+    "1519362841369378961": "🏠",
+    "1519362845970530577": "👀",
+    "1519362849548406975": "🧠",
+    "1519362852853649439": "⚖️",
+    "1519362856884371526": "☕",
+    "1519362860218843399": "☀️",
+    "1519362875129335849": "♻️",
+    "1519362878300229883": "🌬️",
+    "1519362881756336168": "🌧️",
+    "1519362884868636883": "🏃",
+    "1519362891210424473": "👂",
+    "1519362900681298000": "🧹",
+    "1519362915801501767": "🌅",
+    "1519362926622806046": "👩",
+    "1519362931689525422": "📶",
+    "1519362936777478326": "👁️",
+    "1519362941617438750": "💍",
+    "1519362944717160530": "😢",
+    "1519362947766554737": "🤝",
+    "1519362951247691898": "🗑️",
+    "1519362955437805771": "💸",
+    "1519362959187509461": "🔄",
+    "1519362962530373742": "👦",
+    "1519362965558657146": "🔮",
+    "1519362984818901173": "🌸",
+    "1519362989470253187": "😈",
+    "1519362992502997125": "💀",
+    "1519362997443629186": "☠️",
+    "1519363003424706671": "🎭",
+    "1519363006599794799": "💡",
+    "1519363009883934740": "🔁",
+    "1519363015147913396": "💾",
+    "1519363018725658675": "🚫",
+    "1519363022399995914": "🛑",
+    "1519363028334674070": "🎉",
+    "1519363032185176198": "✨",
+    "1519363038107406447": "⏸️",
+    "1519363047163166922": "👑",
+    "1519363052871614627": "📋",
+    "1519363057199878144": "📝",
+    "1519363059909398610": "✏️",
+    "1519363063738925187": "🔔",
+    "1519363066545045756": "🔑",
+    "1519363069925654609": "🎯",
+    "1519363074824343592": "💚",
+    "1519363084253266031": "⭐",
+    "1519363093736718518": "👤",
+    "1519363096601301120": "👥",
+    "1519363099478458498": "📦",
+    "1519363103064723547": "🔍",
+    "1519363106395000994": "🌐",
+    "1519363307998417148": "💬",
+    "1519363311207186482": "📡",
+    "1519363314524881048": "🔊",
+    "1519363318391771326": "🖼️",
+    "1519363321458065408": "🔗",
+    "1519363326109417613": "🏷️",
+    "1519363329259208836": "📌",
+    "1519363332266524813": "🚀",
+    "1519363345252090081": "⬇️",
+    "1519363348288901221": "🎊",
+    "1519363351354937497": "📥",
+    "1519363357436543099": "📍",
+    "1519363362322907218": "🪶",
+    "1519363367712591922": "▶️",
+    "1519363370694738072": "💎",
+    "1519363373748195502": "🌯",
+    "1519363376969420930": "🍞",
+    "1519363380513603615": "🚕",
+    "1519363385328799826": "🏗️",
+    "1519363388789227611": "🐑",
+    "1519363391939018857": "🚌",
+    "1519363395239804998": "🚿",
+    "1519363399845154958": "➡️",
+    "1519363402890346658": "🦁",
+    "1519363406078021863": "🙏",
+    "1519363409421008987": "🐉",
+    "1519363412625326161": "🐺",
+    "1519363415871590420": "🦊",
+    "1519363418790822029": "🐻",
+    "1519363422716825600": "🐯",
+    "1519363429394153633": "🦅",
+    "1519363432615510078": "🐬",
+    "1519363439385116812": "🍒",
+    "1519363442597695600": "🌴",
+    "1519363445466595522": "🌙",
+    "1519363450084786376": "☁️",
+    "1519363453347696821": "🌈",
+    "1519363456334168255": "💣",
+    "1519363469013422181": "🧪",
+    "1519363484377284770": "🎧",
+    "1519363490228343067": "🎨",
+    "1519363493701091348": "📷",
+    "1519363499875242104": "⌨️",
+    "1519363516002467871": "💻",
+    "1519363521140359410": "⚽",
+    "1519363547514015764": "🏅",
+    "1519363558809272371": "🎪",
+    "1519363568645177457": "🏰",
+    "1519363571815809179": "🗺️",
+    "1519363589897588868": "🔋",
+    "1519363593366147255": "💊",
+    "1519363600047673415": "🩺",
+    "1519363612978839642": "📚",
+    "1519363621912576191": "📏",
+    "1519363626006351975": "📏",
+    "1519363642808729690": "📁",
+    "1519363657404776661": "🚪",
+    "1519363663654293665": "🛏️",
+    "1519363694549667881": "🍀",
+    "1519363697728815175": "🌹",
+    "1519363706243387573": "🌿",
+}
+
+def _emoji_safe(text: str) -> str:
+    """Zamijeni <:name:id> i <a:name:id> sa Unicode ekvivalentom."""
+    if not text or "<:" not in text and "<a:" not in text:
+        return text
+    def _repl(m):
+        eid = m.group(2)
+        return _EMOJI_UNICODE.get(eid, "")  # prazan string ako nema mape
+    return re.sub(r"<a?:[\w]+:(\d+)>", lambda m: _EMOJI_UNICODE.get(m.group(1), ""), text)
+
+def _embed_safe(embed) -> "discord.Embed":
+    """Vrati kopiju embeda sa zamijenjenim emoji stringovima (za prefix bridge)."""
+    import copy
+    e = copy.copy(embed)
+    d = e.to_dict()
+    def _walk(obj):
+        if isinstance(obj, str): return _emoji_safe(obj)
+        if isinstance(obj, dict): return {k: _walk(v) for k, v in obj.items()}
+        if isinstance(obj, list): return [_walk(i) for i in obj]
+        return obj
+    d = _walk(d)
+    return discord.Embed.from_dict(d)
+
+class _SafeMessage:
+    """Wrapper oko discord.Message — primjenjuje emoji safe na edit() pozivima."""
+    __slots__ = ("_msg",)
+    def __init__(self, msg): self._msg = msg
+    async def edit(self, **kwargs):
+        if "embed"   in kwargs: kwargs["embed"]   = _embed_safe(kwargs["embed"])
+        if "embeds"  in kwargs: kwargs["embeds"]  = [_embed_safe(e) for e in kwargs["embeds"]]
+        if "content" in kwargs and kwargs["content"]: kwargs["content"] = _emoji_safe(kwargs["content"])
+        return await self._msg.edit(**kwargs)
+    async def delete(self, **kwargs): return await self._msg.delete(**kwargs)
+    def __getattr__(self, name): return getattr(self._msg, name)
+
 # ═══════════════════════════════════════════
 #    INTENTS & BOT
 # ═══════════════════════════════════════════
@@ -774,100 +1010,34 @@ bot = commands.Bot(command_prefix="-", intents=intents, help_command=None)
 
 # ═══════════════════════════════════════════
 #    PREFIX BRIDGE — .kpm radi kao /kpm
-#    Webhook-based: renderuje application emojije
 # ═══════════════════════════════════════════
-
-# Webhook cache: channel_id -> discord.Webhook
-_wh_cache: dict = {}
-
-async def _get_channel_webhook(channel) -> "discord.Webhook | None":
-    """Dohvati ili napravi webhook za kanal (za renderovanje app emojija)."""
-    try:
-        cid = channel.id
-        # Provjeri cache
-        if cid in _wh_cache:
-            return _wh_cache[cid]
-        # Provjeri postojeće webhooks u kanalu
-        try:
-            webhooks = await channel.webhooks()
-            for wh in webhooks:
-                if wh.user and wh.user.id == bot.user.id and wh.name == BOT_NAME:
-                    _wh_cache[cid] = wh
-                    return wh
-        except Exception:
-            pass
-        # Napravi novi webhook
-        wh = await channel.create_webhook(name=BOT_NAME)
-        _wh_cache[cid] = wh
-        return wh
-    except Exception:
-        return None
-
-async def _wh_send(channel, content=None, *, embed=None, embeds=None, view=None,
-                   ephemeral=False, delete_after=None, **kw):
-    """Pošalji poruku putem webhooks (renderuje app emojije) ili fallback na channel.send."""
-    kwargs: dict = {}
-    if content  is not None: kwargs["content"]  = content
-    if embed    is not None: kwargs["embed"]    = embed
-    if embeds   is not None: kwargs["embeds"]   = embeds
-    if view     is not None: kwargs["view"]     = view
-    if delete_after is not None: kwargs["delete_after"] = delete_after
-
-    # Pokušaj webhook (jedini način za app emoji u obicnim porukama)
-    wh = await _get_channel_webhook(channel)
-    if wh is not None:
-        try:
-            wh_kw = {k: v for k, v in kwargs.items() if k not in ("delete_after",)}
-            wh_kw["username"]   = bot.user.display_name
-            wh_kw["avatar_url"] = str(bot.user.display_avatar.url)
-            wh_kw["wait"]       = True
-            msg = await wh.send(**wh_kw)
-            if delete_after:
-                import asyncio as _aio
-                _aio.get_event_loop().call_later(delete_after, lambda: _aio.ensure_future(msg.delete()))
-            return msg
-        except Exception:
-            pass  # Fallback
-
-    # Fallback: channel.send (app emoji neće renderati, ali poruka će biti poslana)
-    return await channel.send(**kwargs)
-
 class _FakeResponse:
     def __init__(self, fake): self.fake = fake; self._sent = False
     async def send_message(self, content=None, *, embed=None, embeds=None, view=None, ephemeral=False, **kw):
-        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower()
-                    if self.fake.message.content.startswith(".") else "")
-        # Ephemeral help → DM
+        # Zamijeni custom emojije sa Unicode (ne renderuju u channel.send)
+        if content is not None: content = _emoji_safe(content)
+        if embed   is not None: embed   = _embed_safe(embed)
+        if embeds  is not None: embeds  = [_embed_safe(e) for e in embeds]
+        kwargs = {}
+        if content is not None: kwargs["content"] = content
+        if embed   is not None: kwargs["embed"]   = embed
+        if embeds  is not None: kwargs["embeds"]  = embeds
+        if view    is not None: kwargs["view"]    = view
+        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower() if self.fake.message.content.startswith(".") else "")
         if ephemeral and cmd_name == "help":
-            dm_kw: dict = {}
-            if content  is not None: dm_kw["content"]  = content
-            if embed    is not None: dm_kw["embed"]    = embed
-            if embeds   is not None: dm_kw["embeds"]   = embeds
-            if view     is not None: dm_kw["view"]     = view
             try:
-                msg = await self.fake.user.send(**dm_kw)
-                try: await self.fake.message.add_reaction("<:e_mail:1519362754732097546>")
+                msg = await self.fake.user.send(**kwargs)
+                try: await self.fake.message.add_reaction("📧")
                 except: pass
                 self.fake._original = msg; self._sent = True
                 return msg
             except: pass
-        # Ephemeral ostalo → kratko vidljivo, bez webhooks
         if ephemeral:
-            plain_kw: dict = {}
-            if content is not None: plain_kw["content"] = content
-            if embed   is not None: plain_kw["embed"]   = embed
-            if embeds  is not None: plain_kw["embeds"]  = embeds
-            if view    is not None: plain_kw["view"]    = view
-            plain_kw["delete_after"] = 10
-            msg = await self.fake.channel.send(**plain_kw)
-            self.fake._original = msg; self._sent = True
-            return msg
-        # Normalna poruka → webhook (renderuje app emojije!)
-        msg = await _wh_send(self.fake.channel, content,
-                             embed=embed, embeds=embeds, view=view)
-        self.fake._original = msg; self._sent = True
+            kwargs["delete_after"] = 10
+        _raw = await self.fake.channel.send(**kwargs)
+        msg = _SafeMessage(_raw)
+        self.fake._original = _raw; self._sent = True
         return msg
-
     async def defer(self, ephemeral=False, thinking=False): self._sent = True
     async def edit_message(self, **kw):
         try: await self.fake._original.edit(**{k:v for k,v in kw.items() if v is not None})
@@ -876,31 +1046,24 @@ class _FakeResponse:
 
 class _FakeFollowup:
     def __init__(self, fake): self.fake = fake
-    async def send(self, content=None, *, embed=None, embeds=None, view=None,
-                   ephemeral=False, **kw):
-        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower()
-                    if self.fake.message.content.startswith(".") else "")
-        # Ephemeral help → DM
+    async def send(self, content=None, *, embed=None, embeds=None, view=None, ephemeral=False, **kw):
+        # Zamijeni custom emojije sa Unicode (ne renderuju u channel.send)
+        if content is not None: content = _emoji_safe(content)
+        if embed   is not None: embed   = _embed_safe(embed)
+        if embeds  is not None: embeds  = [_embed_safe(e) for e in embeds]
+        kwargs = {}
+        if content is not None: kwargs["content"] = content
+        if embed   is not None: kwargs["embed"]   = embed
+        if embeds  is not None: kwargs["embeds"]  = embeds
+        if view    is not None: kwargs["view"]    = view
+        cmd_name = (self.fake.message.content[1:].split(maxsplit=1)[0].lower() if self.fake.message.content.startswith(".") else "")
         if ephemeral and cmd_name == "help":
-            dm_kw: dict = {}
-            if content is not None: dm_kw["content"] = content
-            if embed   is not None: dm_kw["embed"]   = embed
-            if embeds  is not None: dm_kw["embeds"]  = embeds
-            if view    is not None: dm_kw["view"]    = view
-            try: return await self.fake.user.send(**dm_kw)
+            try: return await self.fake.user.send(**kwargs)
             except: pass
-        # Ephemeral ostalo → kratko vidljivo, bez webhooks
         if ephemeral:
-            plain_kw: dict = {}
-            if content is not None: plain_kw["content"] = content
-            if embed   is not None: plain_kw["embed"]   = embed
-            if embeds  is not None: plain_kw["embeds"]  = embeds
-            if view    is not None: plain_kw["view"]    = view
-            plain_kw["delete_after"] = 10
-            return await self.fake.channel.send(**plain_kw)
-        # Normalna poruka → webhook
-        return await _wh_send(self.fake.channel, content,
-                              embed=embed, embeds=embeds, view=view)
+            kwargs["delete_after"] = 10
+        _raw = await self.fake.channel.send(**kwargs)
+        return _SafeMessage(_raw)
 
 class FakeInteraction:
     def __init__(self, message):
@@ -1645,24 +1808,19 @@ async def _validate_app_emojis():
                     print(f"  [emoji-check] API odgovor: {resp.status} — provjera preskočena")
                     return
                 data_resp = await resp.json()
-                raw = data_resp if isinstance(data_resp, list) else data_resp.get("items", [])
-                portal_emojis = {e["id"]: e["name"] for e in raw}
-        print(f"  ℹ️  Na developer portalu: {len(portal_emojis)} emojija")
-        # Pronađi sve <:name:id> u bot.py kodu
+                portal_emojis = {e["id"]: e["name"] for e in data_resp.get("items", data_resp if isinstance(data_resp, list) else [])}
+        # Pronađi sve <:name:id> u bot.py kodu (iz konstanti na vrhu)
         with open(__file__, "r", encoding="utf-8") as _f:
             src = _f.read()
-        used = _re.findall(r'<a?:([\w]+):(\d+)>', src)
-        used_ids = {eid: name for name, eid in used}
-        missing = {eid: name for eid, name in used_ids.items() if eid not in portal_emojis}
+        used = _re.findall(r'<:[\w]+:(\d+)>', src)
+        used_ids = set(used)
+        missing = [eid for eid in used_ids if eid not in portal_emojis]
         ok = len(used_ids) - len(missing)
         print(f"  ✅ Emoji provjera: {ok}/{len(used_ids)} validni na developer portalu")
         if missing:
-            for eid, name in list(missing.items())[:5]:
-                print(f"  ⚠️  NEDOSTAJE: <:{name}:{eid}>")
-            if len(missing) > 5:
-                print(f"  ⚠️  ... i još {len(missing)-5} nedostaje")
+            print(f"  ⚠️  Nedostaju na portalu ({len(missing)}): {', '.join(missing[:10])}{'...' if len(missing)>10 else ''}")
         else:
-            print(f"  ✅ Svi emojiji potvrđeni na developer portalu!")
+            print(f"  ✅ Dupla zaštita: svi emojiji potvrđeni na developer portalu!")
     except Exception as _e:
         print(f"  [emoji-check] Greška pri provjeri: {_e}")
 
@@ -3666,7 +3824,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     try:
         await msg.edit(embed=final_e)
     except Exception:
-        pass  # Ne šaljemo drugi embed — sprječavamo duplikate
+        pass  # Nema duplog embeda
 
 # /rulet uklonjeno (na zahtjev) — /flip i /8ball uklonjeni (v2.2) — pravimo mjesto za /mafia igru.
 # /meme uklonjeno (v2.1) — vanjski sadržaj može vratiti NSFW u SFW kanal.
