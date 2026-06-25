@@ -58,16 +58,18 @@ APP_ID   = 1451057022245146745  # Discord developer portal app ID
 OFFICIAL_INVITE   = "gian"               # GIAN
 OFFICIAL_GUILD_ID = 1494043955980140754  # ID zvaničnog GIAN servera
 
+_LP = 0xB39DDB  # Svetlo ljubičasta — jedina boja svih embeda (nikad se ne mijenja)
+
 COLORS = {
-    "default": 0x000000, "success": 0x000000, "error":   0xE74C3C,
-    "warning": 0xF39C12, "info":    0x000000, "gold":    0x000000,
-    "balkan":  0x000000, "purple":  0x000000, "fun":     0x000000,
-    "dark":    0x000000, "teal":    0x000000, "love":    0x000000,
-    "pink":    0x000000, "aqua":    0x000000,
-    # Sačuvane boje za isključene igre
-    "mafia":   0x2B2D42,
-    "amogus":  0x1B1B2F,
-    "slots":   0xF1C40F,
+    "default": _LP, "success": _LP, "error":   _LP,
+    "warning": _LP, "info":    _LP, "gold":    _LP,
+    "balkan":  _LP, "purple":  _LP, "fun":     _LP,
+    "dark":    _LP, "teal":    _LP, "love":    _LP,
+    "pink":    _LP, "aqua":    _LP,
+    # Igre — ista boja
+    "mafia":   _LP,
+    "amogus":  _LP,
+    "slots":   _LP,
 }
 
 # ── Custom animirani emoji (već postoje na serveru) — za ljepši izgled igara ──
@@ -78,12 +80,12 @@ E_FIRE4 = "<:e_fire2:1519362671491678280>"
 E_GAME  = "<:icon_game:1519358323667767346>"
 E_MUSIC = "<:icon_music:1519358320337752125>"
 
-# Akcentne boje po igri (premium izgled)
+# Akcentne boje po igri — sve svetlo ljubičasta (nikad se ne mijenja)
 GAME_COLORS = {
-    "kaladont": 0x000000,
-    "wordle":   0x6AAA64,  # zelena (wordle)
-    "kviz":     0x9B59B6,  # ljubičasta
-    "geo":      0x3498DB,  # plava
+    "kaladont": _LP,
+    "wordle":   _LP,
+    "kviz":     _LP,
+    "geo":      _LP,
 }
 # ═══════════════════════════════════════════
 #    PANEL API — Live embed integracija
@@ -1630,7 +1632,7 @@ def _autoembed_color_for(text: str) -> int:
     t = (text or "").lstrip()
     if t.startswith(("<:icon_cross:1519358379917836508>", "<:icon_ban:1519358278356959284>", "<:e_no:1519363018725658675>", "<:e_skull:1519362992502997125>")):       return COLORS["error"]
     if t.startswith(("<:icon_warning:1519358274284032030>️", "<:icon_warning:1519358274284032030>")):                   return COLORS["warning"]
-    return 0x000000  # Sve ostalo → crna
+    return _LP  # Sve ostalo → svetlo ljubičasta
 
 def _wrap_to_embed(content):
     if content is None: return None
@@ -1768,12 +1770,12 @@ def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb
 #           • linija koje već imaju markdown (**/__/##/`/*)  → samo > bez bold
 #           • linija bez slova (separator crte, emojis)     → samo > bez bold
 # ═══════════════════════════════════════════
-_SLOTS_COLOR = 0xF1C40F
+_SLOTS_COLOR = _LP
 _orig_embed_init = discord.Embed.__init__
 
 def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
     _color = color if color is not None else colour
-    if description and _color != _SLOTS_COLOR:
+    if description and _color is not None:
         _e_styled = []
         for _ln in str(description).split("\n"):
             if _ln.strip() and not _ln.lstrip().startswith(">"):
@@ -3831,27 +3833,27 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     def _embed(r1, r2, r3, status: str, color: int = 0xF1C40F, title: str = "", ts=None) -> discord.Embed:
         reels_line = f"> `[ {r1} ]`  `[ {r2} ]`  `[ {r3} ]`"
         e = discord.Embed(
-            title=title or "🎰  SLOTS",
+            title=title or "🎰 • SLOTS • 🎰",
             description=f"\n{reels_line}\n\n> {status}",
-            color=color,
+            color=_LP,
         )
         e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
         if ts:
             e.timestamp = ts
-        e.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}  •  {BOT_NAME}")
+        e.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}\n{BOT_NAME}")
         return e
 
     # ── Frame 0: svi reelovi se vrte (~0.7s) ─────────────────────────────
-    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, "⏳ Vrtim...", title="🎰  SLOTS"), wait=True)
+    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, "⏳ Vrtim...", title="🎰 • SLOTS • 🎰"), wait=True)
     await asyncio.sleep(0.7)
 
     # ── Frame 1: lijevi staje (~0.65s) ───────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, f"🔒 **{reels[0]}**  ·  {SPIN}  ·  {SPIN}", title="🎰  SLOTS"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, f"🔒 **{reels[0]}**  ·  {SPIN}  ·  {SPIN}", title="🎰 • SLOTS • 🎰"))
     except: pass
     await asyncio.sleep(0.65)
 
     # ── Frame 2: desni staje (~0.65s) ────────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], f"🔒 **{reels[0]}**  ·  {SPIN}  ·  🔒 **{reels[2]}**", title="🎰  SLOTS"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], f"🔒 **{reels[0]}**  ·  {SPIN}  ·  🔒 **{reels[2]}**", title="🎰 • SLOTS • 🎰"))
     except: pass
     await asyncio.sleep(0.65)
 
@@ -3865,25 +3867,21 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         win          = int(ulog * multiplier)
         d["balance"] += win - ulog
         if sym == "7️⃣":
-            color    = 0xFFD700
-            title    = "🎰  7 7 7 — MEGA JACKPOT 🎉"
+            title    = "🎰 • 7 7 7 MEGA JACKPOT 🎉 • 🎰"
             status   = f"🏆 **JACKPOT!**  +**{win:,}** <:e_coins3:1519362621206298666>  `{LABEL[sym]}`"
         else:
-            color    = 0x2ECC71
-            title    = f"🎰  {sym}{sym}{sym} — JACKPOT!"
+            title    = f"🎰 • {sym}{sym}{sym} JACKPOT! • 🎰"
             status   = f"🎊 **Pogotak!**  +**{win:,}** <:e_coins3:1519362621206298666>  `{LABEL[sym]}`"
 
     elif two_same:
         win          = ulog
         d["balance"] += 0
-        color        = 0xF39C12
-        title        = "🎰  Par — ulog vraćen"
+        title        = "🎰 • Par — ulog vraćen • 🎰"
         status       = f"✨ **Dva ista!**  **{win:,}** <:e_coins3:1519362621206298666>  `×1.0`"
 
     else:
         d["balance"] = max(0, d["balance"] - ulog)
-        color        = 0xE74C3C
-        title        = "🎰  Nema sreće"
+        title        = "🎰 • Nema sreće • 🎰"
         status       = f"💸 **Promašaj!**  −**{ulog:,}** <:e_coins3:1519362621206298666>"
 
     save_data()
