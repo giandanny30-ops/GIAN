@@ -3630,13 +3630,26 @@ async def kradi(i: discord.Interaction, korisnik: discord.Member):
 async def rank(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     d = get_xp(u.id)
-    needed = d["level"] * 75
+    needed = max(d["level"] * 75, 1)
     filled = min(d["xp"] * 10 // needed, 10)
-    bar = "<:e_flower:1519362984818901173>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
-    pct = round(d["xp"] / needed * 100)
-    await i.response.send_message(embed=em_pro(f"<:e_level2:1519362739749785610> Rank Profil", f"{bar}\n`{'▰'*filled}{'▱'*(10-filled)}` **{pct}%**", color=COLORS["purple"], thumb=u.display_avatar.url, author=u, fields=[
-        ("<:e_trophy2:1519362624742232146> Level", f"```fix\n{d['level']}\n```", True), ("<:e_star2:1519363084253266031> XP", f"```py\n{d['xp']}/{needed}\n```", True), ("<:e_chart:1519362656568475880> Progres", f"```css\n[{pct}%]\n```", True),
-    ]))
+    empty  = 10 - filled
+    bar    = "█" * filled + "░" * empty
+    pct    = min(round(d["xp"] / needed * 100), 100)
+    rank_e = discord.Embed(
+        description=(
+            f"**{u.display_name}**\n"
+            f"```\n[{bar}] {pct}%\n```"
+        ),
+        color=COLORS["purple"],
+        timestamp=datetime.now(timezone.utc)
+    )
+    rank_e.set_thumbnail(url=u.display_avatar.url)
+    rank_e.add_field(name="<:e_trophy2:1519362624742232146>  Level",   value=f"**{d['level']}**",           inline=True)
+    rank_e.add_field(name="<:e_star2:1519363084253266031>  XP",        value=f"**{d['xp']:,} / {needed:,}**", inline=True)
+    rank_e.add_field(name="<:e_chart:1519362656568475880>  Progres",   value=f"**{pct}%**",                 inline=True)
+    rank_e.set_author(name=f"🏆  Rank — {u.display_name}", icon_url=u.display_avatar.url)
+    rank_e.set_footer(text=f"{BOT_NAME} {VERSION}  •  Rank sistem")
+    await i.response.send_message(embed=rank_e)
 
 # ═══════════════════════════════════════════
 #    /aktivnost — prikaz LVL / XP / poruke
@@ -3765,7 +3778,7 @@ async def kpm(i: discord.Interaction):
     await i.response.send_message(embed=_kpm_e, view=v)
     v.msg = await i.original_response()
 
-@bot.tree.command(name="slots", description="Slot mašina — uloži od 20 do 1.000.000.000 eura")
+@bot.tree.command(name="slots", description="🎰 Slot mašina — uloži i zavrti!")
 @app_commands.describe(ulog="Iznos uloga (min 20 — max 1.000.000.000)")
 @app_commands.checks.cooldown(1, 15, key=lambda i: i.user.id)
 async def slots(i: discord.Interaction, ulog: int = 100):
@@ -3797,131 +3810,134 @@ async def slots(i: discord.Interaction, ulog: int = 100):
 
     await i.response.defer()
 
-    # ─── Simboli i težine ───────────────────────────────────────────────
+    # ─── OWO-style simboli (lievo→desno→centar redoslijed zaustavljanja) ─
+    # (simbol, težina, jackpot_multi, opis, boja_jackpot)
     SLOT_DATA = [
-        ("<:e_flower:1519362984818901173>", 22, 3.0,  0.5),
-        ("<:e_herb:1519363706243387573>", 20, 3.5,  0.6),
-        ("<:e_sun:1519362860218843399>", 18, 4.0,  0.7),
-        ("<:e_wrap:1519363373748195502>", 15, 5.0,  0.8),
-        ("<:e_bell:1519363063738925187>", 12, 6.0,  0.9),
-        ("<:e_star2:1519363084253266031>",  8, 8.0,  1.2),
-        ("<:e_diamond2:1519362640961474601>",  4, 15.0, 1.8),
-        ("7️⃣",  1, 50.0, 2.5),
+        ("🟪", 30, 1.0,  "Vraća ulog",      0x9B59B6),  # 20% ~
+        ("❤️", 25, 2.0,  "×2 ulog",         0xE74C3C),  # 20% ~
+        ("🍒", 18, 3.0,  "×3 ulog",         0xE74C3C),  # 5%  ~
+        ("💎", 10, 4.0,  "×4 ulog",         0x3498DB),  # 2.5%~
+        ("🌟",  6, 6.0,  "×6 ulog",         0xF1C40F),
+        ("🔔",  4, 8.0,  "×8 ulog",         0xF39C12),
+        ("7️⃣",  1, 10.0, "× 1 0  J A C K P O T", 0xFFD700),  # 1%
     ]
-    symbols_list  = [s[0] for s in SLOT_DATA]
-    weights       = [s[1] for s in SLOT_DATA]
-    jackpot_multi = {s[0]: s[2] for s in SLOT_DATA}
-    pair_multi    = {s[0]: s[3] for s in SLOT_DATA}
+    SYM      = [s[0] for s in SLOT_DATA]
+    WEIGHTS  = [s[1] for s in SLOT_DATA]
+    MULTI    = {s[0]: s[2] for s in SLOT_DATA}
+    DESC_MAP = {s[0]: s[3] for s in SLOT_DATA}
 
-    # Unaprijed izaberi krajnji rezultat
-    reels = random.choices(symbols_list, weights=weights, k=3)
-    sym   = reels[0]
+    # Unaprijed odredi krajnji ishod
+    reels = random.choices(SYM, weights=WEIGHTS, k=3)
 
-    # ─── Animacija ──────────────────────────────────────────────────────
-    SPIN = "<:e_slotm:1519362699014967297>"  # simbol vrtnje
-    def _sr(): return random.choice(symbols_list)  # random simbol za vrtnju
+    SPIN_GIF = "https://static.wikia.nocookie.net/owobot/images/f/f3/SlotsRolling.gif/revision/latest?cb=20201231075644"
+    SPIN_SYM = "🎰"
 
-    def _spin_embed(r1, r2, r3, subtitle="<:e_slotm:1519362699014967297>  Vrte se..."):
-        desc = f"𓉘  {r1}  │  {r2}  │  {r3}  𓉝"
+    def _reel_line(r1, r2, r3) -> str:
+        return f"┃  {r1}  ┃  {r2}  ┃  {r3}  ┃"
+
+    def _build_spin(r1, r2, r3, status: str, gif: bool = True) -> discord.Embed:
         e = discord.Embed(
-            title=f"<:e_slotm:1519362699014967297>  S L O T  M A Š I N A",
-            description=desc,
+            title="🎰  S L O T S",
+            description=(
+                f"```\n┏━━━━━━━━━━━━━━━━━┓\n"
+                f"{_reel_line(r1, r2, r3)}\n"
+                f"┗━━━━━━━━━━━━━━━━━┛```\n"
+                f"{status}"
+            ),
             color=0xF1C40F,
-            timestamp=datetime.now(timezone.utc)
         )
-        e.add_field(name="<:e_coins3:1519362621206298666> Ulog", value=f"`{ulog:,} <:e_coins3:1519362621206298666>`", inline=True)
-        e.add_field(name="⏳ Status", value=subtitle, inline=True)
-        e.set_footer(text=f"{i.user.display_name} • {BOT_NAME}")
+        e.add_field(name="<:e_coins3:1519362621206298666> Ulog", value=f"`{ulog:,}`", inline=True)
+        e.add_field(name="<:e_bank2:1519362662515871744> Balans", value=f"`{d['balance']:,}`", inline=True)
+        e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
+        e.set_footer(text=f"{BOT_NAME} • Slots")
+        if gif:
+            e.set_image(url=SPIN_GIF)
         return e
 
-    # Frame 0 — sve se vrte
-    msg = await i.followup.send(embed=_spin_embed(_sr(), _sr(), _sr()), wait=True)
+    def _sr(): return random.choice(SYM)
 
-    # Frame 1-2 — sve se vrte (random)
-    for _ in range(2):
-        await asyncio.sleep(0.55)
-        try: await msg.edit(embed=_spin_embed(_sr(), _sr(), _sr()))
-        except: pass
+    # ── Frame 0: GIF + sve se vrte ──────────────────────────────────────
+    msg = await i.followup.send(
+        embed=_build_spin(SPIN_SYM, SPIN_SYM, SPIN_SYM, "⏳  Valjci se vrte...", gif=True),
+        wait=True
+    )
 
-    # Frame 3 — prvi valjak staje
-    await asyncio.sleep(0.65)
-    try: await msg.edit(embed=_spin_embed(reels[0], _sr(), _sr(), f"<:e_lock3:1519362717394403432> Stao: {reels[0]}"))
+    await asyncio.sleep(1.5)
+
+    # ── Frame 1: Lijevi staje ────────────────────────────────────────────
+    try: await msg.edit(embed=_build_spin(reels[0], SPIN_SYM, SPIN_SYM, f"🔒  Stao: **{reels[0]}**  —  vrte se dalje...", gif=True))
     except: pass
 
-    # Frame 4 — drugi valjak staje
-    await asyncio.sleep(0.7)
-    try: await msg.edit(embed=_spin_embed(reels[0], reels[1], _sr(), f"<:e_lock3:1519362717394403432> Stao: {reels[0]} {reels[1]}"))
+    await asyncio.sleep(1.2)
+
+    # ── Frame 2: Desni staje ─────────────────────────────────────────────
+    try: await msg.edit(embed=_build_spin(reels[0], SPIN_SYM, reels[2], f"🔒  Stao: **{reels[0]}** · **{reels[2]}**  —  centar se vrti...", gif=True))
     except: pass
 
-    # Frame 5 — treći valjak staje (kratka pauza za dramski efekat)
-    await asyncio.sleep(0.75)
+    await asyncio.sleep(1.2)
 
-    # ─── Odluka ─────────────────────────────────────────────────────────
-    if reels[0] == reels[1] == reels[2]:
-        multiplier = jackpot_multi[sym]
-        win        = int(ulog * multiplier)
-        net        = win - ulog
+    # ── Odluka ───────────────────────────────────────────────────────────
+    all_same = reels[0] == reels[1] == reels[2]
+    sym      = reels[1]  # centar odlučuje (kao OWO)
+
+    if all_same:
+        multiplier   = MULTI[sym]
+        win          = int(ulog * multiplier)
+        net          = win - ulog
         d["balance"] += net
-        color = COLORS["gold"]
-        if sym in ("<:e_diamond2:1519362640961474601>", "7️⃣"):
-            title  = "<:e_diamond2:1519362640961474601>  M E G A  J A C K P O T  <:e_diamond2:1519362640961474601>"
-            result = f"<:e_coins3:1519362621206298666> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.0f})*"
-            footer_extra = "<:e_trophy2:1519362624742232146> NEVJEROVATAN POGODAK!"
+        if sym == "7️⃣":
+            color        = 0xFFD700
+            title        = "🎉  7 7 7  —  M E G A  J A C K P O T  🎉"
+            result_line  = f"**+{win:,} <:e_coins3:1519362621206298666>**  *(×{multiplier:.0f})*"
+            footer_extra = "🏆 NEVJEROVATAN POGODAK!"
         else:
-            title  = "<:e_party:1519363028334674070>  J A C K P O T  <:e_party:1519363028334674070>"
-            result = f"<:e_confetti2:1519363348288901221> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
-            footer_extra = "Sva tri ista!"
+            color        = 0x2ECC71
+            title        = f"🎊  J A C K P O T  —  {sym}{sym}{sym}"
+            result_line  = f"**+{win:,} <:e_coins3:1519362621206298666>**  *(×{multiplier:.1f})*"
+            footer_extra = f"Sva tri {sym} — {DESC_MAP[sym]}"
         outcome = "jackpot"
 
-    elif reels[0] == reels[1] or reels[1] == reels[2]:
-        mid        = reels[1]
-        multiplier = pair_multi[mid]
-        win        = int(ulog * multiplier)
-        net        = win - ulog
-        if net >= 0:
-            d["balance"] += net
-            color  = COLORS["success"]
-            title  = "<:e_sparkles:1519363032185176198>  D O B I T A K  <:e_sparkles:1519363032185176198>"
-            result = f"<:e_grheart:1519363074824343592> **+{win:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
-        else:
-            d["balance"] = max(0, d["balance"] + net)
-            color  = COLORS["warning"]
-            title  = "<:e_dizzy:1519362812554510509>  M A L I  G U B I T A K"
-            result = f"<:e_green:1519362769047126028> **{net:,} <:e_coins3:1519362621206298666>** *(×{multiplier:.1f})*"
-        footer_extra = "Dva ista simbola — par!"
-        outcome = "pair"
+    elif reels[0] == reels[1] or reels[1] == reels[2] or reels[0] == reels[2]:
+        # Dva ista — vraćamo ulog (1x)
+        win          = ulog
+        net          = 0
+        color        = 0xF39C12
+        title        = "✨  P A R  —  Dva ista!"
+        result_line  = f"**{win:,} <:e_coins3:1519362621206298666>**  *(×1.0 — ulog vraćen)*"
+        footer_extra = "Dva ista simbola"
+        outcome      = "pair"
 
     else:
         d["balance"] = max(0, d["balance"] - ulog)
-        color  = COLORS["error"]
-        title  = "<:e_moneywing:1519362955437805771>  N I Š T A . . ."
-        result = f"<:icon_cross:1519358379917836508> **−{ulog:,} <:e_coins3:1519362621206298666>**"
-        footer_extra = "Nema sreće ovaj put"
-        outcome = "loss"
+        color        = 0xE74C3C
+        title        = "💸  N I Š T A . . ."
+        result_line  = f"**−{ulog:,} <:e_coins3:1519362621206298666>**"
+        footer_extra = "Nema sreće ovaj put — pokušaj ponovo!"
+        outcome      = "loss"
 
     save_data()
 
-    # ─── Finalni embed ────────────────────────────────────────────────────
-    slot_line = f"𓉘  {reels[0]}  │  {reels[1]}  │  {reels[2]}  𓉝"
-    if outcome == "jackpot":
-        final_desc = f"{slot_line}\n\n<:e_slotm:1519362699014967297> Sva tri ista — **JACKPOT!**"
-    elif outcome == "pair":
-        final_desc = f"{slot_line}\n\n🎯 Dva ista simbola — **par!**"
-    else:
-        final_desc = f"{slot_line}\n\n<:e_cry:1519362944717160530> Nema kombinacije. Pokušaj ponovo!"
-
+    # ── Finalni embed (bez GIF-a, centar se otkrio) ──────────────────────
     final_e = discord.Embed(
-        description=f"{final_desc}\n\n<:e_coins3:1519362621206298666> `{ulog:,} <:e_coins3:1519362621206298666>` ulog  ·  {result}  ·  <:e_bank2:1519362662515871744> `{d['balance']:,} <:e_coins3:1519362621206298666>`",
+        title=title,
+        description=(
+            f"```\n┏━━━━━━━━━━━━━━━━━┓\n"
+            f"{_reel_line(reels[0], reels[1], reels[2])}\n"
+            f"┗━━━━━━━━━━━━━━━━━┛```\n"
+            f"{result_line}"
+        ),
         color=color,
         timestamp=datetime.now(timezone.utc)
     )
-    final_e.set_author(name=f"<:e_slotm:1519362699014967297> {title} — {i.user.display_name}", icon_url=i.user.display_avatar.url)
-    final_e.set_footer(text=f"{BOT_NAME} • {footer_extra}")
+    final_e.add_field(name="<:e_coins3:1519362621206298666> Ulog",   value=f"`{ulog:,}`",          inline=True)
+    final_e.add_field(name="<:e_bank2:1519362662515871744> Balans",  value=f"`{d['balance']:,}`",   inline=True)
+    final_e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
+    final_e.set_footer(text=f"{BOT_NAME} • Slots  •  {footer_extra}")
 
     try:
         await msg.edit(embed=final_e)
     except Exception:
-        pass  # Nema duplog embeda
+        pass
 
 # /rulet uklonjeno (na zahtjev) — /flip i /8ball uklonjeni (v2.2) — pravimo mjesto za /mafia igru.
 # /meme uklonjeno (v2.1) — vanjski sadržaj može vratiti NSFW u SFW kanal.
@@ -4109,6 +4125,19 @@ def kaladont_active_embed(game: dict):
     e.set_footer(text="🎯 Pritisni dugme za kraj igre")
     return e
 
+KALADONT_PENGUIN_GIFS = [
+    "https://media.giphy.com/media/iFxXouCf76ZencqIRP/giphy.gif",
+    "https://media.giphy.com/media/14bWswbeWGzYEo/giphy.gif",
+    "https://media.giphy.com/media/D8F5Q0aUKJMhO/giphy.gif",
+    "https://media.giphy.com/media/3orieTRnFkTAq44PwA/giphy.gif",
+    "https://media.giphy.com/media/VxbvpfaTTo3le/giphy.gif",
+    "https://media.giphy.com/media/l0Exk8EUzSLsrErEQ/giphy.gif",
+    "https://media.giphy.com/media/Bq2m2VoYWRz5K/giphy.gif",
+    "https://media.giphy.com/media/5xtDarIYCrMRcKCkIz2/giphy.gif",
+    "https://media.giphy.com/media/GaimHOCasAFpm/giphy.gif",
+    "https://media.giphy.com/media/7SEDt0yFLvzRm/giphy.gif",
+]
+
 def kaladont_word_card(word: str, player: str, req: str, count: int):
     icon = KALADONT_BOX_ICONS[(count - 1) % len(KALADONT_BOX_ICONS)]
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
@@ -4119,6 +4148,7 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
         ),
         color=KALADONT_COLOR,
     )
+    e.set_thumbnail(url=random.choice(KALADONT_PENGUIN_GIFS))
     e.set_footer(text=f"GIAN Kaladont  •  #{count}")
     return e
 
@@ -7536,7 +7566,7 @@ async def ticket_setup(i: discord.Interaction):
     except discord.Forbidden:
         await i.followup.send("<:icon_cross:1519358379917836508> Nemam permisiju da pišem u ovaj kanal!", ephemeral=True)
 
-class SupportTicketModal(discord.ui.Modal, title="<:e_ticket3:1519362637534597221> Otvori Tiket za Podršku"):
+class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"):
     razlog = discord.ui.TextInput(
         label="Razlog tiketa (kratko)",
         placeholder="Npr: Problem sa ulogom, ban žalba, pitanje...",
@@ -8392,7 +8422,7 @@ async def help_cmd(i: discord.Interaction):
             is_mobile = True
     except Exception: pass
 
-    title = "<:e_diamond3:1519363370694738072> G I A N N I  —  K O M A N D E  <:e_diamond3:1519363370694738072>" if not is_mobile else "<:e_phone:1519362788462559323> G I A N N I  —  M O B I L E  <:e_diamond3:1519363370694738072>"
+    title = "<:e_diamond3:1519363370694738072> S Q U A D  —  K O M A N D E  <:e_diamond3:1519363370694738072>" if not is_mobile else "<:e_phone:1519362788462559323> S Q U A D  —  M O B I L E  <:e_diamond3:1519363370694738072>"
     prefix_txt = f"Prefiksi: `{px}` (slash) i `.` (mobitel)" if not is_mobile else f"Mobitel mod — koristi `.` prefix"
 
     e = discord.Embed(
