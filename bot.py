@@ -3831,17 +3831,19 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     def _row(r1, r2, r3) -> str:
         return f"`[ {r1} ]` `[ {r2} ]` `[ {r3} ]`"
 
+    SLOTS_BANNER = "https://i.imgur.com/6YnWybh.png"
+
     def _embed(r1, r2, r3, status: str, color: int = 0xF1C40F, title: str = "") -> discord.Embed:
         e = discord.Embed(
             description=(
-                f"` ─── SLOTS ─── `\n\n"
-                f"{_row(r1, r2, r3)}\n\n"
+                f"\n{_row(r1, r2, r3)}\n\n"
                 f"{status}"
             ),
             color=color,
         )
         if title:
             e.title = title
+        e.set_image(url=SLOTS_BANNER)
         e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
         e.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}  •  {BOT_NAME}")
         return e
@@ -4087,16 +4089,16 @@ def kaladont_active_embed(game: dict):
     return e
 
 KALADONT_PENGUIN_GIFS = [
-    "https://media.giphy.com/media/iFxXouCf76ZencqIRP/giphy.gif",
-    "https://media.giphy.com/media/14bWswbeWGzYEo/giphy.gif",
-    "https://media.giphy.com/media/D8F5Q0aUKJMhO/giphy.gif",
-    "https://media.giphy.com/media/3orieTRnFkTAq44PwA/giphy.gif",
-    "https://media.giphy.com/media/VxbvpfaTTo3le/giphy.gif",
-    "https://media.giphy.com/media/l0Exk8EUzSLsrErEQ/giphy.gif",
-    "https://media.giphy.com/media/Bq2m2VoYWRz5K/giphy.gif",
-    "https://media.giphy.com/media/5xtDarIYCrMRcKCkIz2/giphy.gif",
-    "https://media.giphy.com/media/GaimHOCasAFpm/giphy.gif",
-    "https://media.giphy.com/media/7SEDt0yFLvzRm/giphy.gif",
+    "https://media.tenor.com/KbLz2FY2P0cAAAAC/penguin-cute.gif",
+    "https://media.tenor.com/Gu7UMdNQVmMAAAAC/penguin-funny.gif",
+    "https://media.tenor.com/MnJZubrd37QAAAAC/penguin-dance.gif",
+    "https://media.tenor.com/0LLb1mSMq2MAAAAC/penguin-waddle.gif",
+    "https://media.tenor.com/3VCFDlP3n2IAAAAC/penguin-slide.gif",
+    "https://media.tenor.com/OoBBmwIsMHUAAAAC/penguin-happy.gif",
+    "https://media.tenor.com/YOmPqXe2LQAAAAAC/baby-penguin.gif",
+    "https://media.tenor.com/1Cx9TuFnqMwAAAAC/penguin-cute-penguin.gif",
+    "https://media.tenor.com/7qZx1uFcVnYAAAAC/penguin-slip.gif",
+    "https://media.tenor.com/w8CVH4DFMZIAAAAC/penguin-clumsy.gif",
 ]
 
 def kaladont_word_card(word: str, player: str, req: str, count: int):
@@ -4109,7 +4111,7 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
         ),
         color=KALADONT_COLOR,
     )
-    e.set_thumbnail(url=random.choice(KALADONT_PENGUIN_GIFS))
+    e.set_image(url=random.choice(KALADONT_PENGUIN_GIFS))
     e.set_footer(text=f"🐧 {BOT_NAME} Kaladont  •  #{count}")
     return e
 
@@ -7646,9 +7648,26 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
         await i.response.send_message(embed=potvrda, ephemeral=True)
 
 
-@bot.tree.command(name="tiket", description="<:e_ticket3:1519362637534597221> Otvori tiket za podršku (direktno, bez panela)")
+@bot.tree.command(name="tiket", description="<:e_ticket3:1519362637534597221> Otvori tiket za podršku")
 async def tiket_cmd(i: discord.Interaction):
-    await i.response.send_modal(SupportTicketModal())
+    BAR = "━━━━━━━━━━━━━━━━━━━━"
+    e = discord.Embed(
+        title="<:e_ticket3:1519362637534597221>  Otvori Tiket",
+        description=(
+            f"{BAR}\n"
+            f"📚  Trebaš pomoć? **Otvori tiket!**\n\n"
+            f"🎀  Popuni formu i naš staff će ti odgovoriti što prije.\n"
+            f"🔘  Prosječno vrijeme odgovora: **< 30 minuta**\n"
+            f"{BAR}\n\n"
+            f"🎁  **Šta ćeš dobiti**\n"
+            f"🎀  Privatni kanal samo za tebe i staff\n"
+            f"✅  Pomoć od iskusnog tima\n"
+            f"📸  Možeš priložiti slike/screenshote"
+        ),
+        color=0xFF69B4,
+    )
+    e.set_footer(text=f"{BOT_NAME} Ticket Sistem")
+    await i.response.send_message(embed=e, view=TicketOpenView(), ephemeral=True)
 
 # ═══════════════════════════════════════════
 #    STAFF PRIJAVA SISTEM
