@@ -1776,12 +1776,23 @@ _orig_embed_init = discord.Embed.__init__
 import re as _re_title
 
 def _fmt_title(t):
-    """Dodaj ' | ' između custom emoji prefiksa i ostatka naslova ako već nije."""
+    """Dodaj ' | ' između emoji prefiksa i ostatka naslova ako već nije."""
     if not t or " | " in t:
         return t
+    # Custom Discord emoji: <:name:id> ili <a:name:id>
     m = _re_title.match(r'^(<a?:\w+:\d+>)\s+(.*)', t, _re_title.DOTALL)
     if m:
         return f"{m.group(1)} | {m.group(2)}"
+    # Unicode emoji (supplementary planes npr 🎰🛑🎊 i common symbols 🪙💎✅❌⚠️)
+    m2 = _re_title.match(
+        r'^([\U0001F000-\U0001FAFF\U00002600-\U000027BF\U00002300-\U000023FF'
+        r'\U0000FE00-\U0000FE0F\u2702-\u27B0\u2B00-\u2BFF]+[\uFE0F\u20E3]?\s+)(.*)',
+        t, _re_title.DOTALL
+    )
+    if m2:
+        emoji_part = m2.group(1).rstrip()
+        rest = m2.group(2)
+        return f"{emoji_part} | {rest}"
     return t
 
 def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
@@ -3843,30 +3854,33 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     reels = random.choices(SYM, weights=WEIGHTS, k=3)
     SPIN  = "🎰"
 
-    def _embed(r1, r2, r3, status: str, color: int = 0xF1C40F, title: str = "", ts=None) -> discord.Embed:
+    def _embed(r1, r2, r3, status: str = "", title: str = "", ts=None) -> discord.Embed:
         reels_line = f"> `[ {r1} ]`  `[ {r2} ]`  `[ {r3} ]`"
+        desc = f"\n{reels_line}"
+        if status:
+            desc += f"\n\n> {status}"
         e = discord.Embed(
             title=title or "🎰 | SLOTS | 🎰",
-            description=f"\n{reels_line}\n\n> {status}",
+            description=desc,
             color=_LP,
         )
         e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
         if ts:
             e.timestamp = ts
-        e.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}")
+        e.set_footer(text=f"🪙 | Ulog: {ulog:,}  •  💰 | Balans: {d['balance']:,}")
         return e
 
-    # ── Frame 0: svi reelovi se vrte (~0.7s) ─────────────────────────────
-    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, "⏳ Vrtim...", title="🎰 | SLOTS | 🎰"), wait=True)
+    # ── Frame 0: svi reelovi se vrte (~0.7s) — status prazan, animacija u reelovima ──
+    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, title="🎰 | SLOTS | 🎰"), wait=True)
     await asyncio.sleep(0.7)
 
     # ── Frame 1: lijevi staje (~0.65s) ───────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, f"🔒 **{reels[0]}**  ·  {SPIN}  ·  {SPIN}", title="🎰 | SLOTS | 🎰"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, title="🎰 | SLOTS | 🎰"))
     except: pass
     await asyncio.sleep(0.65)
 
     # ── Frame 2: desni staje (~0.65s) ────────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], f"🔒 **{reels[0]}**  ·  {SPIN}  ·  🔒 **{reels[2]}**", title="🎰 | SLOTS | 🎰"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], title="🎰 | SLOTS | 🎰"))
     except: pass
     await asyncio.sleep(0.65)
 
@@ -3900,7 +3914,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     save_data()
 
     try:
-        await msg.edit(embed=_embed(reels[0], reels[1], reels[2], status, color=color, title=title, ts=datetime.now(timezone.utc)))
+        await msg.edit(embed=_embed(reels[0], reels[1], reels[2], status=status, title=title, ts=datetime.now(timezone.utc)))
     except Exception:
         pass
 
