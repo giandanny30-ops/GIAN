@@ -1650,9 +1650,9 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
                 _has_md = any(m in _line for m in ("**", "__", "```", "`", "##", "||")) or _line.lstrip().startswith("*")
                 _has_word = any(c.isalpha() for c in _line)
                 if _has_md or not _has_word:
-                    styled.append(_line)
+                    styled.append(f"> {_line}")
                 else:
-                    styled.append(f"__**{_line}**__")
+                    styled.append(f"> **{_line}**")
             else:
                 styled.append(_line)
         desc = "\n".join(styled)
@@ -1849,16 +1849,16 @@ def _patched_embed_init(self, *, title=None, description=None, color=None, colou
                 _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
                 _has_word = any(c.isalpha() for c in _ln)
                 if _has_md or not _has_word:
-                    _e_styled.append(_ln)
+                    _e_styled.append(f"> {_ln}")
                 else:
-                    _e_styled.append(f"__**{_ln}**__")
+                    _e_styled.append(f"> **{_ln}**")
             else:
                 _e_styled.append(_ln)
         description = "\n".join(_e_styled)
     _orig_embed_init(self, title=title, description=description, color=color, colour=colour, **kwargs)
 
 discord.Embed.__init__ = _patched_embed_init
-print("[bold-embed] aktivan — sve embeds koriste __**bold**__ format")
+print("[bold-embed] aktivan — sve embeds (osim slots) koriste > bold format")
 
 # ═══════════════════════════════════════════
 #    GIF HELPER (nekos.best)
