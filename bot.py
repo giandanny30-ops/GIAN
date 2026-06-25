@@ -1863,7 +1863,7 @@ async def _license_check_and_shutdown_if_clone():
                         f"<:e_link:1519363321458065408> **Jedini originalni bot:** GIAN\n\n"
                         f"Bot će se sada automatski isključiti i napustiti server."
                     ),
-                    color=0xE74C3C
+                    color=_LP
                 )
                 await ch.send(embed=e)
         except Exception:
@@ -2070,7 +2070,7 @@ async def on_guild_join(guild):
                         f"<:e_link:1519363321458065408> **Jedini originalni bot:** GIAN\n\n"
                         f"Bot napušta server."
                     ),
-                    color=0xE74C3C
+                    color=_LP
                 )
                 await ch.send(embed=e)
         except Exception:
@@ -2135,7 +2135,7 @@ async def on_member_join(member):
                         f"<:e_gift:1519362618341462067> {member.mention} dobio/la **1 {vemoji} vatricu** kao poklon dobrodošlice!\n"
                         f"{vemoji} Ukupno: **{novi_v}**  ·  Još vatrica zarađuješ svakih **150 poruka!**"
                     ),
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
                 vj_e.set_author(name=f"{member.display_name} se pridružio/la!", icon_url=member.display_avatar.url)
@@ -2192,7 +2192,7 @@ async def on_member_join(member):
                         f"<:e_rocket2:1519363332266524813> Nastavljamo dalje — sljedeća stanica još veća!\n"
                         f"━━━━━━━━━━━━━━━━━━━━━━"
                     ),
-                    color=0x000000, timestamp=datetime.now(timezone.utc)
+                    color=_LP, timestamp=datetime.now(timezone.utc)
                 )
                 ms_e.set_image(url="https://media.tenor.com/M0vSf9CGHoEAAAAC/celebration.gif")
                 ms_e.set_footer(text=f"{BOT_NAME} • Server raste! <:e_level2:1519362739749785610>")
@@ -2335,7 +2335,7 @@ async def on_member_join(member):
                 f"┗ <:e_gift:1519362618341462067> {gws_lnk}\n\n"
                 f"<:e_feather:1519363362322907218> Ti si **{member_count}.** član servera!"
             ),
-            color=0x000000,
+            color=_LP,
             timestamp=_now_utc
         )
         e.set_thumbnail(url=member.display_avatar.url)
@@ -2416,7 +2416,7 @@ async def on_member_update(before, after):
                 f"{after.mention} je upravo **boostovao server**! <:e_rocket2:1519363332266524813>\n"
                 f"Hvala ti na podršci — server je sad još jači! <:e_muscle:1519362764244652122>"
             ),
-            color=0x000000,
+            color=_LP,
             timestamp=datetime.now(timezone.utc)
         )
         e.add_field(name="<:e_rocket2:1519363332266524813> Boostova", value=f"`{boosts}`",        inline=True)
@@ -2591,7 +2591,7 @@ async def on_message(message):
             except: pass
             cid = message.channel.id
             _kaladont_invalid_count[cid] = _kaladont_invalid_count.get(cid, 0) + 1
-            if _kaladont_invalid_count[cid] >= 10:
+            if _kaladont_invalid_count[cid] >= 7:
                 _kaladont_invalid_count[cid] = 0
                 # Deaktiviraj prethodni invalid embed ako postoji
                 old_msg = _kaladont_invalid_msgs.pop(cid, None)
@@ -2632,7 +2632,7 @@ async def on_message(message):
                 win_e = discord.Embed(
                     title=f"<:e_crown2:1519363047163166922>  K A L A D O N T  —  P O B J E D A !  {E_FIRE4}",
                     description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}  {message.author.mention} je izrekao/la magičnu riječ!  {E_FIRE3}{E_FIRE2}{E_FIRE1}",
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
                 win_e.add_field(name="<:e_trophy2:1519362624742232146>  Pobjednik/ca",  value=f"**{message.author.display_name}**", inline=True)
@@ -2644,7 +2644,7 @@ async def on_message(message):
                 await message.channel.send(content=message.author.mention, embed=win_e)
                 del kaladont_games[message.channel.id]
                 return
-            await message.channel.send(embed=kaladont_word_card(word, message.author.display_name, new_req, count), view=KaladontWordView(message.channel.id))
+            await message.channel.send(embed=kaladont_word_card(word, message.author.mention, new_req, count), view=KaladontWordView(message.channel.id))
             if game["msg"]:
                 try: await game["msg"].edit(embed=kaladont_active_embed(game))
                 except: pass
@@ -2762,7 +2762,7 @@ async def on_message(message):
                         + (f"<:e_label:1519363326109417613>️ Otključana uloga: {new_role.mention}\n" if new_role else "")
                         + f"━━━━━━━━━━━━━━━━━━━━━━"
                     ),
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
                 lv_em.add_field(name="<:e_bolt:1519362674717102160> XP", value=f"+100", inline=True)
@@ -3050,7 +3050,7 @@ async def on_member_remove(member):
                         f"{VE_L[0]} {member.display_name} **je napustio/la server**\n"
                         f"<:e_feather:1519363362322907218> **{member_count_l} member**"
                     ),
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
             e.set_thumbnail(url=member.display_avatar.url)
@@ -3181,7 +3181,7 @@ async def spotify_cmd(i: discord.Interaction, korisnik: discord.Member = None):
         title=f"<:e_music2:1519362679310127114> {spotify.title}",
         url=f"https://open.spotify.com/track/{spotify.track_id}",
         description=f"**Izvođač:** {spotify.artist}\n**Album:** {spotify.album}\n\n`{fmt_t(elapsed)}` {bar} `{fmt_t(duration)}`",
-        color=0x000000,  # Spotify zelena
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_author(name=f"{u.display_name} sluša", icon_url=u.display_avatar.url)
@@ -3709,7 +3709,7 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
     e = discord.Embed(
         title="<:e_chart:1519362656568475880> ᴀᴋᴛɪᴠɴᴏsᴛ",
         description=desc,
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=u.display_avatar.url)
@@ -4052,7 +4052,7 @@ KALADONT_BOX_ICONS = [
     "<:icon_music:1519358320337752125>",
     "<:icon_heart:1519358309008674848>",
 ]
-KALADONT_COLOR = 0x000000
+KALADONT_COLOR = _LP
 
 def kaladont_start_embed(game: dict, mention: str):
     word    = game["word"]
@@ -4104,17 +4104,12 @@ def kaladont_active_embed(game: dict):
     e.set_footer(text="🎯 Pritisni dugme za kraj igre")
     return e
 
+# ── Kaladont slike — uploadaj slike iz images/ foldera na Discord CDN ili Imgur,
+#    zatim zamijeni URL-ove ispod sa tvojim linkovima ──────────────────────────
 KALADONT_PENGUIN_GIFS = [
-    "https://media.tenor.com/KbLz2FY2P0cAAAAC/penguin-cute.gif",
-    "https://media.tenor.com/Gu7UMdNQVmMAAAAC/penguin-funny.gif",
-    "https://media.tenor.com/MnJZubrd37QAAAAC/penguin-dance.gif",
-    "https://media.tenor.com/0LLb1mSMq2MAAAAC/penguin-waddle.gif",
-    "https://media.tenor.com/3VCFDlP3n2IAAAAC/penguin-slide.gif",
-    "https://media.tenor.com/OoBBmwIsMHUAAAAC/penguin-happy.gif",
-    "https://media.tenor.com/YOmPqXe2LQAAAAAC/baby-penguin.gif",
-    "https://media.tenor.com/1Cx9TuFnqMwAAAAC/penguin-cute-penguin.gif",
-    "https://media.tenor.com/7qZx1uFcVnYAAAAC/penguin-slip.gif",
-    "https://media.tenor.com/w8CVH4DFMZIAAAAC/penguin-clumsy.gif",
+    "ZAMIJENI_SA_URL_kaladont_pingvin1",   # images/kaladont_penguin1.png
+    "ZAMIJENI_SA_URL_kaladont_pingvin2",   # images/kaladont_penguin2.png
+    "ZAMIJENI_SA_URL_kaladont_pingvin3",   # images/kaladont_penguin3.png
 ]
 
 def kaladont_word_card(word: str, player: str, req: str, count: int):
@@ -4187,7 +4182,7 @@ async def _send_kaladont_help(i: discord.Interaction, channel_id: int):
     e = discord.Embed(
         title=f"<:icon_warning:1519358274284032030> Pomoć — počni sa `{req}`",
         description=desc,
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_footer(text="📝 Kaladont Pomoć • samo ti vidiš ovo • cooldown 15 min")
@@ -4764,7 +4759,7 @@ def _ag_player_list(players, show_roles=False):
 
 def _ag_lobby_embed(state):
     players = state["players"]
-    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — Lobby", color=0x1B1B2F,
+    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — Lobby", color=_LP,
                       description="Pridruži se i čekaj da host pokrene igru!\n**Min 4 • Max 10 igrača**",
                       timestamp=datetime.now(timezone.utc))
     e.add_field(name=f"<:e_users:1519363096601301120> Igrači ({len(players)}/10)",
@@ -4777,7 +4772,7 @@ def _ag_game_embed(state):
     alive = [p for p in state["players"].values() if p["alive"]]
     ac = sum(1 for p in alive if p["role"]=="crewmate")
     ai = sum(1 for p in alive if p["role"]=="impostor")
-    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — U Toku", color=0x1B1B2F, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — U Toku", color=_LP, timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_users:1519363096601301120> Igrači", value=_ag_player_list(state["players"]), inline=False)
     e.add_field(name="<:e_clipboard:1519363052871614627> Zadaci", value=_task_bar(state["done_tasks"], state["total_tasks"]), inline=True)
     e.add_field(name="<:e_masks:1519363003424706671> Živi", value=f"<:e_internet:1519363106395000994> {ac} crew | <:e_red:1519362782192210041> {ai} imp", inline=True)
@@ -4947,7 +4942,7 @@ class AmogusLobbyView(discord.ui.View):
         state["game_view"] = gv
         extra = f"\n<:icon_warning:1519358274284032030>️ Nije mogao primiti DM: {', '.join(bad_dm)}" if bad_dm else ""
         start_e = discord.Embed(title="<:e_rocket2:1519363332266524813> Igra počinje!", description=f"Uloge podijeljene! Provjeri **DM** za svoju ulogu.{extra}",
-                                color=0x1B1B2F, timestamp=datetime.now(timezone.utc))
+                                color=_LP, timestamp=datetime.now(timezone.utc))
         await i.edit_original_response(embed=start_e, view=None)
         await i.channel.send(embed=_ag_game_embed(state), view=gv)
 
@@ -5286,7 +5281,7 @@ class AmogusGameView(discord.ui.View):
         await i.response.send_modal(AmogusGhostModal(self.cid, uid))
 
 def _ag_meeting_embed(state, caller, reason):
-    e = discord.Embed(title="<:e_report2:1519362714198347886> EMERGENCY MEETING!", color=0xFF0000,
+    e = discord.Embed(title="<:e_report2:1519362714198347886> EMERGENCY MEETING!", color=_LP,
                       description=f"**{caller}** je sazvao/la meeting!\n*{reason}*\n\n**Glasajte koga eliminišete!**",
                       timestamp=datetime.now(timezone.utc))
     alive = {k:v for k,v in state["players"].items() if v["alive"]}
@@ -5446,7 +5441,7 @@ def _pk_lobby_embed(g):
             f"▸ Domaćin klika **Počni igru** kad je spreman\n"
             f"▸ Igra automatski kreće za **60 sekundi**"
         ),
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Poker • Min 2, Max 9 igrača")
@@ -5479,7 +5474,7 @@ def _pk_game_embed(g):
     e = discord.Embed(
         title=phase_titles.get(g["phase"], "<:e_cards2:1519362702835712010> POKER"),
         description=desc,
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Klikni 'Vidi kartice' za svoju ruku • Pot: {g['pot']:,} <:e_coins3:1519362621206298666>")
@@ -6238,7 +6233,7 @@ async def hunt(i: discord.Interaction):
 
     animal = pick_animal()
     if not animal:
-        e = discord.Embed(description=f"<:e_arrow:1519363399845154958>  {random.choice(HUNT_MISS)}", color=0x555555, timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(description=f"<:e_arrow:1519363399845154958>  {random.choice(HUNT_MISS)}", color=_LP, timestamp=datetime.now(timezone.utc))
         e.set_footer(text=f"{BOT_NAME} {VERSION} • Pokušaj ponovo za 7s")
         return await i.followup.send(embed=e)
 
@@ -6390,7 +6385,7 @@ async def pray(i: discord.Interaction, korisnik: discord.Member):
         f"<:e_sparkles:1519363032185176198> {i.user.mention} šalje dobre vibracije {korisnik.mention}! `+{bonus} <:e_coins3:1519362621206298666>` u džep!",
         f"<:e_feather:1519363362322907218>️ Zbog molitve {i.user.mention}, {korisnik.mention} je blagosloven sa `{bonus} <:e_coins3:1519362621206298666>`!",
     ]
-    e = discord.Embed(description=random.choice(msgs), color=0x000000, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(description=random.choice(msgs), color=_LP, timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -7534,7 +7529,7 @@ async def ticket_setup(i: discord.Interaction):
             f"✅  Pomoć od iskusnog tima\n"
             f"📸  Možeš priložiti slike/screenshote"
         ),
-        color=0xFF69B4,
+        color=_LP,
     )
     e.set_footer(text=f"{BOT_NAME} Ticket Sistem")
     try:
@@ -7617,7 +7612,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
                 f"<:e_cal:1519362659676455046> Nalog: <t:{int(i.user.created_at.timestamp())}:R>\n"
                 f"{BAR}"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         e.set_thumbnail(url=i.user.display_avatar.url)
@@ -7645,7 +7640,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
                 f"Privatni kanal: {chan.mention}\n\n"
                 f"<:e_time2:1519362726952964227> Staff će ti odgovoriti uskoro. Budemo te obavijestili! <:e_invite2:1519362710469476405>"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         potvrda.add_field(
@@ -7678,7 +7673,7 @@ async def tiket_cmd(i: discord.Interaction):
             f"✅  Pomoć od iskusnog tima\n"
             f"📸  Možeš priložiti slike/screenshote"
         ),
-        color=0xFF69B4,
+        color=_LP,
     )
     e.set_footer(text=f"{BOT_NAME} Ticket Sistem")
     await i.response.send_message(embed=e, view=TicketOpenView())
@@ -7766,7 +7761,7 @@ class StaffApplyModal(discord.ui.Modal, title="📋 Staff Prijava"):
         prijava_e = discord.Embed(
             title="📋  Nova Staff Prijava",
             description=f"👤  **{i.user.display_name}** ({i.user.mention})  ·  🆔 `{i.user.id}`",
-            color=0xFF69B4,
+            color=_LP,
             timestamp=datetime.now(timezone.utc)
         )
         prijava_e.add_field(name="👤  Godine",       value=self.godine.value,     inline=True)
@@ -7816,7 +7811,7 @@ async def staff_cmd(i: discord.Interaction):
             "💥  **Igrači** — koliko ljudi možeš dovesti\n"
             "👤  **Aktivnost** — sati dnevno + timezone"
         ),
-        color=0xFF69B4,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_footer(text=f"{BOT_NAME} (Custom)  •  Staff Prijava")
@@ -8124,7 +8119,7 @@ async def aktivnost_setup(
     e_out = discord.Embed(
         title="<:icon_check:1519358376268533810> Aktivnost Setup — Sačuvano!",
         description="\n".join(linije),
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e_out.set_footer(text="GIAN (Custom) • Aktivnost Setup")
@@ -8273,7 +8268,7 @@ def _selfrole_embed(panel: dict) -> discord.Embed:
     e = discord.Embed(
         title=panel.get("title", "<:e_label:1519363326109417613>️ Self Roles"),
         description=panel.get("description", "Klikni dugme da dobiješ/skineš ulogu!"),
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     roles_txt = "\n".join(
@@ -8611,7 +8606,7 @@ async def event_cmd(i: discord.Interaction, naslov: str, opis: str):
     e = discord.Embed(
         title=f"<:e_circus:1519363558809272371>  {naslov}",
         description=f"{BAR}\n\n{opis}\n\n{BAR}",
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc),
     )
     e.set_author(
@@ -9097,7 +9092,7 @@ async def _post_vatrice_objava(guild: discord.Guild, davalac: discord.Member | N
     e = discord.Embed(
         title=naslov,
         description=desc,
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc),
     )
     e.set_thumbnail(url=primalac.display_avatar.url)
@@ -9152,7 +9147,7 @@ async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolici
             f"<:e_label:1519363326109417613> Nick ažuriran: `{korisnik.display_name}`\n"
             f"━━━━━━━━━━━━━━━━━━━━━━"
         ),
-        color=0x000000, timestamp=datetime.now(timezone.utc),
+        color=_LP, timestamp=datetime.now(timezone.utc),
     )
     e.add_field(name="<:e_bubble:1519363307998417148> Napisanih poruka (ukupno)", value=f"`{msgs_total:,}`", inline=True)
     e.add_field(name="<:e_cal:1519362659676455046> Poruka ove sedmice", value=f"`{msgs_week:,}`", inline=True)
@@ -9234,7 +9229,7 @@ async def vatrice_pup(i: discord.Interaction):
     e = discord.Embed(
         title=f"{emoji} ᴛᴏᴘ ᴠᴀᴛʀɪᴄᴇ — {i.guild.name} {emoji}",
         description=desc,
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc),
     )
     if i.guild.icon:
@@ -9308,7 +9303,7 @@ async def vatrice_start(i: discord.Interaction):
             f"a `/vatrice pup` prikazuje top listu.\n"
             f"━━━━━━━━━━━━━━━━━━━━━━"
         ),
-        color=0x000000, timestamp=datetime.now(timezone.utc),
+        color=_LP, timestamp=datetime.now(timezone.utc),
     )
     if i.guild.icon:
         e.set_thumbnail(url=i.guild.icon.url)
@@ -9340,7 +9335,7 @@ async def auto_game_loop():
                 "<:e_time2:1519362726952964227>️ Imaš **2 minute** za tiket — brzo! <:e_fire2:1519362671491678280>\n"
                 "<:e_mega2:1519362736566304818> Rezultati se objavljuju **javno** za sve <:e_globe2:1519362694887637004>"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         e.add_field(
@@ -9418,7 +9413,7 @@ async def active_member_week():
                 f"<:e_gift:1519362618341462067> **Nagrada:** `+500 coina` <:e_coins3:1519362621206298666> + `+100 XP` <:e_bolt:1519362674717102160>\n"
                 f"<:e_flower:1519362984818901173> Hvala što si dio × GIAN porodice!"
             ),
-            color=0x000000, timestamp=now
+            color=_LP, timestamp=now
         )
         e.set_thumbnail(url=top_member.display_avatar.url)
         # Top 3
@@ -9465,7 +9460,7 @@ async def bingo_cmd(i: discord.Interaction):
             "<:e_time2:1519362726952964227>️ Imaš **2 minute** za tiket — brzo! <:e_fire2:1519362671491678280>\n"
             "<:e_mega2:1519362736566304818> Rezultati se objavljuju **javno** za sve <:e_globe2:1519362694887637004>"
         ),
-        color=0xF1C40F,
+        color=_LP,
         timestamp=datetime.now(timezone.utc),
     )
     e.set_author(name=f"🎯 Pokrenuo/la: {i.user.display_name}", icon_url=i.user.display_avatar.url)
@@ -9582,7 +9577,7 @@ class PupModal(discord.ui.Modal, title="<:e_ticket3:1519362637534597221>️ Unes
                 f"<:e_check2:1519362730057007268>️ Tvoji brojevi su **tajno zabilježeni** i čekaju kraj runde!\n"
                 f"<:e_pray:1519363406078021863> Drži fige i čekaj objavu!"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         potvrda.add_field(
@@ -9609,7 +9604,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
         e = discord.Embed(
             title="🎯  Bingo — Runda završena",
             description="<:e_cry:1519362944717160530> **Niko nije uzeo tiket ovaj put.**\n<:e_idea:1519363006599794799> Sljedeći auto-bingo za **~3 sata**! <:e_time2:1519362726952964227>",
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         e.add_field(
@@ -9676,7 +9671,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
     results_txt = "\n\n".join(rows) if rows else "*Niko nije igrao.*"
 
     title = "<:e_trophy2:1519362624742232146>  <:e_diamond3:1519363370694738072>  J A C K P O T  <:e_diamond3:1519363370694738072>  <:e_trophy2:1519362624742232146>" if jackpot_uid else "🎯  <:e_diamond3:1519363370694738072>  B I N G O  —  Rezultati  <:e_diamond3:1519363370694738072>"
-    color = 0x000000 if jackpot_uid else 0xF1C40F
+    color=_LP if jackpot_uid else 0xF1C40F
 
     e = discord.Embed(
         title=title,
@@ -9748,7 +9743,7 @@ async def post_pvc_info():
                     f"renamati, postaviti limit i još mnogo toga!\n"
                     f"{sep}"
                 ),
-                color=0x000000
+                color=_LP
             )
             e.add_field(
                 name="1️⃣ Kako napraviti svoj kanal",
@@ -10217,7 +10212,7 @@ class StaffApplicationModal(discord.ui.Modal, title="<:e_clipboard:1519363052871
                 f"<:e_internet:1519363106395000994> Server: **{guild.name}**\n"
                 f"{BAR}"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         e.set_thumbnail(url=i.user.display_avatar.url)
@@ -10267,7 +10262,7 @@ class StaffApplicationModal(discord.ui.Modal, title="<:e_clipboard:1519363052871
                 notif = discord.Embed(
                     title="<:e_bell:1519363063738925187> Nova Staff Prijava",
                     description=f"**{i.user.display_name}** je podnio/la prijavu!\n<:e_folder:1519363642808729690> Pogledaj: {chan.mention}",
-                    color=0xF1C40F,
+                    color=_LP,
                 )
                 await notify_ch.send(embed=notif)
             except Exception:
@@ -10281,7 +10276,7 @@ class StaffApplicationModal(discord.ui.Modal, title="<:e_clipboard:1519363052871
                 f"<:e_lock3:1519362717394403432> Tvoja prijava je **privatna** — vidi je samo vlasnik bota.\n"
                 f"<:e_time2:1519362726952964227> Pregled traje **1–3 dana**. Budemo te obavijestili! <:e_invite2:1519362710469476405>"
             ),
-            color=0xF1C40F,
+            color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
         potvrda.add_field(
@@ -10346,7 +10341,7 @@ class StaffVoteView(discord.ui.View):
                         f"Kontaktiraj administratora da dobiješ Staff ulogu.\n"
                         f"Dobrodošao/la u tim! <:e_shake:1519362947766554737><:e_shield2:1519362627795554374>️"
                     ),
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc),
                 )
                 dm_e.set_footer(text=f"<:e_clipboard:1519363052871614627> {i.guild.name}  •  GIAN Bot")
@@ -10383,7 +10378,7 @@ class StaffVoteView(discord.ui.View):
                         f"Možeš pokušati ponovo za **30 dana**.\n"
                         f"Ne odustaji — nastavite biti aktivni! <:e_muscle:1519362764244652122>"
                     ),
-                    color=0x000000,
+                    color=_LP,
                     timestamp=datetime.now(timezone.utc),
                 )
                 dm_e.set_footer(text=f"<:e_clipboard:1519363052871614627> {i.guild.name}  •  GIAN Bot")
@@ -10550,7 +10545,7 @@ async def tiketstaff_cmd(ctx: commands.Context):
             f"<:icon_ban:1519358278356959284> **Discord invite linkovi nisu dozvoljeni** u poljima!\n"
             f"{BAR}"
         ),
-        color=0xF1C40F, timestamp=datetime.now(timezone.utc),
+        color=_LP, timestamp=datetime.now(timezone.utc),
     )
     e.add_field(name="<:e_pushpin:1519363357436543099> Rubrike", value=(
         "<:e_chart:1519362656568475880> **Godine** — koliko imaš godina\n"
@@ -11860,7 +11855,7 @@ async def poo_cmd(i: discord.Interaction):
             f'<:e_chart:1519362656568475880> Ukupni Poo XP: **{xp:,}**\n'
             f'<:e_shake:1519362947766554737> Ukupno doprinosa: **{helps:,}**'
         ),
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     if top_text:
@@ -11896,7 +11891,7 @@ async def poo_zadaci_cmd(i: discord.Interaction, stranica: int = 1):
     e = discord.Embed(
         title=f'<:e_skull:1519362992502997125> POO Zadaci — Stranica {stranica}/10',
         description=desc or 'Nema zadataka.',
-        color=0x000000,
+        color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
     e.set_footer(text=f'Stranica {stranica}/10 · Napredak: {done_count}/{len(POO_ZADACI)} · {BOT_NAME}')
@@ -11908,7 +11903,7 @@ async def poo_top_cmd(i: discord.Interaction):
     contribs = poo.get('contributors', {})
     if not contribs:
         return await i.response.send_message(
-            embed=em('<:e_skull:1519362992502997125> Poo Top Lista', 'Još niko nije doprinjeo Poo-u! Budi aktivan na serveru.', color=0x000000))
+            embed=em('<:e_skull:1519362992502997125> Poo Top Lista', 'Još niko nije doprinjeo Poo-u! Budi aktivan na serveru.', color=_LP))
     top = sorted(contribs.items(), key=lambda x: x[1], reverse=True)[:10]
     medals = ['<:e_star2:1519363084253266031>', '<:icon_rank2:1519358512336212091>', '<:icon_rank3:1519358517633355919>'] + [f'`#{n}`' for n in range(4, 11)]
     lines = []
@@ -11921,7 +11916,7 @@ async def poo_top_cmd(i: discord.Interaction):
     e = discord.Embed(
         title='<:e_skull:1519362992502997125> Top 10 Cuvara Poo-a',
         description='\n'.join(lines),
-        color=0x000000, timestamp=datetime.now(timezone.utc))
+        color=_LP, timestamp=datetime.now(timezone.utc))
     e.add_field(name='<:e_skull:1519362992502997125> Trenutni Stage', value=f'{semo} **{snm}** (XP: {poo.get("xp",0):,})', inline=True)
     e.set_footer(text=f'Budi aktivan i hrani Poo-a! · {BOT_NAME}')
     await i.response.send_message(embed=e)
@@ -11950,7 +11945,7 @@ async def poo_hrani_cmd(i: discord.Interaction):
     leveled = new_stage > old_stage
     desc = f'Nahranio/la si Poo-a! +**{bonus} Poo XP** <:e_plate:1519362791591378975>\nPoo XP ukupno: **{poo["xp"]:,}**'
     if leveled: desc += f'\n\n<:e_party:1519363028334674070> **POO JE NAPREDOVAO NA NOVI STAGE!**\n{semo} **{snm}**'
-    await i.response.send_message(embed=em('<:e_skull:1519362992502997125> Poo je sit!', desc, color=0x000000, fields=[
+    await i.response.send_message(embed=em('<:e_skull:1519362992502997125> Poo je sit!', desc, color=_LP, fields=[
         ('<:e_coins3:1519362621206298666> Potrošeno', f'`{COST} <:e_coins3:1519362621206298666>`', True),
         ('<:e_bank2:1519362662515871744> Ostalo', f'`{eco["balance"]:,} <:e_coins3:1519362621206298666>`', True),
         ('<:e_skull:1519362992502997125> Stage', f'{semo} {snm}', True),
@@ -11982,7 +11977,7 @@ async def poo_info_cmd(i: discord.Interaction):
             f'<:e_clipboard:1519363052871614627> Zadaci: `{bar}` `{done_count}/{total_tasks}` ({pct}%)\n\n'
             f'<:e_idea:1519363006599794799> Koristi `/poo-zadaci` za detaljan pregled!'
         ),
-        color=0x000000, timestamp=datetime.now(timezone.utc)
+        color=_LP, timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=i.user.display_avatar.url)
     e.set_footer(text=f'<:e_skull:1519362992502997125> POO igra · {BOT_NAME} · Budi aktivan i pomozi Poo-u!')
