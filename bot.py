@@ -645,6 +645,49 @@ KALADONT_DICT = set([
     "RIBOZOM","SELEN","SILICIJ","SIMULATOR","SINAPTICKI","SINTEZA","SINTEROVANJE","SPEKTAR",
     "SPIRALA","SREBRO","STIMULANS","STRUKTURA","SUPSTANCA","URAN","VAKUUM","VALENCA","VIRUS",
     "VITAMIN","VODIK","VOLUMEN","ZAGRIJAVANJE","ZRAK","ZRENJE",
+
+      # === Gradovi i mjesta BiH ===
+      "GLAMOC","LIVNO","KUPRES","PROZOR","JABLANICA","KONJIC","FOCA","CAJNICE","GORAZDE","VISEGRAD",
+      "ZVORNIK","BIJELJINA","DOBOJ","GRADACAC","BRCKO","TESANJ","MAGLAJ","ZAVIDOVICI","KAKANJ","VISOKO",
+      "RUDO","CAJNICE","NEVESINJE","GACKO","BERKOVICI","STOLAC","CAPLJINA","MEDJUGORJE","LJUBUSKI","SIROKI",
+      "POSUSJE","GRUDE","IMOTSKI","LIVNO","TOMISLAVGRAD","BUGOJNO","GORNJI","DONJI","SREDNJI",
+      # === Rijeke i priroda ===
+      "NERETVA","BOSNA","DRINA","UNA","SAVA","TREBISNJICA","VRBAS","KRIVAJA","USORA","SPRECA",
+      "TARA","PIVA","LIKA","ZRMANJA","KRKA","CETINA","NARENTA","DUNAV","MORAVA","VARDAR",
+      "SUTJESKA","BLIDINJE","JABLANICKO","BILECKO","RAMSKO","BUSKO","PROKOSKO",
+      # === Historija i kultura ===
+      "FEUDALIZAM","OSMANSKO","AUSTROUGARSKA","SOCIJALIZAM","KOMUNIZAM","FASISAM","NACIONALIZAM",
+      "REVOLUCIJA","USTANAK","OBNOVA","IZGRADNJA","MODERNIZACIJA","INDUSTRIJA","KOLEKTIVIZACIJA",
+      "PARTIZAN","CETNIK","USTASA","DOMOBRAN","ANTIFASISAM","OSLOBODJENJE","NEZAVISNOST",
+      "DEKLARACIJA","USTAV","ZAKONODAVSTVO","VLADA","PREDSJEDNIK","SKUPSTINA","MINISTARSTVO",
+      "AMBASADA","KONZULAT","DIPLOMATIJA","SPORAZUM","MIROVNI","PRIMIRJE","KAPITULACIJA",
+      # === Hemija — elementi i pojmovi ===
+      "VODIK","KISEONIK","UGLJIK","DUSIK","FOSFOR","SUMPOR","HLOR","JOD","BROM","FLUOR",
+      "NATRIJ","KALIJ","KALCIJ","MAGNEZIJ","ALUMINIJ","SILICIJ","BAKAR","CINK","GVOZDJE",
+      "MANGAN","KOBALT","NIKAL","KROM","TITAN","VANADIJ","CIRKONIJ","RUTENIJ","PALADIJ",
+      "SREBRO","ZLATO","PLATINA","ZIVA","OLOVO","BIZMUT","ARSEN","SELEN","TELUR","POLONIJ",
+      "RADIJ","URAN","TORIJ","NEON","ARGON","KRIPTON","KSENON","HELIJ","RADON",
+      "METAN","ETAN","PROPAN","BUTAN","BENZEN","TOLUEN","ETANOL","METANOL","ACETON","GLICEROL",
+      "KISELINA","BAZA","SO","OKSID","SULFAT","NITRAT","KARBONAT","FOSFAT","HLORID","BROMID",
+      "ELEKTROLIZA","HIDROLIZA","OKSIDACIJA","REDUKCIJA","SAGORIJEVANJE","KATALIZATOR",
+      "PROTEINI","UGLJIKOHIDRATI","MASTI","AMINOKISELINE","NUKLEINSKA","CELULOZA","SKROB",
+      # === Biografija i osobe (opsti pojmovi) ===
+      "BIOGRAF","AUTOBIOGRAF","PORTRET","KARAKTERISTIKA","DJELO","DOPRINOS","NASLJEDSTVO",
+      "RODJEN","UMRO","ZIVOTOPIS","MEMORIJE","DNEVNIK","PISMA","TESTAMENT","LEGAT",
+      "MENTOR","UCENIK","NASLJEDNIK","PRETHODNIK","SAVREMENICI","SUVREMENICI","POTOMAK",
+      "FEUDALAC","PLEMSTVO","VLASTELA","VELIKAS","VAZAL","KNEZEVSTVO","KRALJEVSTVO","CARSTVO",
+      # === Kule, tvrdjave, gradjevine ===
+      "KULA","TVRDJAVA","UTVRDA","ZIDINE","BASTION","KULA","TORANJ","DVORI","KASABA","KARAVANSARAJ",
+      "BEZISTAN","HANIKAH","TEKIJA","MESDID","MUSALA","MEKTEB","MEDRESA","IMARET","BEDESTEN",
+      "SAHAT","SAHATNICA","CARSIJSKA","MAHALA","MAHALICA","DEMIRHANA","TABAKHANA","BOJADISANA",
+      # === Geografija sveta ===
+      "HIMALAJI","ALPE","ANDE","KORDILJERI","KAVKAZ","URAL","KARPATIJA","PIRENEJ","APENINI",
+      "SAHARA","KALAHARI","NAMIB","GOBI","THAR","ATACAMA","PATAGONIA","ARKTIK","ANTARKTIKA",
+      "EKVATOR","TROPIK","POLARCNIK","MERIDIJAN","PARALELA","GEOGRAFSKA","KARTICA","MAPA",
+      "KONTINENT","POLUOTOK","ISLAND","ARHIPELAG","FJORD","ZALJJEV","TJESNAC","KANAL","ESTUARIJ",
+      "AMAZON","NIL","MISISIPI","JANGCE","GANGES","JENISEJ","OB","LENA","MEKONG","VOLGA",
+      "KASPIJSKO","BAJKALSKO","VIKTORIJA","SUPERIOR","MICHIGHAN","HURON","ERI","ONTARIO",
+      "TIHI","ATLANTSKI","INDIJSKI","ARKTICKI","ANTARKTICKI","SREDOZEMNO","CRNO","CRVENO",
     # === Više svakodnevnih BHS riječi ===
     "ACENA","ACIN","ADET","ADRESA","AGENCIJA","AGRESIJA","AHILEJ","AJET","AKCIJA","AKLAM",
     "AKCENT","AKORD","AKTIV","AKVARIJUM","ALARM","ALATKA","ALEJA","AMALGAM","AMBIS","AMORTIZER",
@@ -1607,9 +1650,9 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
                 _has_md = any(m in _line for m in ("**", "__", "```", "`", "##", "||")) or _line.lstrip().startswith("*")
                 _has_word = any(c.isalpha() for c in _line)
                 if _has_md or not _has_word:
-                    styled.append(f"> {_line}")
+                    styled.append(_line)
                 else:
-                    styled.append(f"> **{_line}**")
+                    styled.append(f"__**{_line}**__")
             else:
                 styled.append(_line)
         desc = "\n".join(styled)
@@ -1782,7 +1825,7 @@ def _fmt_title(t):
     # Custom Discord emoji: <:name:id> ili <a:name:id>
     m = _re_title.match(r'^(<a?:\w+:\d+>)\s+(.*)', t, _re_title.DOTALL)
     if m:
-        return f"{m.group(1)} | {m.group(2)}"
+        return f"{m.group(1)} {m.group(2)}"
     # Unicode emoji (supplementary planes npr 🎰🛑🎊 i common symbols 🪙💎✅❌⚠️)
     m2 = _re_title.match(
         r'^([\U0001F000-\U0001FAFF\U00002600-\U000027BF\U00002300-\U000023FF'
@@ -1792,7 +1835,7 @@ def _fmt_title(t):
     if m2:
         emoji_part = m2.group(1).rstrip()
         rest = m2.group(2)
-        return f"{emoji_part} | {rest}"
+        return f"{emoji_part} {rest}"
     return t
 
 def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
@@ -1806,16 +1849,16 @@ def _patched_embed_init(self, *, title=None, description=None, color=None, colou
                 _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
                 _has_word = any(c.isalpha() for c in _ln)
                 if _has_md or not _has_word:
-                    _e_styled.append(f"> {_ln}")
+                    _e_styled.append(_ln)
                 else:
-                    _e_styled.append(f"> **{_ln}**")
+                    _e_styled.append(f"__**{_ln}**__")
             else:
                 _e_styled.append(_ln)
         description = "\n".join(_e_styled)
     _orig_embed_init(self, title=title, description=description, color=color, colour=colour, **kwargs)
 
 discord.Embed.__init__ = _patched_embed_init
-print("[bold-embed] aktivan — sve embeds (osim slots) koriste > bold format")
+print("[bold-embed] aktivan — sve embeds koriste __**bold**__ format")
 
 # ═══════════════════════════════════════════
 #    GIF HELPER (nekos.best)
@@ -2591,8 +2634,11 @@ async def on_message(message):
             except: pass
             cid = message.channel.id
             _kaladont_invalid_count[cid] = _kaladont_invalid_count.get(cid, 0) + 1
-            if _kaladont_invalid_count[cid] >= 7:
+            if _kaladont_invalid_count[cid] >= 5:
                 _kaladont_invalid_count[cid] = 0
+                # Ne šalji ako je već aktivan invalid embed (sprečava duplikate)
+                if _kaladont_invalid_msgs.get(cid):
+                    return
                 # Deaktiviraj prethodni invalid embed ako postoji
                 old_msg = _kaladont_invalid_msgs.pop(cid, None)
                 if old_msg:
@@ -2603,7 +2649,15 @@ async def on_message(message):
                     view=KaladontInvalidView(cid, checkpoint_word=game["word"])
                 )
                 _kaladont_invalid_msgs[cid] = inv_msg
-        else:
+                  # Auto-brisanje embeda nakon 10 sekundi
+                  async def _auto_del_inv(msg=inv_msg, ch_id=cid):
+                      await asyncio.sleep(10)
+                      if _kaladont_invalid_msgs.get(ch_id) is msg:
+                          _kaladont_invalid_msgs.pop(ch_id, None)
+                          try: await msg.delete()
+                          except: pass
+                  asyncio.create_task(_auto_del_inv())
+          else:
             # ── Validna riječ — prihvata se ───────────────────────
             # Resetuj invalid counter i deaktiviraj stari invalid embed
             _kaladont_invalid_count.pop(message.channel.id, None)
@@ -2613,7 +2667,7 @@ async def on_message(message):
                 except: pass
             game["word"]             = word
             game["last_uid"]         = message.author.id
-            game["last_player_name"] = message.author.display_name
+            game["last_player_name"] = message.author.mention
             game["used"].add(word)
             game["chain"].append((word, message.author.display_name))
             count   = len(game["chain"])
@@ -3133,7 +3187,7 @@ async def ping(i: discord.Interaction):
         ("<:e_satellite:1519363311207186482> Latency", f"`{ms}ms`", True), ("<:e_chart:1519362656568475880> Status", status, True), ("<:e_gear:1519362652516782194> Bot", f"`{bot.user}`", True)
     ]))
 
-@bot.tree.command(name="serverinfo", description="<:e_chart:1519362656568475880> Informacije o serveru")
+@bot.tree.command(name="serverinfo", description="📊 Informacije o serveru")
 async def serverinfo(i: discord.Interaction):
     g = i.guild
     bots, humans = sum(1 for m in g.members if m.bot), g.member_count - sum(1 for m in g.members if m.bot)
@@ -3146,7 +3200,7 @@ async def serverinfo(i: discord.Interaction):
         ("<:e_rocket2:1519363332266524813> Boostovi",  f"`{g.premium_subscription_count or 0}`",              True),
     ]))
 
-@bot.tree.command(name="userinfo", description="<:e_user:1519363093736718518> Informacije o korisniku")
+@bot.tree.command(name="userinfo", description="👤 Informacije o korisniku")
 async def userinfo(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     eco, xpd = get_economy(u.id), get_xp(u.id)
@@ -3160,7 +3214,7 @@ async def userinfo(i: discord.Interaction, korisnik: discord.Member = None):
         ("<:icon_warning:1519358274284032030>️ Upozorenja",  f"`{warns}`",                                           True),
     ]))
 
-@bot.tree.command(name="spotify", description="<:e_music2:1519362679310127114> Pogledaj šta korisnik trenutno sluša na Spotifyu")
+@bot.tree.command(name="spotify", description="🎵 Pogledaj šta korisnik trenutno sluša na Spotifyu")
 async def spotify_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     spotify = next((a for a in u.activities if isinstance(a, discord.Spotify)), None)
@@ -3189,7 +3243,7 @@ async def spotify_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     e.set_footer(text=f"Spotify • {BOT_NAME}")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="invite", description="<:e_chart:1519362656568475880> Statistika — poruke + invite-ovi")
+@bot.tree.command(name="invite", description="📊 Statistika — poruke + invite-ovi")
 async def invite_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     mkey = f"{i.guild.id}:{u.id}"
@@ -3224,7 +3278,7 @@ async def invite_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     await i.response.send_message(embed=e, view=view) if view else await i.response.send_message(embed=e)
 
 
-@bot.tree.command(name="avatar", description="<:e_picture:1519363318391771326>️ Prikaži avatar korisnika")
+@bot.tree.command(name="avatar", description="🖼️ Prikaži avatar korisnika")
 async def avatar(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     await i.response.send_message(embed=em(f"<:e_picture:1519363318391771326>️ {u.display_name}",
@@ -3233,7 +3287,7 @@ async def avatar(i: discord.Interaction, korisnik: discord.Member = None):
 
 # /say uklonjeno (v2.1) — rizik impersonacije/uznemiravanja kroz bota.
 
-@bot.tree.command(name="brojanje-postavi", description="<:e_chart:1519362656568475880> Postavi kanal za brojanje [ADMIN]")
+@bot.tree.command(name="brojanje-postavi", description="📊 Postavi kanal za brojanje [ADMIN]")
 @app_commands.describe(kanal="Kanal u kojem će se brojati", pocetak="Od kog broja krenuti (default 0 → sljedeći je 1)")
 @app_commands.checks.has_permissions(administrator=True)
 async def brojanje_postavi(i: discord.Interaction, kanal: discord.TextChannel, pocetak: int = 0):
@@ -3257,7 +3311,7 @@ async def brojanje_postavi(i: discord.Interaction, kanal: discord.TextChannel, p
            color=COLORS["success"])
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="brojanje-reset", description="<:e_chart:1519362656568475880> Resetuj brojanje na 0 [ADMIN]")
+@bot.tree.command(name="brojanje-reset", description="📊 Resetuj brojanje na 0 [ADMIN]")
 @app_commands.checks.has_permissions(administrator=True)
 async def brojanje_reset(i: discord.Interaction):
     cfg = data.get("counting", {}).get(str(i.guild.id))
@@ -3293,7 +3347,7 @@ def _find_role_by_names(guild: discord.Guild, names: list):
             return r
     return None
 
-@bot.tree.command(name="ban", description="<:e_hammer:1519362836671762494> [VLASNIK / 〢 /GIAN] Ban korisnika")
+@bot.tree.command(name="ban", description="🔨 [VLASNIK / 〢 /GIAN] Ban korisnika")
 async def ban(i: discord.Interaction, korisnik: discord.Member, razlog: str = "Bez razloga"):
     # ── Provjera pristupa: samo OWNER ili 〢 /GIAN član kojeg je vlasnik odobrio ──
     if i.user.id not in OWNER_IDS:
@@ -3413,7 +3467,7 @@ async def ban(i: discord.Interaction, korisnik: discord.Member, razlog: str = "B
             ]))
         except: pass
 
-@bot.tree.command(name="ban-dozvola", description="<:e_crown2:1519363047163166922> [VLASNIK] Dozvoli/oduzmi pravo na /ban za 〢 /GIAN člana")
+@bot.tree.command(name="ban-dozvola", description="👑 [VLASNIK] Dozvoli/oduzmi pravo na /ban za 〢 /GIAN člana")
 async def ban_dozvola(i: discord.Interaction, akcija: str, korisnik: discord.Member):
     """
     akcija: "add" (dodaj dozvolu) ili "remove" (ukloni dozvolu)
@@ -3450,7 +3504,7 @@ async def ban_dozvola(i: discord.Interaction, akcija: str, korisnik: discord.Mem
                      color=COLORS["warning"]),
             ephemeral=True)
 
-@bot.tree.command(name="kick", description="<:e_run:1519362884868636883> [VLASNIK] Pravi kick / [STAFF] dodjela /GIAN oznake")
+@bot.tree.command(name="kick", description="🏃 [VLASNIK] Pravi kick / [STAFF] dodjela /GIAN oznake")
 @app_commands.default_permissions(kick_members=True)
 @app_commands.checks.has_permissions(kick_members=True)
 async def kick(i: discord.Interaction, korisnik: discord.Member, razlog: str = "Bez razloga"):
@@ -3494,7 +3548,7 @@ async def kick(i: discord.Interaction, korisnik: discord.Member, razlog: str = "
             ]))
         except: pass
 
-@bot.tree.command(name="timeout", description="<:e_time2:1519362726952964227>️ Ućutkaj korisnika")
+@bot.tree.command(name="timeout", description="⏰ Ućutkaj korisnika")
 @app_commands.default_permissions(moderate_members=True)
 @app_commands.checks.has_permissions(moderate_members=True)
 async def timeout_cmd(i: discord.Interaction, korisnik: discord.Member, minuta: int = 10, razlog: str = "Bez razloga"):
@@ -3506,7 +3560,7 @@ async def timeout_cmd(i: discord.Interaction, korisnik: discord.Member, minuta: 
         ("📝 Razlog", razlog, False), ("<:e_shield2:1519362627795554374>️ Moderator", i.user.mention, True),
     ]))
 
-@bot.tree.command(name="warn", description="<:icon_warning:1519358274284032030>️ Upozori korisnika")
+@bot.tree.command(name="warn", description="⚠️ Upozori korisnika")
 @app_commands.default_permissions(manage_messages=True)
 @app_commands.checks.has_permissions(manage_messages=True)
 async def warn(i: discord.Interaction, korisnik: discord.Member, razlog: str = "Kršenje pravila"):
@@ -3518,7 +3572,7 @@ async def warn(i: discord.Interaction, korisnik: discord.Member, razlog: str = "
         ("📝 Razlog", razlog, False), ("<:e_shield2:1519362627795554374>️ Moderator", i.user.mention, True),
     ]))
 
-@bot.tree.command(name="warnings", description="<:e_clipboard:1519363052871614627> Upozorenja korisnika")
+@bot.tree.command(name="warnings", description="📋 Upozorenja korisnika")
 @app_commands.checks.has_permissions(manage_messages=True)
 async def warnings_cmd(i: discord.Interaction, korisnik: discord.Member):
     warns = get_warnings(i.guild.id, korisnik.id)
@@ -3527,7 +3581,7 @@ async def warnings_cmd(i: discord.Interaction, korisnik: discord.Member):
     desc = "\n".join([f"`{n+1}.` **{w['razlog']}** — {w['vreme']}" for n, w in enumerate(warns)])
     await i.response.send_message(embed=em(f"<:e_clipboard:1519363052871614627> {korisnik.display_name} — Upozorenja", desc, color=COLORS["warning"], thumb=korisnik.display_avatar.url), ephemeral=True)
 
-@bot.tree.command(name="clearwarnings", description="<:e_trash:1519362951247691898>️ Obriši upozorenja")
+@bot.tree.command(name="clearwarnings", description="🗑️ Obriši upozorenja")
 @app_commands.default_permissions(administrator=True)
 @app_commands.checks.has_permissions(administrator=True)
 async def clearwarnings(i: discord.Interaction, korisnik: discord.Member):
@@ -3535,7 +3589,7 @@ async def clearwarnings(i: discord.Interaction, korisnik: discord.Member):
     save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810> Obrisano", f"Sva upozorenja za {korisnik.mention} su uklonjena.", color=COLORS["success"]), ephemeral=True)
 
-@bot.tree.command(name="clear", description="<:e_broom:1519362900681298000> Obriši poruke")
+@bot.tree.command(name="clear", description="🧹 Obriši poruke")
 @app_commands.default_permissions(manage_messages=True)
 @app_commands.checks.has_permissions(manage_messages=True)
 async def clear(i: discord.Interaction, kolicina: int = 10):
@@ -3548,7 +3602,7 @@ async def clear(i: discord.Interaction, kolicina: int = 10):
 # ═══════════════════════════════════════════
 #    EKONOMIJA & LEVEL
 # ═══════════════════════════════════════════
-@bot.tree.command(name="baki", description="<:e_coins3:1519362621206298666> Provjeri stanje novca")
+@bot.tree.command(name="baki", description="🪙 Provjeri stanje novca")
 async def baki(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     d = get_economy(u.id)
@@ -3557,7 +3611,7 @@ async def baki(i: discord.Interaction, korisnik: discord.Member = None):
         ("<:e_coins3:1519362621206298666> Balans", f"```yaml\n{d['balance']:,} <:e_coins3:1519362621206298666>\n```", True), ("<:e_job:1519362615069904977> Poslednji posao", f"`{last}`", True),
     ]))
 
-@bot.tree.command(name="posao", description="<:e_job:1519362615069904977> Radi i zaradi (svakih 30 min)")
+@bot.tree.command(name="posao", description="💼 Radi i zaradi (svakih 30 min)")
 @app_commands.checks.cooldown(1, 1800, key=lambda i: i.user.id)
 async def posao(i: discord.Interaction):
     cfg_p = _g_eco("posao")
@@ -3572,7 +3626,7 @@ async def posao(i: discord.Interaction):
         ("<:e_coins3:1519362621206298666> Zarada", f"`+{earn} <:e_coins3:1519362621206298666>`", True), ("<:e_bank2:1519362662515871744> Balans", f"`{d['balance']:,} <:e_coins3:1519362621206298666>`", True), ("<:e_time2:1519362726952964227> Sledeći", "za 30 min", True),
     ]))
 
-@bot.tree.command(name="daily", description="<:e_gift:1519362618341462067> Dnevna nagrada")
+@bot.tree.command(name="daily", description="🎁 Dnevna nagrada")
 async def daily(i: discord.Interaction):
     cfg_d = _g_eco("daily")
     if not cfg_d.get("enabled", True):
@@ -3612,7 +3666,7 @@ async def daily(i: discord.Interaction):
         ]
     ))
 
-@bot.tree.command(name="daj", description="<:e_shake:1519362947766554737> Pošalji pare drugaru")
+@bot.tree.command(name="daj", description="🤝 Pošalji pare drugaru")
 async def daj(i: discord.Interaction, korisnik: discord.Member, iznos: int):
     if iznos <= 0: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Greška", "Iznos mora biti pozitivan!", color=COLORS["error"]), ephemeral=True)
     if korisnik.id == i.user.id: return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508> Greška", "Ne možeš sebi slati!", color=COLORS["error"]), ephemeral=True)
@@ -3623,7 +3677,7 @@ async def daj(i: discord.Interaction, korisnik: discord.Member, iznos: int):
         ("<:e_box:1519363099478458498> Od", i.user.mention, True), ("<:e_inbox:1519363351354937497> Za", korisnik.mention, True), ("<:e_coins3:1519362621206298666> Iznos", f"`{iznos:,} <:e_coins3:1519362621206298666>`", True),
     ]))
 
-@bot.tree.command(name="kradi", description="<:e_search:1519363103064723547>️ Pokušaj ukrasti (rizično!)")
+@bot.tree.command(name="kradi", description="🔍 Pokušaj ukrasti (rizično!)")
 @app_commands.checks.cooldown(1, 7200, key=lambda i: i.user.id)
 async def kradi(i: discord.Interaction, korisnik: discord.Member):
     cfg_k = _g_eco("kradi")
@@ -3652,7 +3706,7 @@ async def kradi(i: discord.Interaction, korisnik: discord.Member):
         ])
     save_data(); await i.followup.send(embed=e)
 
-@bot.tree.command(name="rank", description="<:e_level2:1519362739749785610> Level i XP")
+@bot.tree.command(name="rank", description="📈 Level i XP")
 async def rank(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
     d = get_xp(u.id)
@@ -3680,7 +3734,7 @@ async def rank(i: discord.Interaction, korisnik: discord.Member = None):
 # ═══════════════════════════════════════════
 #    /aktivnost — prikaz LVL / XP / poruke
 # ═══════════════════════════════════════════
-@bot.tree.command(name="aktivnost", description="<:e_chart:1519362656568475880> Tvoja aktivnost: level, XP i broj poruka")
+@bot.tree.command(name="aktivnost", description="📊 Tvoja aktivnost: level, XP i broj poruka")
 @discord.app_commands.describe(korisnik="Čija statistika? (default: ti)")
 async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
     u = korisnik or i.user
@@ -3726,7 +3780,7 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
 # ═══════════════════════════════════════════
 VERS_CHANNEL_ID = 1498983966005268520
 
-@bot.tree.command(name="leaderboard", description="<:e_medal3:1519363547514015764> Top lista servera")
+@bot.tree.command(name="leaderboard", description="🥉 Top lista servera")
 @app_commands.choices(tip=[app_commands.Choice(name="XP & Leveli", value="xp"), app_commands.Choice(name="Novac <:e_coins3:1519362621206298666>", value="novac")])
 async def leaderboard(i: discord.Interaction, tip: str = "xp"):
     await i.response.defer()
@@ -3788,7 +3842,7 @@ class KPM(discord.ui.View):
     @discord.ui.button(label="Makaze", emoji="<:e_sword2:1519362631146930317>️", style=discord.ButtonStyle.danger)
     async def s(self, i, b): await self.play(i, "<:e_sword2:1519362631146930317>️ Makaze")
 
-@bot.tree.command(name="kpm", description="<:e_ctrl:1519362682296209498> Kamen-Papir-Makaze")
+@bot.tree.command(name="kpm", description="⌨️ Kamen-Papir-Makaze")
 async def kpm(i: discord.Interaction):
     v = KPM(i.user)
     _kpm_e = discord.Embed(
@@ -3952,7 +4006,7 @@ class VjesalaView(discord.ui.View):
         right_letters = [l for l in sorted(self.guessed) if l in self.word]
         t = title or "<:e_ctrl:1519362682296209498> Vješala"
         c = color or COLORS["balkan"]
-        e = discord.Embed(title=t, description="<:icon_game:1519358323667767346>  **Pogodi skrivenu riječ slovo po slovo!**", color=c, timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(title=t, description="🎮  **Pogodi skrivenu riječ slovo po slovo!**", color=c, timestamp=datetime.now(timezone.utc))
         e.add_field(name="📝 Riječ", value=f"`{self.display_word()}`", inline=False)
         e.add_field(name="<:e_skull:1519362992502997125> Vješalo", value=VJASALA_FAZE[self.wrong], inline=True)
         e.add_field(name="<:icon_cross:1519358379917836508> Pogrešna", value=" ".join(wrong_letters) or "—", inline=True)
@@ -4006,7 +4060,7 @@ class VjesalaView(discord.ui.View):
         await i.response.edit_message(embed=self.make_embed(f"<:e_check2:1519362730057007268>️ Predao si! Bila je: **{self.word}**", COLORS["warning"]), view=self)
         self.stop()
 
-@bot.tree.command(name="vjasala", description="<:e_ctrl:1519362682296209498> Igra Vješala — pogodi skrivenu riječ!")
+@bot.tree.command(name="vjasala", description="⌨️ Igra Vješala — pogodi skrivenu riječ!")
 async def vjasala(i: discord.Interaction):
     _poo_task_progress(i.guild.id if i.guild else 0, i.user.id, "vjasala")
     word = random.choice(VJASALA_RJECNIK)
@@ -4441,7 +4495,7 @@ def _wordle_embed(game: dict, user, *, finished: bool = False, won: bool = False
     e.set_footer(text=footer)
     return e
 
-@bot.tree.command(name="wordle", description="<:e_green:1519362769047126028> Pogodi skrivenu riječ od 5 slova u 6 pokušaja!")
+@bot.tree.command(name="wordle", description="🟢 Pogodi skrivenu riječ od 5 slova u 6 pokušaja!")
 async def wordle(i: discord.Interaction):
     cfg = _g_gamble("wordle")
     if not cfg.get("enabled", True):
@@ -4471,7 +4525,7 @@ async def wordle(i: discord.Interaction):
     except Exception:
         pass
 
-@bot.tree.command(name="wordle-stop", description="<:e_green:1519362769047126028> Zaustavi trenutnu Wordle igru u ovom kanalu")
+@bot.tree.command(name="wordle-stop", description="🟢 Zaustavi trenutnu Wordle igru u ovom kanalu")
 async def wordle_stop(i: discord.Interaction):
     game = wordle_games.get(i.channel.id)
     if not game:
@@ -4537,7 +4591,7 @@ class ToploView(discord.ui.View):
         guesses = game.get("guesses", 0)
         history = game.get("history", [])[-5:]
         c = color or COLORS["info"]
-        e = discord.Embed(title="<:e_sun:1519362860218843399>️ Toplo-Hladno", description="<:e_fire2:1519362671491678280>  **Pogodi tajni broj — toplije ili hladnije!**", color=c, timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(title="☀️️ Toplo-Hladno", description="🔥  **Pogodi tajni broj — toplije ili hladnije!**", color=c, timestamp=datetime.now(timezone.utc))
         e.add_field(name="🎯 Raspon", value=f"`1 — {self.max_num}`", inline=True)
         e.add_field(name="<:e_chart:1519362656568475880> Pokušaji", value=f"`{guesses}`", inline=True)
         if result: e.add_field(name="<:e_satellite:1519363311207186482> Signal", value=result, inline=False)
@@ -4597,7 +4651,7 @@ class ToploView(discord.ui.View):
         await i.response.edit_message(embed=e, view=self)
         self.stop()
 
-@bot.tree.command(name="toplo-hladno", description="<:e_sun:1519362860218843399>️ Pogodi tajni broj — Toplo ili Hladno!")
+@bot.tree.command(name="toplo-hladno", description="☀️ Pogodi tajni broj — Toplo ili Hladno!")
 @app_commands.describe(maksimum="Maksimalni broj (default 100, max 1000)")
 async def toplo_hladno(i: discord.Interaction, maksimum: int = 100):
     if i.channel.id in toplo_games:
@@ -5341,7 +5395,7 @@ class AmogusMeetingView(discord.ui.View):
                 await _ag_tally(chan, state)
                 break
 
-@bot.tree.command(name="amogus", description="<:e_rocket2:1519363332266524813> Pokreni Among Us igru!")
+@bot.tree.command(name="amogus", description="🚀 Pokreni Among Us igru!")
 async def amogus_cmd(i: discord.Interaction):
     ok, left = _check_game_cooldown(i.user, i.guild_id, "amogus")
     if not ok:
@@ -5358,7 +5412,7 @@ async def amogus_cmd(i: discord.Interaction):
     amogus_games[i.channel.id] = state
     await i.response.send_message(embed=_ag_lobby_embed(state), view=AmogusLobbyView(i.channel.id))
 
-@bot.tree.command(name="amogus-stop", description="<:e_rocket2:1519363332266524813> Zaustavi Among Us igru [HOST/ADMIN]")
+@bot.tree.command(name="amogus-stop", description="🚀 Zaustavi Among Us igru [HOST/ADMIN]")
 async def amogus_stop(i: discord.Interaction):
     state = _ag(i.channel.id)
     if not state:
@@ -5909,7 +5963,7 @@ async def _pk_end_game(channel_id: int, winner_ids: list, skip_embed: bool = Fal
                 await ch.send(embed=e)
     poker_games.pop(channel_id, None)
 
-@bot.tree.command(name="poker", description="<:e_cards2:1519362702835712010> Pokreni Texas Hold'em Poker za pravi novac (2–9 igrača)")
+@bot.tree.command(name="poker", description="🃏 Pokreni Texas Hold'em Poker za pravi novac (2–9 igrača)")
 @app_commands.describe(ulog="Iznos uloga po igraču u <:e_coins3:1519362621206298666> (default: 200, min: 50, max: 50000)")
 async def poker_cmd(i: discord.Interaction, ulog: int = 200):
     ok, left = _check_game_cooldown(i.user, i.guild_id, "poker")
@@ -5965,31 +6019,31 @@ async def social_cmd(i: discord.Interaction, target: discord.Member, action: str
     if gif: e.set_image(url=gif)
     await i.followup.send(embed=e)
 
-@bot.tree.command(name="zagrljaj", description="<:e_shake:1519362947766554737> Zagrli nekog na serveru")
+@bot.tree.command(name="zagrljaj", description="🤝 Zagrli nekog na serveru")
 async def zagrljaj(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "hug", "<:e_shake:1519362947766554737> {from} grli {to}! Aww, tako slatko! <:e_heart2:1519362668644012133>", "love")
 
-@bot.tree.command(name="poljubac", description="<:e_heart2:1519362668644012133> Pošalji poljubac nekome")
+@bot.tree.command(name="poljubac", description="💗 Pošalji poljubac nekome")
 async def poljubac(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "kiss", "<:e_heart2:1519362668644012133> {from} šalje poljubac {to}! <:e_heart2:1519362668644012133>", "pink")
 
-@bot.tree.command(name="mazi", description="<:e_heart2:1519362668644012133> Pomazi nekoga nježno")
+@bot.tree.command(name="mazi", description="💗 Pomazi nekoga nježno")
 async def mazi(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "pat", "<:e_heart2:1519362668644012133> {from} mazi {to} po glavi! Predobro! <:e_sparkles:1519363032185176198>", "love")
 
-@bot.tree.command(name="tapsi", description="<:e_shake:1519362947766554737> Tapši nekoga prijateljski")
+@bot.tree.command(name="tapsi", description="🤝 Tapši nekoga prijateljski")
 async def tapsi(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "handshake", "<:e_shake:1519362947766554737> {from} tapše {to}! Aj, brate! <:e_shake:1519362947766554737>", "teal")
 
-@bot.tree.command(name="high5", description="<:e_shake:1519362947766554737> Daj peticu nekome")
+@bot.tree.command(name="high5", description="🤝 Daj peticu nekome")
 async def high5(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "highfive", "<:e_shake:1519362947766554737> {from} daje peticu {to}! Dobra ekipa! <:e_bolt:1519362674717102160>", "success")
 
-@bot.tree.command(name="cudan", description="<:e_devil:1519362989470253187> Budi ćudan prema nekome")
+@bot.tree.command(name="cudan", description="😈 Budi ćudan prema nekome")
 async def cudan(i: discord.Interaction, korisnik: discord.Member):
     await social_cmd(i, korisnik, "poke", "<:e_devil:1519362989470253187> {from} je ćudan prema {to}! Ajde, brate... <:e_muscle:1519362764244652122>", "warning")
 
-@bot.tree.command(name="srce", description="<:e_heart2:1519362668644012133>️ Pošalji srce nekome")
+@bot.tree.command(name="srce", description="💗 Pošalji srce nekome")
 async def srce(i: discord.Interaction, korisnik: discord.Member):
     poruke = [
         "<:e_heart2:1519362668644012133>️ {from} šalje srce {to}! Aww! <:e_cry:1519362944717160530>",
@@ -6001,7 +6055,7 @@ async def srce(i: discord.Interaction, korisnik: discord.Member):
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="brak", description="<:e_ring:1519362941617438750> Zaprosio nekoga (za fun)")
+@bot.tree.command(name="brak", description="💍 Zaprosio nekoga (za fun)")
 async def brak(i: discord.Interaction, korisnik: discord.Member):
     if korisnik.id == i.user.id:
         return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Ne možeš se zarositi sam sebi!", color=COLORS["error"]), ephemeral=True)
@@ -6081,7 +6135,7 @@ FORA_PORUKE = [
 
 # /pozz uklonjeno (v2.2) — pravimo mjesto za /mafia igru.
 
-@bot.tree.command(name="kompli", description="<:e_rose:1519363697728815175> Pošalji slatki kompliment nekome")
+@bot.tree.command(name="kompli", description="🌹 Pošalji slatki kompliment nekome")
 @discord.app_commands.describe(korisnik="Kome šalješ kompliment")
 async def kompli(i: discord.Interaction, korisnik: discord.Member):
     if await fun_cooldown(i, "kompli"): return
@@ -6094,7 +6148,7 @@ async def kompli(i: discord.Interaction, korisnik: discord.Member):
     e.set_footer(text=f"{BOT_NAME} • Muvanje 101 <:e_heart2:1519362668644012133>")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="fora", description="<:e_sparkles:1519363032185176198> Ubaci foru na račun nekoga (sve u šali!)")
+@bot.tree.command(name="fora", description="✨ Ubaci foru na račun nekoga (sve u šali!)")
 @discord.app_commands.describe(korisnik="Ko prima foru")
 async def fora(i: discord.Interaction, korisnik: discord.Member):
     if await fun_cooldown(i, "fora"): return
@@ -6107,7 +6161,7 @@ async def fora(i: discord.Interaction, korisnik: discord.Member):
     e.set_footer(text=f"{BOT_NAME} • Sve u šali! <:e_sparkles:1519363032185176198>")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="muv", description="<:e_crystal:1519362965558657146> Muvaj nekoga Balkan stilom")
+@bot.tree.command(name="muv", description="🔮 Muvaj nekoga Balkan stilom")
 @discord.app_commands.describe(korisnik="Ko je sretan/na da ga/ju muvaš")
 async def muv(i: discord.Interaction, korisnik: discord.Member):
     if await fun_cooldown(i, "muv"): return
@@ -6130,7 +6184,7 @@ async def muv(i: discord.Interaction, korisnik: discord.Member):
     e.set_footer(text=f"{BOT_NAME} • Balkan Muvanje™ <:e_crystal:1519362965558657146>")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="crush", description="<:e_heart2:1519362668644012133> Otkrij ko je tvoj tajni crush na serveru!")
+@bot.tree.command(name="crush", description="💗 Otkrij ko je tvoj tajni crush na serveru!")
 async def crush(i: discord.Interaction):
     if await fun_cooldown(i, "crush"): return
     members = [m for m in i.guild.members if not m.bot and m.id != i.user.id]
@@ -6219,7 +6273,7 @@ def zoo_power(uid) -> int:
 
 HUNT_COOLDOWNS: dict = {}
 
-@bot.tree.command(name="hunt", description="<:e_arrow:1519363399845154958> Idi u lov na životinje! (kao owo hunt)")
+@bot.tree.command(name="hunt", description="➡️ Idi u lov na životinje! (kao owo hunt)")
 async def hunt(i: discord.Interaction):
     now = time.time()
     last = HUNT_COOLDOWNS.get(i.user.id, 0)
@@ -6259,7 +6313,7 @@ async def hunt(i: discord.Interaction):
     e.set_footer(text=f"{i.user.display_name} • {BOT_NAME} {VERSION}")
     await i.followup.send(embed=e)
 
-@bot.tree.command(name="zoo", description="<:e_lion:1519363402890346658> Pogledaj svoju zbirku životinja (kao owo zoo)")
+@bot.tree.command(name="zoo", description="🦁 Pogledaj svoju zbirku životinja (kao owo zoo)")
 async def zoo_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     u   = korisnik or i.user
     zoo = get_zoo(u.id)
@@ -6291,7 +6345,7 @@ async def zoo_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="battle", description="<:e_sword2:1519362631146930317>️ Bori se sa nekim (kao owo battle)")
+@bot.tree.command(name="battle", description="⚔️ Bori se sa nekim (kao owo battle)")
 async def battle(i: discord.Interaction, korisnik: discord.Member):
     if korisnik.id == i.user.id:
         return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Ne možeš se boriti sam sa sobom!", color=COLORS["error"]), ephemeral=True)
@@ -6337,7 +6391,7 @@ async def battle(i: discord.Interaction, korisnik: discord.Member):
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.followup.send(embed=e)
 
-@bot.tree.command(name="sell", description="<:e_coins3:1519362621206298666> Prodaj životinje iz zoo-a (kao owo sell)")
+@bot.tree.command(name="sell", description="🪙 Prodaj životinje iz zoo-a (kao owo sell)")
 @app_commands.describe(zivotinja="Ime životinje (npr. Riba)", kolicina="Koliko prodaješ (default 1)")
 async def sell(i: discord.Interaction, zivotinja: str, kolicina: int = 1):
     name = zivotinja.strip().capitalize()
@@ -6364,7 +6418,7 @@ async def sell(i: discord.Interaction, zivotinja: str, kolicina: int = 1):
         fields=[("<:e_bank2:1519362662515871744> Balans", f"`{get_economy(i.user.id)['balance']:,} <:e_coins3:1519362621206298666>`", True)]
     ))
 
-@bot.tree.command(name="animals", description="<:e_clipboard:1519363052871614627> Listu svih životinja i raritet (kao owo animals)")
+@bot.tree.command(name="animals", description="📋 Listu svih životinja i raritet (kao owo animals)")
 async def animals_cmd(i: discord.Interaction):
     e = discord.Embed(title="<:e_clipboard:1519363052871614627> Sve životinje — Raritetna lista", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     for rarity in RARITY_ORDER:
@@ -6375,7 +6429,7 @@ async def animals_cmd(i: discord.Interaction):
     e.set_footer(text=f"{BOT_NAME} {VERSION} • /hunt za loviti!")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="pray", description="<:e_pray:1519363406078021863> Pomoli se za nekoga (kao owo pray)")
+@bot.tree.command(name="pray", description="🙏 Pomoli se za nekoga (kao owo pray)")
 async def pray(i: discord.Interaction, korisnik: discord.Member):
     if korisnik.id == i.user.id:
         return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", "Ne možeš moliti za sebe!", color=COLORS["error"]), ephemeral=True)
@@ -6761,7 +6815,7 @@ def _bj_str(hand, hide=False):
     return "  ".join(f"`{r}{s}`" for r, s in hand)
 
 def _bj_embed(player, dealer, oklada, note="", hide=True):
-    e = discord.Embed(title="<:e_cards2:1519362702835712010> Blackjack", description="<:e_diamond2:1519362640961474601>  **Pobijedi dilera — cilj je 21!**", color=COLORS["dark"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🃏 Blackjack", description="💎  **Pobijedi dilera — cilj je 21!**", color=COLORS["dark"], timestamp=datetime.now(timezone.utc))
     e.add_field(name=f"Tvoje karte  ({_bj_val(player)})", value=_bj_str(player),         inline=False)
     e.add_field(name=f"Dealer  {'(?)' if hide else f'({_bj_val(dealer)})'}", value=_bj_str(dealer, hide), inline=False)
     if note:
@@ -6814,7 +6868,7 @@ class BjView(discord.ui.View):
     async def on_timeout(self):
         self.clear_items()
 
-@bot.tree.command(name="blackjack", description="<:e_cards2:1519362702835712010> Igraj Blackjack protiv dilera!")
+@bot.tree.command(name="blackjack", description="🃏 Igraj Blackjack protiv dilera!")
 @app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (min 10)")
 async def blackjack(i: discord.Interaction, oklada: int):
     eco = get_economy(i.user.id)
@@ -6925,7 +6979,7 @@ class TriviaView(discord.ui.View):
     async def on_timeout(self):
         self.clear_items()
 
-@bot.tree.command(name="kviz", description="<:e_brain:1519362849548406975> Odgovori na Balkan pitanje i osvoji pare!")
+@bot.tree.command(name="kviz", description="🧠 Odgovori na Balkan pitanje i osvoji pare!")
 @app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (default 50)")
 async def kviz(i: discord.Interaction, oklada: int = 50):
     eco = get_economy(i.user.id)
@@ -7007,7 +7061,7 @@ GEOGRAFIJA_QS = [
     ("Glavni grad Finske?", "Helsinki", ["Tampere", "Turku", "Espoo"]),
 ]
 
-@bot.tree.command(name="geografija", description="<:e_globe2:1519362694887637004> Geografski kviz — pogodi i osvoji pare!")
+@bot.tree.command(name="geografija", description="🌍 Geografski kviz — pogodi i osvoji pare!")
 @app_commands.describe(oklada="Koliko <:e_coins3:1519362621206298666> ulažeš (default 50)")
 async def geografija(i: discord.Interaction, oklada: int = 50):
     eco = get_economy(i.user.id)
@@ -7057,16 +7111,16 @@ def has_item(uid, key):
         return True
     return bool(items.get(key))
 
-@bot.tree.command(name="shop", description="<:e_cart:1519362665347153930> Pogledaj šta možeš kupiti")
+@bot.tree.command(name="shop", description="🛒 Pogledaj šta možeš kupiti")
 async def shop(i: discord.Interaction):
-    e = discord.Embed(title="<:e_cart:1519362665347153930> GIAN Shop", description="Kupi predmete sa `/kupi <id>` komandom:", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🛒 GIAN Shop", description="Kupi predmete sa `/kupi <id>` komandom:", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     for key, item in SHOP_ITEMS.items():
         dur = "Jednom" if not item["duration"] else f"{item['duration']//3600}h" if item["duration"] >= 3600 else f"{item['duration']//60}min"
         e.add_field(name=item["name"], value=f"**ID:** `{key}`\n{item['desc']}\n<:e_time2:1519362726952964227> `{dur}` • <:e_coins3:1519362621206298666> `{item['price']:,}`", inline=True)
     e.set_footer(text=f"{BOT_NAME} • /kupi <id> za kupovinu")
     await i.response.send_message(embed=e)
 
-@bot.tree.command(name="kupi", description="<:e_bank2:1519362662515871744> Kupi predmet iz shopa")
+@bot.tree.command(name="kupi", description="🏦 Kupi predmet iz shopa")
 @app_commands.describe(predmet="ID predmeta iz /shop")
 async def kupi(i: discord.Interaction, predmet: str):
     if predmet not in SHOP_ITEMS:
@@ -7129,7 +7183,7 @@ def quest_progress(uid, quest_id, amount=1):
     save_data()
     return None
 
-@bot.tree.command(name="quests", description="<:e_clipboard:1519363052871614627> Pogledaj svoje dnevne zadatke")
+@bot.tree.command(name="quests", description="📋 Pogledaj svoje dnevne zadatke")
 async def quests_cmd(i: discord.Interaction):
     qd    = get_quests(i.user.id)
     save_data()
@@ -7200,7 +7254,7 @@ class GiveawayView(discord.ui.View):
         except Exception:
             pass
 
-giveaway_group = app_commands.Group(name="giveaway", description="<:e_party:1519363028334674070> Nagradne igre")
+giveaway_group = app_commands.Group(name="giveaway", description="🎉 Nagradne igre")
 
 def _gw_fmt_duration(minuta: int) -> str:
     """Pretvori minute u 'Xh Ymin' string."""
@@ -7220,7 +7274,7 @@ async def _gw_timer(msg_id: int, channel: discord.TextChannel, seconds: float):
     except Exception as ex:
         print(f"[giveaway timer] msg={msg_id} error: {ex}")
 
-@giveaway_group.command(name="start", description="<:e_party:1519363028334674070> Pokreni nagradnu igru")
+@giveaway_group.command(name="start", description="🎉 Pokreni nagradnu igru")
 @app_commands.describe(nagrada="Šta se osvaja", minuta="Koliko minuta traje (npr. 60 = 1h, 120 = 2h)", kanal="Kanal (default ovaj)")
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.checks.has_permissions(manage_guild=True)
@@ -7280,7 +7334,7 @@ async def _end_giveaway(msg_id, channel):
     try: msg = await channel.fetch_message(msg_id)
     except: return
     if not ga["entrants"]:
-        e = discord.Embed(title="<:e_party:1519363028334674070> Nagradna igra završena", description="Niko se nije prijavio! <:e_cry:1519362944717160530>", color=COLORS["error"])
+        e = discord.Embed(title="🎉 Nagradna igra završena", description="Niko se nije prijavio! 😢", color=COLORS["error"])
         await msg.edit(embed=e, view=None); return
     winner_id = random.choice(list(ga["entrants"]))
     winner    = channel.guild.get_member(winner_id)
@@ -7325,7 +7379,7 @@ async def _reset_gw_worker(chan: discord.TextChannel, host: discord.Member, nagr
     except Exception as ex:
         print(f"[reset_gw worker] error: {ex}")
 
-@bot.tree.command(name="reset-gw", description="<:e_refresh:1519362959187509461> [ADMIN] Resetuj i ponovo pokreni giveaway za 5 minuta")
+@bot.tree.command(name="reset-gw", description="🔄 [ADMIN] Resetuj i ponovo pokreni giveaway za 5 minuta")
 @app_commands.describe(nagrada="Nagrada za novi giveaway", kanal="Kanal (default ovaj)")
 @app_commands.default_permissions(manage_guild=True)
 @app_commands.checks.has_permissions(manage_guild=True)
@@ -7359,7 +7413,7 @@ async def reset_gw_cmd(i: discord.Interaction, nagrada: str, kanal: discord.Text
 # ═══════════════════════════════════════════
 #    <:e_coins3:1519362621206298666> OWNER-ONLY: DODAJ / ODUZMI NOVAC
 # ═══════════════════════════════════════════
-@bot.tree.command(name="novac", description="<:e_coins3:1519362621206298666> [OWNER] Dodaj ili oduzmi coina korisniku")
+@bot.tree.command(name="novac", description="🪙 [OWNER] Dodaj ili oduzmi coina korisniku")
 @app_commands.describe(akcija="dodaj ili oduzmi", korisnik="Kome mijenjamo balans", iznos="Koliko coina")
 async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Member, iznos: int):
     if i.user.id not in OWNER_IDS:
@@ -7410,7 +7464,7 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
 # ═══════════════════════════════════════════
 #    POLL / GLASANJE
 # ═══════════════════════════════════════════
-@bot.tree.command(name="poll", description="<:e_chart:1519362656568475880> Napravi glasanje sa reakcijama")
+@bot.tree.command(name="poll", description="📊 Napravi glasanje sa reakcijama")
 @app_commands.describe(pitanje="Pitanje", opcija1="1. opcija", opcija2="2. opcija", opcija3="3. opcija (opcionalno)", opcija4="4. opcija (opcionalno)")
 async def poll(i: discord.Interaction, pitanje: str, opcija1: str, opcija2: str, opcija3: str = None, opcija4: str = None):
     opts   = [o for o in [opcija1, opcija2, opcija3, opcija4] if o]
@@ -7497,7 +7551,7 @@ class TicketOpenView(discord.ui.View):
         await chan.send(content=i.user.mention, embed=e, view=TicketCloseView())
         await i.followup.send(f"<:icon_check:1519358376268533810> Ticket otvoren: {chan.mention}", ephemeral=True)
 
-@bot.tree.command(name="ticket-setup", description="<:e_ticket3:1519362637534597221> Postavi ticket sistem u ovaj kanal")
+@bot.tree.command(name="ticket-setup", description="🎟 Postavi ticket sistem u ovaj kanal")
 @app_commands.default_permissions(manage_channels=True)
 @app_commands.checks.has_permissions(administrator=True)
 async def ticket_setup(i: discord.Interaction):
@@ -7659,7 +7713,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
         await i.response.send_message(embed=potvrda)
 
 
-@bot.tree.command(name="tiket", description="<:e_ticket3:1519362637534597221> Otvori tiket za podršku")
+@bot.tree.command(name="tiket", description="🎟 Otvori tiket za podršku")
 async def tiket_cmd(i: discord.Interaction):
     BAR = "━━━━━━━━━━━━━━━━━━━━"
     e = discord.Embed(
@@ -7943,7 +7997,7 @@ async def sort_roles(ctx: commands.Context):
     except Exception as ex:
         await ctx.send(embed=em("<:icon_cross:1519358379917836508>", f"Greška: `{ex}`", color=COLORS["error"]))
 
-@bot.tree.command(name="setup-roles", description="<:e_label:1519363326109417613>️ Kreiraj sve GIAN uloge odjednom [ADMIN]")
+@bot.tree.command(name="setup-roles", description="🏷️ Kreiraj sve GIAN uloge odjednom [ADMIN]")
 @app_commands.default_permissions(administrator=True)
 async def setup_roles(i: discord.Interaction):
     await i.response.defer(ephemeral=True)
@@ -7998,7 +8052,7 @@ async def setup_roles(i: discord.Interaction):
 # ═══════════════════════════════════════════
 #    SERVER SETUP KOMANDE
 # ═══════════════════════════════════════════
-@bot.tree.command(name="setup", description="<:e_gear:1519362652516782194>️ Postavi sve kanale i uloge servera odjednom [ADMIN]")
+@bot.tree.command(name="setup", description="⚙ Postavi sve kanale i uloge servera odjednom [ADMIN]")
 @app_commands.default_permissions(administrator=True)
 @discord.app_commands.describe(
     welcome="Kanal za dobrodošlicu novih članova",
@@ -8069,7 +8123,7 @@ async def setup_all(
     e.set_footer(text=f"Pregled svih postavki: /server-config | {BOT_NAME}")
     await i.response.send_message(embed=e, ephemeral=True)
 
-@bot.tree.command(name="setup-welcome", description="<:e_gear:1519362652516782194>️ Postavi welcome kanal [ADMIN]")
+@bot.tree.command(name="setup-welcome", description="⚙ Postavi welcome kanal [ADMIN]")
 @discord.app_commands.describe(kanal="Kanal gdje bot šalje welcome embed novim članovima")
 @discord.app_commands.default_permissions(manage_guild=True)
 async def setup_welcome(i: discord.Interaction, kanal: discord.TextChannel):
@@ -8092,7 +8146,7 @@ async def setup_welcome(i: discord.Interaction, kanal: discord.TextChannel):
     e_out.set_footer(text=f"{BOT_NAME} • Welcome Setup")
     await i.response.send_message(embed=e_out, ephemeral=True)
 
-@bot.tree.command(name="aktivnost-setup", description="<:e_gear:1519362652516782194>️ Postavi kanal za XP level-up i aktivnost [ADMIN]")
+@bot.tree.command(name="aktivnost-setup", description="⚙ Postavi kanal za XP level-up i aktivnost [ADMIN]")
 @discord.app_commands.describe(
     levelup_kanal="Kanal gdje bot objavljuje level-up notifikacije",
     xp_kanal="Kanal za XP/rank prikaz (/rank, /leaderboard komande)"
@@ -8127,7 +8181,7 @@ async def aktivnost_setup(
     e_out.set_footer(text="GIAN (Custom) • Aktivnost Setup")
     await i.response.send_message(embed=e_out, ephemeral=True)
 
-@bot.tree.command(name="setup-leave", description="<:e_gear:1519362652516782194>️ Postavi leave kanal [ADMIN]")
+@bot.tree.command(name="setup-leave", description="⚙ Postavi leave kanal [ADMIN]")
 @discord.app_commands.describe(kanal="Kanal gdje bot šalje poruku kad član napusti server")
 @discord.app_commands.default_permissions(manage_guild=True)
 async def setup_leave(i: discord.Interaction, kanal: discord.TextChannel):
@@ -8148,7 +8202,7 @@ async def setup_leave(i: discord.Interaction, kanal: discord.TextChannel):
     e_out.set_footer(text=f"{BOT_NAME} • Leave Setup")
     await i.response.send_message(embed=e_out, ephemeral=True)
 
-@bot.tree.command(name="setup-autorole", description="<:e_gear:1519362652516782194>️ Postavi automatsku ulogu pri ulasku [ADMIN]")
+@bot.tree.command(name="setup-autorole", description="⚙ Postavi automatsku ulogu pri ulasku [ADMIN]")
 @discord.app_commands.describe(uloga="Uloga koja se daje svim novim članovima")
 @discord.app_commands.default_permissions(manage_roles=True)
 async def setup_autorole(i: discord.Interaction, uloga: discord.Role):
@@ -8158,7 +8212,7 @@ async def setup_autorole(i: discord.Interaction, uloga: discord.Role):
     save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810> Auto-Uloga postavljena!", f"Svaki novi član dobije: {uloga.mention}", color=COLORS["success"]), ephemeral=True)
 
-@bot.tree.command(name="setup-log", description="<:e_gear:1519362652516782194>️ Postavi log kanal [ADMIN]")
+@bot.tree.command(name="setup-log", description="⚙ Postavi log kanal [ADMIN]")
 @discord.app_commands.describe(kanal="Log kanal gdje bot šalje editovane/obrisane poruke, join/leave, banove")
 @discord.app_commands.default_permissions(manage_guild=True)
 async def setup_log(i: discord.Interaction, kanal: discord.TextChannel):
@@ -8166,7 +8220,7 @@ async def setup_log(i: discord.Interaction, kanal: discord.TextChannel):
     save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810> Log kanal postavljen!", f"Kanal: {kanal.mention}\nBiće logovano: join/leave, edit, delete, ban.", color=COLORS["success"]), ephemeral=True)
 
-@bot.tree.command(name="setup-starboard", description="<:e_gear:1519362652516782194>️ Postavi starboard kanal [ADMIN]")
+@bot.tree.command(name="setup-starboard", description="⚙ Postavi starboard kanal [ADMIN]")
 @discord.app_commands.describe(kanal="Starboard kanal", zvjezdice="Broj <:e_star2:1519363084253266031> za pin (default: 3)")
 @discord.app_commands.default_permissions(manage_guild=True)
 async def setup_starboard(i: discord.Interaction, kanal: discord.TextChannel, zvjezdice: int = 3):
@@ -8176,7 +8230,7 @@ async def setup_starboard(i: discord.Interaction, kanal: discord.TextChannel, zv
     save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810> Starboard postavljen!", f"Kanal: {kanal.mention}\nPotrebno <:e_star2:1519363084253266031>: `{zvjezdice}`", color=COLORS["success"]), ephemeral=True)
 
-@bot.tree.command(name="setup-levelrole", description="<:e_gear:1519362652516782194>️ Postavi ulogu za određeni level [ADMIN]")
+@bot.tree.command(name="setup-levelrole", description="⚙ Postavi ulogu za određeni level [ADMIN]")
 @discord.app_commands.describe(level="Level za koji se daje uloga", uloga="Uloga koja se daje")
 @discord.app_commands.default_permissions(manage_roles=True)
 async def setup_levelrole(i: discord.Interaction, level: int, uloga: discord.Role):
@@ -8187,7 +8241,7 @@ async def setup_levelrole(i: discord.Interaction, level: int, uloga: discord.Rol
     save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810> Level uloga postavljena!", f"Level **{level}** → {uloga.mention}", color=COLORS["success"]), ephemeral=True)
 
-@bot.tree.command(name="server-config", description="<:e_gear:1519362652516782194>️ Pregled konfiguracije servera [ADMIN]")
+@bot.tree.command(name="server-config", description="⚙ Pregled konfiguracije servera [ADMIN]")
 @discord.app_commands.default_permissions(manage_guild=True)
 async def server_config_cmd(i: discord.Interaction):
     cfg = get_guild_config(i.guild.id)
@@ -8205,7 +8259,7 @@ async def server_config_cmd(i: discord.Interaction):
     e.add_field(name="<:e_confetti2:1519363348288901221> Level uloge",      value=lr_txt, inline=False)
     await i.response.send_message(embed=e, ephemeral=True)
 
-@bot.tree.command(name="afk", description="<:e_sleep:1519362785291669644> Postavi AFK status")
+@bot.tree.command(name="afk", description="😴 Postavi AFK status")
 @discord.app_commands.describe(razlog="Razlog zašto si AFK")
 async def afk_cmd(i: discord.Interaction, razlog: str = "AFK"):
     uid = str(i.user.id)
@@ -8313,7 +8367,7 @@ PANEL_PRESETS = [
     },
 ]
 
-@bot.tree.command(name="setup-panels", description="<:e_label:1519363326109417613>️ [ADMIN] Auto-kreiraj sva 3 self-role panela odjednom")
+@bot.tree.command(name="setup-panels", description="🏷️ [ADMIN] Auto-kreiraj sva 3 self-role panela odjednom")
 @app_commands.default_permissions(administrator=True)
 async def setup_panels_cmd(i: discord.Interaction, kanal: discord.TextChannel = None):
     if not i.user.guild_permissions.administrator:
@@ -8355,7 +8409,7 @@ async def setup_panels_cmd(i: discord.Interaction, kanal: discord.TextChannel = 
 # ═══════════════════════════════════════════
 #    SET-LEVEL  (Admin/Owner komanda)
 # ═══════════════════════════════════════════
-@bot.tree.command(name="set-level", description="<:e_crown2:1519363047163166922> [OWNER] Postavi level korisniku direktno")
+@bot.tree.command(name="set-level", description="👑 [OWNER] Postavi level korisniku direktno")
 @app_commands.describe(korisnik="Korisnik kojemu postavljaš level", level="Level (1–1000)", xp="XP (opciono, default je level×100)")
 @app_commands.default_permissions(administrator=True)
 async def set_level_cmd(i: discord.Interaction, korisnik: discord.Member, level: int, xp: int = -1):
@@ -8396,7 +8450,7 @@ async def set_level_cmd(i: discord.Interaction, korisnik: discord.Member, level:
 # ═══════════════════════════════════════════
 #    HELP
 # ═══════════════════════════════════════════
-@bot.tree.command(name="help", description="<:e_help2:1519362723148726534> Sve dostupne komande bota")
+@bot.tree.command(name="help", description="❓ Sve dostupne komande bota")
 async def help_cmd(i: discord.Interaction):
     is_admin = False
     is_owner = i.user.id in OWNER_IDS
@@ -8593,7 +8647,7 @@ async def help_cmd(i: discord.Interaction):
 # ═══════════════════════════════════════════
 #    <:e_circus:1519363558809272371> EVENT — samo vlasnik
 # ═══════════════════════════════════════════
-@bot.tree.command(name="event", description="<:e_circus:1519363558809272371> Objavi event na serveru (samo vlasnik)")
+@bot.tree.command(name="event", description="🎪 Objavi event na serveru (samo vlasnik)")
 @discord.app_commands.describe(
     naslov="Naslov eventa",
     opis="Opis eventa — šta, kada, gdje, nagrade itd."
@@ -8831,7 +8885,7 @@ data.setdefault("cmd_uses", {})
 
 
 # ─── <:e_trophy2:1519362624742232146> TOP CHATTERS ───
-@bot.tree.command(name="topchatters", description="<:e_trophy2:1519362624742232146> Top 10 najaktivnijih chatera")
+@bot.tree.command(name="topchatters", description="🏆 Top 10 najaktivnijih chatera")
 async def topchatters_cmd(i: discord.Interaction):
     gid = str(i.guild.id)
     rows = [(int(k.split(":")[1]), v) for k, v in data.get("msg_count", {}).items() if k.startswith(f"{gid}:")]
@@ -8845,11 +8899,11 @@ async def topchatters_cmd(i: discord.Interaction):
         m = i.guild.get_member(uid)
         name = m.display_name if m else f"User {uid}"
         desc.append(f"{medals[idx]} **{name}** — `{cnt:,}` poruka")
-    e = discord.Embed(title="<:e_trophy2:1519362624742232146> Top 10 Najaktivnijih", description="\n".join(desc), color=COLORS["success"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🏆 Top 10 Najaktivnijih", description="\n".join(desc), color=COLORS["success"], timestamp=datetime.now(timezone.utc))
     await i.response.send_message(embed=e)
 
 # ─── <:e_bank2:1519362662515871744> BANKA ───
-@bot.tree.command(name="bank", description="<:e_bank2:1519362662515871744> Banka — deposit/withdraw/balance (5% nedjeljna kamata)")
+@bot.tree.command(name="bank", description="🏦 Banka — deposit/withdraw/balance (5% nedjeljna kamata)")
 async def bank_cmd(i: discord.Interaction, akcija: str = "balance", iznos: int = 0):
     uid = str(i.user.id)
     bnk = data["bank"].setdefault(uid, {"saved": 0, "last_interest": int(time.time())})
@@ -8875,7 +8929,7 @@ async def bank_cmd(i: discord.Interaction, akcija: str = "balance", iznos: int =
     await i.response.send_message(embed=em("<:e_bank2:1519362662515871744> Banka — pomoć", "`/bank balance` — stanje\n`/bank deposit 100` — uloži\n`/bank withdraw 50` — podigni", color=COLORS["info"]))
 
 # ─── <:e_slotm:1519362699014967297> LOTO ───
-@bot.tree.command(name="lottery", description="<:e_slotm:1519362699014967297> Sedmična loto — kupi tiket za 100 coina")
+@bot.tree.command(name="lottery", description="🎰 Sedmična loto — kupi tiket za 100 coina")
 async def lottery_cmd(i: discord.Interaction, akcija: str = "info"):
     lot = data["lottery"]
     uid = str(i.user.id)
@@ -8912,7 +8966,7 @@ async def lottery_cmd(i: discord.Interaction, akcija: str = "info"):
     await i.response.send_message(embed=e)
 
 # ─── <:e_coins3:1519362621206298666> HEIST (timski razboj) ───
-@bot.tree.command(name="heist", description="<:e_coins3:1519362621206298666> Timski razboj — okupi 3+ ljudi i dobijte 1000-5000")
+@bot.tree.command(name="heist", description="🪙 Timski razboj — okupi 3+ ljudi i dobijte 1000-5000")
 async def heist_cmd(i: discord.Interaction):
     uid = str(i.user.id)
     cd = data["heist_cooldown"].get(uid, 0)
@@ -8947,7 +9001,7 @@ async def heist_cmd(i: discord.Interaction):
         await i.followup.send(embed=em("<:e_taxi:1519363380513603615> UHVAĆENI!", f"Policija je sve pohvatala! Svako je izgubio 200 coina.", color=COLORS["error"]))
 
 # ─── <:e_phone:1519362788462559323> QR KOD ───
-@bot.tree.command(name="qr", description="<:e_phone:1519362788462559323> Generiši QR kod iz teksta ili URL-a")
+@bot.tree.command(name="qr", description="📱 Generiši QR kod iz teksta ili URL-a")
 async def qr_cmd(i: discord.Interaction, tekst: str):
     url = f"https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={discord.utils.escape_markdown(tekst).replace(' ', '%20')}"
     e = discord.Embed(title="<:e_phone:1519362788462559323> QR Kod", description=f"```{tekst[:200]}```", color=COLORS["info"])
@@ -8958,7 +9012,7 @@ async def qr_cmd(i: discord.Interaction, tekst: str):
 # ─── <:e_lock3:1519362717394403432> CONFESS (anonimno) ───
 # /confess uklonjeno (v2.1) — anonimnost se može zloupotrijebiti za uznemiravanje.
 
-@bot.tree.command(name="setchannel", description="<:e_gear:1519362652516782194>️ [ADMIN] Postavi confess/report/birthday/staff-apps kanal")
+@bot.tree.command(name="setchannel", description="⚙ [ADMIN] Postavi confess/report/birthday/staff-apps kanal")
 @app_commands.describe(tip="Tip kanala", kanal="Kanal za taj tip")
 @app_commands.choices(tip=[
     app_commands.Choice(name="confess",    value="confess_channel"),
@@ -8995,7 +9049,7 @@ def _add_vatrica(guild_id: int, user_id: int, n: int = 1) -> int:
     store[key] = int(store.get(key, 0)) + n
     return store[key]
 
-vatrice_group = app_commands.Group(name="vatrice", description="<:e_fire2:1519362671491678280> Sistem vatrica — VLASNIK ONLY (daj, top, postavke)")
+vatrice_group = app_commands.Group(name="vatrice", description="🔥 Sistem vatrica — VLASNIK ONLY (daj, top, postavke)")
 
 def _vatrice_owner_only(i: discord.Interaction) -> bool:
     return i.user.id in OWNER_IDS
@@ -9144,9 +9198,9 @@ async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolici
         title=f"{emoji} Vatrice poslane!",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"{i.user.mention} je dao **+{kolicina}** {emoji} {korisnik.mention}!\n\n"
-            f"{emoji} Ukupno vatrica: **{novi}**\n"
-            f"<:e_label:1519363326109417613> Nick ažuriran: `{korisnik.display_name}`\n"
+            f"{i.user.mention} je dao **+{kolicina}** 🔥 {korisnik.mention}!\n\n"
+            f"🔥 Ukupno vatrica: **{novi}**\n"
+            f"<:e_label:1519363326109417613> Nick ažuriran: `{korisnik.display_name}` 🔥\n"
             f"━━━━━━━━━━━━━━━━━━━━━━"
         ),
         color=_LP, timestamp=datetime.now(timezone.utc),
@@ -9161,7 +9215,7 @@ async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolici
     e.set_footer(text=f"{BOT_NAME} • /vatrice pup za top listu")
     await i.response.send_message(embed=e)
 
-@vatrice_group.command(name="kanal", description="<:e_fire2:1519362671491678280> [VLASNIK] Postavi kanal za objave vatrica")
+@vatrice_group.command(name="kanal", description="🔥 [VLASNIK] Postavi kanal za objave vatrica")
 @app_commands.describe(kanal="Kanal gdje će se slati objave kad neko dobije vatricu")
 async def vatrice_kanal(i: discord.Interaction, kanal: discord.TextChannel):
     if not _vatrice_owner_only(i):
@@ -9177,7 +9231,7 @@ async def vatrice_kanal(i: discord.Interaction, kanal: discord.TextChannel):
         ephemeral=True,
     )
 
-@vatrice_group.command(name="pup", description="<:e_fire2:1519362671491678280> Top lista — najpopularniji članovi po vatricama")
+@vatrice_group.command(name="pup", description="🔥 Top lista — najpopularniji članovi po vatricama")
 async def vatrice_pup(i: discord.Interaction):
     store = _vatrice_store()
     cfg = get_guild_config(i.guild.id)
@@ -9239,7 +9293,7 @@ async def vatrice_pup(i: discord.Interaction):
     e.set_footer(text=f"<:e_fire2:1519362671491678280> {BOT_NAME} • Vatrice sistem  •  Vatricu zarađuješ svakih 150 poruka")
     await i.response.send_message(embed=e)
 
-@vatrice_group.command(name="oblik", description="<:e_fire2:1519362671491678280> [VLASNIK] Postavi oblik (emoji) vatrice na serveru")
+@vatrice_group.command(name="oblik", description="🔥 [VLASNIK] Postavi oblik (emoji) vatrice na serveru")
 @app_commands.describe(emoji="Emoji koji predstavlja vatricu (npr. <:e_fire2:1519362671491678280>, <:e_flask:1519363469013422181>️, <:e_sparkles:1519363032185176198>)")
 async def vatrice_oblik(i: discord.Interaction, emoji: str = None):
     cfg = get_guild_config(i.guild.id)
@@ -9292,11 +9346,11 @@ async def vatrice_start(i: discord.Interaction):
         await asyncio.sleep(0.4)  # rate limit zaštita za nick edits
     save_data()
     e = discord.Embed(
-        title=f"{emoji} Vatrice — START!",
+        title=f"🔥 Vatrice — START!",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
             f"<:e_party:1519363028334674070> **Sezona vatrica je započela!**\n\n"
-            f"Svi članovi servera **{i.guild.name}** resetovani su na **1 vatricu** {emoji}\n"
+            f"Svi članovi servera **{i.guild.name}** resetovani su na **1 vatricu** 🔥\n"
             f"<:e_users:1519363096601301120> Ukupno: **{dodano}** članova\n"
             f"<:e_label:1519363326109417613> Nickovi ažurirani: **{nick_ok}**\n"
             f"<:e_crown2:1519363047163166922> Owner servera (preskočen): **{skipped_owner}**\n\n"
@@ -9605,7 +9659,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
     if not players:
         e = discord.Embed(
             title="🎯  Bingo — Runda završena",
-            description="<:e_cry:1519362944717160530> **Niko nije uzeo tiket ovaj put.**\n<:e_idea:1519363006599794799> Sljedeći auto-bingo za **~3 sata**! <:e_time2:1519362726952964227>",
+            description="😢 **Niko nije uzeo tiket ovaj put.**\n💡 Sljedeći auto-bingo za **~3 sata**! ⏰",
             color=_LP,
             timestamp=datetime.now(timezone.utc),
         )
@@ -9677,7 +9731,7 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
 
     e = discord.Embed(
         title=title,
-        description="<:e_party:1519363028334674070> Runda je gotova! Pogledaj ko je pobijedio!" if total_prizes > 0 else "Ovaj put nema pobjednika. Sreće idući put!",
+        description="🎉 Runda je gotova! Pogledaj ko je pobijedio!" if total_prizes > 0 else "Ovaj put nema pobjednika. Sreće idući put!",
         color=color,
         timestamp=datetime.now(timezone.utc),
     )
@@ -10017,7 +10071,7 @@ async def on_app_command_completion(interaction, command):
     except Exception: pass
 
 # ─── <:e_report2:1519362714198347886> REPORT — 1 minuta cooldown po članu ───
-@bot.tree.command(name="report", description="<:e_report2:1519362714198347886> Prijavi člana staffu (1x u minuti)")
+@bot.tree.command(name="report", description="📝 Prijavi člana staffu (1x u minuti)")
 @app_commands.describe(korisnik="Koga prijavljuješ", razlog="Razlog prijave (kratko i jasno)")
 @app_commands.checks.cooldown(1, 60.0, key=lambda i: (i.guild_id, i.user.id))
 async def report_cmd(i: discord.Interaction, korisnik: discord.Member, razlog: str):
@@ -10955,7 +11009,7 @@ async def pravila_voice_cmd(ctx: commands.Context):
 
 
 # ─── <:e_refresh:1519362959187509461> SYNC — manualno ponovno učitavanje slash komandi ───
-@bot.tree.command(name="sync", description="<:e_refresh:1519362959187509461> Force-sync svih slash komandi (samo vlasnik)")
+@bot.tree.command(name="sync", description="🔄 Force-sync svih slash komandi (samo vlasnik)")
 @app_commands.describe(scope="global = svi serveri (~1h cache), guild = ovaj server (odmah)")
 @app_commands.choices(scope=[
     app_commands.Choice(name="guild (samo ovaj server, odmah)", value="guild"),
@@ -11406,7 +11460,7 @@ async def mafia_end(g: MafiaGame, winner: str):
     ))
     MAFIA_GAMES.pop(g.channel.id, None)
 
-@bot.tree.command(name="mafia", description="<:e_masks:1519363003424706671> Pokreni Mafia igru u ovom kanalu")
+@bot.tree.command(name="mafia", description="🎭 Pokreni Mafia igru u ovom kanalu")
 async def mafia_cmd(i: discord.Interaction):
     if not isinstance(i.channel, discord.TextChannel):
         return await i.response.send_message(
@@ -11429,7 +11483,7 @@ async def mafia_cmd(i: discord.Interaction):
     view = MafiaLobbyView(g)
     await i.response.send_message(embed=mafia_lobby_embed(g), view=view)
 
-@bot.tree.command(name="mafia-stop", description="<:e_stop:1519363022399995914> [DOMAĆIN] Prekini Mafia igru u ovom kanalu")
+@bot.tree.command(name="mafia-stop", description="🛑 [DOMAĆIN] Prekini Mafia igru u ovom kanalu")
 async def mafia_stop_cmd(i: discord.Interaction):
     g = MAFIA_GAMES.get(i.channel.id)
     if not g:
@@ -11447,9 +11501,9 @@ async def mafia_stop_cmd(i: discord.Interaction):
 #    <:e_floppy:1519363015147913396> CLOUD BACKUP — /backup grupa (now/restore/status)
 #    Spojeno u JEDNU grupu da ne probijemo 100-cmd Discord limit.
 # ═══════════════════════════════════════════
-backup_group = app_commands.Group(name="backup", description="<:e_floppy:1519363015147913396> [VLASNIK] Cloud backup sistem")
+backup_group = app_commands.Group(name="backup", description="💾 [VLASNIK] Cloud backup sistem")
 
-@backup_group.command(name="now", description="<:e_floppy:1519363015147913396> [VLASNIK] Forsiraj odmah upload backupa na Discord")
+@backup_group.command(name="now", description="💾 [VLASNIK] Forsiraj odmah upload backupa na Discord")
 async def backup_now_cmd(i: discord.Interaction):
     if i.user.id not in OWNER_IDS:
         return await i.response.send_message(
@@ -11472,7 +11526,7 @@ async def backup_now_cmd(i: discord.Interaction):
         ephemeral=True,
     )
 
-@backup_group.command(name="restore", description="<:e_floppy:1519363015147913396> [VLASNIK] Vrati podatke iz zadnjeg backupa sa Discorda")
+@backup_group.command(name="restore", description="💾 [VLASNIK] Vrati podatke iz zadnjeg backupa sa Discorda")
 async def backup_restore_cmd(i: discord.Interaction):
     if i.user.id not in OWNER_IDS:
         return await i.response.send_message(
@@ -11512,7 +11566,7 @@ async def backup_restore_cmd(i: discord.Interaction):
             ephemeral=True,
         )
 
-@backup_group.command(name="status", description="<:e_floppy:1519363015147913396> [VLASNIK] Status cloud backup sistema")
+@backup_group.command(name="status", description="💾 [VLASNIK] Status cloud backup sistema")
 async def backup_status_cmd(i: discord.Interaction):
     if i.user.id not in OWNER_IDS:
         return await i.response.send_message(
@@ -11650,7 +11704,7 @@ def get_next_meme(guild_id: int) -> str:
 # ═══════════════════════════════════════════
 #    /meme — balkanski mem
 # ═══════════════════════════════════════════
-@bot.tree.command(name="meme", description="<:e_sparkles:1519363032185176198> Pošalji balkanski mem u kanal")
+@bot.tree.command(name="meme", description="✨ Pošalji balkanski mem u kanal")
 async def meme_cmd(i: discord.Interaction):
     meme_text = get_next_meme(i.guild.id if i.guild else 0)
     e = discord.Embed(
