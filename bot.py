@@ -9326,6 +9326,56 @@ async def vatrice_start(i: discord.Interaction):
     e.set_footer(text=f"{BOT_NAME} • Pokrenuo: {i.user.display_name}")
     await i.followup.send(embed=e)
 
+@vatrice_group.command(name="resetnik", description="[VLASNIK] Ukloni vatrice sufiks iz svih nickova — vrati čista imena")
+async def vatrice_resetnik(i: discord.Interaction):
+    if not _vatrice_owner_only(i):
+        return await i.response.send_message(
+            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik bota može resetovati nickove.", color=COLORS["error"]),
+            ephemeral=True,
+        )
+    await i.response.defer(ephemeral=False)
+    # Briše sufikse oblika: " <:e_fire2:151936...>3" ili " 🔥3" ili " 🔥 3"
+    _vatrice_nick_re = re.compile(
+        r"\s*(?:<a?:[^:>]+:\d+>|[\U00002600-\U000027BF\U0001F300-\U0001FAFF\U00002702-\U000027B0]+)\s*\d+\s*$",
+        re.UNICODE,
+    )
+    total   = 0
+    changed = 0
+    errors  = 0
+    for m in i.guild.members:
+        if m.bot:
+            continue
+        total += 1
+        if m.id == i.guild.owner_id:
+            continue  # bot ne može mijenjati nick ownera servera
+        display = m.nick if m.nick else m.name
+        clean   = _vatrice_nick_re.sub("", display).strip() or m.name
+        # Ako je clean == username → nick na None (Discord default), inače postavi clean nick
+        target = None if clean == m.name else clean
+        if m.nick == target:
+            continue  # već čisto, nema promjene
+        try:
+            await m.edit(nick=target, reason="Vatrice resetnik — čišćenje sufiksa")
+            changed += 1
+        except (discord.Forbidden, discord.HTTPException):
+            errors += 1
+        await asyncio.sleep(1.1)  # rate limit zaštita (5 nick edits / 5s po serveru)
+    e = discord.Embed(
+        title="<:icon_check:1519358376268533810> Vatrice — Nickovi resetovani!",
+        description=(
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"<:e_users:1519363096601301120> Ukupno članova: **{total}**\n"
+            f"<:e_label:1519363326109417613> Nickovi očišćeni: **{changed}**\n"
+            f"<:icon_cross:1519358379917836508> Greške (nema permisije): **{errors}**\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"_Svi vatrice sufiksi su uklonjeni. Nick je vraćen na čisto ime._"
+        ),
+        color=_LP,
+        timestamp=datetime.now(timezone.utc),
+    )
+    e.set_footer(text=f"{BOT_NAME} • Pokrenuo: {i.user.display_name}")
+    await i.followup.send(embed=e)
+
 bot.tree.add_command(vatrice_group)
 
 # ═══════════════════════════════════════════
