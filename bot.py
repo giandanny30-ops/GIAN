@@ -1767,19 +1767,8 @@ print("[auto-embed] aktivan — sve plain poruke (send/edit/reply/followup) auto
 def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb=None, image=None, author=None, accent=True):
     desc = _prepend_box(title, desc)
     if desc:
-        _pro_styled = []
-        for _ln in str(desc).split("\n"):
-            if _ln.strip() and not _ln.lstrip().startswith(">"):
-                _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
-                _has_word = any(c.isalpha() for c in _ln)
-                if _has_md or not _has_word:
-                    _pro_styled.append(f"> {_ln}")
-                else:
-                    _pro_styled.append(f"> **{_ln}**")
-            else:
-                _pro_styled.append(_ln)
-        desc = "\n".join(_pro_styled)
-    sep = "˚｡⋆୨୧˚ ───────────── ˚୨୧⋆｡˚"
+        desc = _apply_gt_bold(str(desc))
+    sep = "──────────────────────"
     if accent and desc:
         desc = f"{sep}\n{desc}\n{sep}"
     elif accent:
@@ -2685,7 +2674,7 @@ async def on_message(message):
                 add_xp(message.author.id, 200)
                 save_data()
                 win_e = discord.Embed(
-                    title=f"<:e_crown2:1519363047163166922>  K A L A D O N T  —  P O B J E D A !  {E_FIRE4}",
+                    title=f"<:e_crown2:1519363047163166922>  **KALADONT — POBJEDA!**  {E_FIRE4}",
                     description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}  {message.author.mention} je izrekao/la magičnu riječ!  {E_FIRE3}{E_FIRE2}{E_FIRE1}",
                     color=_LP,
                     timestamp=datetime.now(timezone.utc)
@@ -4117,7 +4106,7 @@ def kaladont_start_embed(game: dict, mention: str):
     tezina_label = tezina_map.get(letters, f"**{letters} slova**")
     tezina_icon  = {1: "<:e_green:1519362769047126028>", 2: "<:e_green:1519362769047126028>", 3: "<:e_red:1519362782192210041>"}.get(letters, "<:e_gear:1519362652516782194>")
     e = discord.Embed(
-        title="📝  K A L A D O N T",
+        title="📝  **KALADONT**",
         description=(
             f"Igra je počela! Prva riječ:\n"
             f"## <:e_bubble:1519363307998417148>  **{word}**\n\n"
@@ -4147,7 +4136,7 @@ def kaladont_active_embed(game: dict):
     icon    = KALADONT_ICONS[(count - 1) % len(KALADONT_ICONS)]
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
     e = discord.Embed(
-        title=f"{E_GAME}  K A L A D O N T  {E_GAME}",
+        title=f"{E_GAME}  **KALADONT**  {E_GAME}",
         description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}{E_FIRE4}  **aktivna igra**  {E_FIRE4}{E_FIRE3}{E_FIRE2}{E_FIRE1}",
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
@@ -4467,27 +4456,27 @@ def _wordle_embed(game: dict, user, *, finished: bool = False, won: bool = False
     legend = "<:e_green:1519362769047126028> tačno mjesto  •  <:e_green:1519362769047126028> pogrešno mjesto  •  <:e_stop:1519363022399995914> nema slova"
     if finished and won:
         color = GAME_COLORS["wordle"]
-        title = f"{E_GAME}  W O R D L E  —  P O B J E D A !  {E_FIRE4}"
+        title = f"{E_GAME}  **WORDLE — POBJEDA!**  {E_FIRE4}"
         footer = f"<:e_trophy2:1519362624742232146> Pogodio/la {user.display_name} • {used}/{maxg} pokušaja"
         extra = (f"\n\n{E_FIRE1}{E_FIRE2}{E_FIRE3} Riječ je bila **{game['word']}**!\n"
                  f"<:e_coins3:1519362621206298666> Nagrada: **+{reward:,} <:e_coins3:1519362621206298666>**   •   <:e_star2:1519363084253266031> XP: **+{xp}**")
     elif finished:
         color = COLORS["error"]
-        title = "<:e_red:1519362782192210041>  W O R D L E  —  K R A J"
+        title = "<:e_red:1519362782192210041>  **WORDLE — KRAJ**"
         footer = "Pokušaj ponovo sa /wordle"
         extra = (f"\n\n<:e_skull:1519362992502997125> Iskoristio/la si svih **{maxg}** pokušaja!\n"
                  f"<:e_key:1519363066545045756> Skrivena riječ je bila **{game['word']}**")
     else:
         color = GAME_COLORS["wordle"]
-        title = f"{E_GAME}  W O R D L E"
+        title = f"{E_GAME}  **WORDLE**"
         footer = f"Pokušaj {used}/{maxg} • upiši riječ od 5 slova"
         extra = ""
     e = discord.Embed(
         title=title,
         description=(
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"──────────────────────\n"
             f"{board}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"──────────────────────\n"
             f"{legend}{extra}"
         ),
         color=color,
