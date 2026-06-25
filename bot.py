@@ -2649,14 +2649,14 @@ async def on_message(message):
                     view=KaladontInvalidView(cid, checkpoint_word=game["word"])
                 )
                 _kaladont_invalid_msgs[cid] = inv_msg
-                  # Auto-brisanje embeda nakon 10 sekundi
-                  async def _auto_del_inv(msg=inv_msg, ch_id=cid):
-                      await asyncio.sleep(10)
-                      if _kaladont_invalid_msgs.get(ch_id) is msg:
-                          _kaladont_invalid_msgs.pop(ch_id, None)
-                          try: await msg.delete()
-                          except: pass
-                  asyncio.create_task(_auto_del_inv())
+                # Auto-brisanje embeda nakon 10 sekundi
+                async def _auto_del_inv(msg=inv_msg, ch_id=cid):
+                    await asyncio.sleep(10)
+                    if _kaladont_invalid_msgs.get(ch_id) is msg:
+                        _kaladont_invalid_msgs.pop(ch_id, None)
+                        try: await msg.delete()
+                        except: pass
+                asyncio.create_task(_auto_del_inv())
           else:
             # ── Validna riječ — prihvata se ───────────────────────
             # Resetuj invalid counter i deaktiviraj stari invalid embed
