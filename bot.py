@@ -3833,32 +3833,33 @@ async def slots(i: discord.Interaction, ulog: int = 100):
 
     SLOTS_BANNER = "https://i.imgur.com/6YnWybh.png"
 
-    def _embed(r1, r2, r3, status: str, color: int = 0xF1C40F, title: str = "") -> discord.Embed:
-        e = discord.Embed(
-            description=(
-                f"\n{_row(r1, r2, r3)}\n\n"
-                f"{status}"
-            ),
+    def _embeds(r1, r2, r3, status: str, color: int = 0xF1C40F, title: str = "", ts=None) -> list[discord.Embed]:
+        # Embed 1: naslov + SLOTS baner (baner se prikazuje IZNAD reelova)
+        e1 = discord.Embed(title=title or "\u200b", color=color)
+        e1.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
+        e1.set_image(url=SLOTS_BANNER)
+
+        # Embed 2: reelovi + status + footer
+        e2 = discord.Embed(
+            description=f"{_row(r1, r2, r3)}\n\n{status}",
             color=color,
         )
-        if title:
-            e.title = title
-        e.set_image(url=SLOTS_BANNER)
-        e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
-        e.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}  •  {BOT_NAME}")
-        return e
+        if ts:
+            e2.timestamp = ts
+        e2.set_footer(text=f"🪙 Ulog: {ulog:,}  •  💰 Balans: {d['balance']:,}  •  {BOT_NAME}")
+        return [e1, e2]
 
     # ── Frame 0: sve se vrte ─────────────────────────────────────────────
-    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, "⏳ Valjci se vrte..."), wait=True)
+    msg = await i.followup.send(embeds=_embeds(SPIN, SPIN, SPIN, "⏳ Valjci se vrte...", title="🎰  SLOTS"), wait=True)
     await asyncio.sleep(1.4)
 
     # ── Frame 1: lijevi staje ────────────────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, f"🔒 **{reels[0]}** · vrte se dalje..."))
+    try: await msg.edit(embeds=_embeds(reels[0], SPIN, SPIN, f"🔒 **{reels[0]}** · vrte se dalje...", title="🎰  SLOTS"))
     except: pass
     await asyncio.sleep(1.1)
 
     # ── Frame 2: desni staje ─────────────────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], f"🔒 **{reels[0]}** · 🎰 · **{reels[2]}**  — centar..."))
+    try: await msg.edit(embeds=_embeds(reels[0], SPIN, reels[2], f"🔒 **{reels[0]}** · 🎰 · **{reels[2]}**  — centar...", title="🎰  SLOTS"))
     except: pass
     await asyncio.sleep(1.1)
 
@@ -3895,10 +3896,8 @@ async def slots(i: discord.Interaction, ulog: int = 100):
 
     save_data()
 
-    final_e = _embed(reels[0], reels[1], reels[2], status, color=color, title=title)
-    final_e.timestamp = datetime.now(timezone.utc)
     try:
-        await msg.edit(embed=final_e)
+        await msg.edit(embeds=_embeds(reels[0], reels[1], reels[2], status, color=color, title=title, ts=datetime.now(timezone.utc)))
     except Exception:
         pass
 
