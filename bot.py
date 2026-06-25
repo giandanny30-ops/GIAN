@@ -4122,7 +4122,7 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
     e.add_field(name="<:e_right:1519363367712591922>️  Sljedeća", value=f"**`{req}`**", inline=False)
     _img = random.choice(KALADONT_PENGUIN_GIFS)
     if _img.startswith("http"):
-        e.set_image(url=_img)
+        e.set_thumbnail(url=_img)
     e.set_footer(text=f"🐧 {BOT_NAME} Kaladont  •  #{count}")
     return e
 
