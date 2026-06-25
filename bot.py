@@ -2657,7 +2657,7 @@ async def on_message(message):
                         try: await msg.delete()
                         except: pass
                 asyncio.create_task(_auto_del_inv())
-          else:
+        else:
             # ── Validna riječ — prihvata se ───────────────────────
             # Resetuj invalid counter i deaktiviraj stari invalid embed
             _kaladont_invalid_count.pop(message.channel.id, None)
