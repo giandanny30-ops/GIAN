@@ -9334,9 +9334,17 @@ async def vatrice_resetnik(i: discord.Interaction):
             ephemeral=True,
         )
     await i.response.defer(ephemeral=False)
-    # Briše sufikse oblika: " <:e_fire2:151936...>3" ili " 🔥3" ili " 🔥 3"
+    # Briše sufikse oblika:
+    #   " <:e_fire2:1519362671491678280>3"  — pun custom emoji + broj
+    #   " <:e_fire2:15193626714916782"       — odsjekano na 32 znaka (bez > i broja)
+    #   " 🔥3"                               — unicode emoji + broj
     _vatrice_nick_re = re.compile(
-        r"\s*(?:<a?:[^:>]+:\d+>|[\U00002600-\U000027BF\U0001F300-\U0001FAFF\U00002702-\U000027B0]+)\s*\d+\s*$",
+        r"\s*(?:"
+        r"<a?:[^:>]{1,50}:\d{0,20}>?\s*\d*"   # custom emoji (potpun ili odsjekano)
+        r"|"
+        r"[\U00002600-\U000027BF\U0001F300-\U0001FAFF\U00002702-\U000027B0]+"
+        r"\s*\d*"                               # unicode emoji + opcionalni broj
+        r")\s*$",
         re.UNICODE,
     )
     total   = 0
