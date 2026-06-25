@@ -4107,9 +4107,9 @@ def kaladont_active_embed(game: dict):
 # ── Kaladont slike — uploadaj slike iz images/ foldera na Discord CDN ili Imgur,
 #    zatim zamijeni URL-ove ispod sa tvojim linkovima ──────────────────────────
 KALADONT_PENGUIN_GIFS = [
-    "ZAMIJENI_SA_URL_kaladont_pingvin1",   # images/kaladont_penguin1.png
-    "ZAMIJENI_SA_URL_kaladont_pingvin2",   # images/kaladont_penguin2.png
-    "ZAMIJENI_SA_URL_kaladont_pingvin3",   # images/kaladont_penguin3.png
+    "https://i.imgur.com/NcMzy4B.png",
+    "https://i.imgur.com/XzLe6aT.png",
+    "https://i.imgur.com/nsZcLzn.png",
 ]
 
 def kaladont_word_card(word: str, player: str, req: str, count: int):
@@ -4120,7 +4120,9 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
         color=KALADONT_COLOR,
     )
     e.add_field(name="<:e_right:1519363367712591922>️  Sljedeća", value=f"**`{req}`**", inline=False)
-    e.set_image(url=random.choice(KALADONT_PENGUIN_GIFS))
+    _img = random.choice(KALADONT_PENGUIN_GIFS)
+    if _img.startswith("http"):
+        e.set_image(url=_img)
     e.set_footer(text=f"🐧 {BOT_NAME} Kaladont  •  #{count}")
     return e
 
