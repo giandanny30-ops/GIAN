@@ -4121,12 +4121,10 @@ def kaladont_word_card(word: str, player: str, req: str, count: int):
     icon = KALADONT_BOX_ICONS[(count - 1) % len(KALADONT_BOX_ICONS)]
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
     e = discord.Embed(
-        description=(
-            f"{icon}  **{word}**  ·  <:e_speaker:1519363314524881048>️ {player}  ·  {streak_fx} **#{count}**\n"
-            f"<:e_right:1519363367712591922>️  Sljedeća: **`{req}`**"
-        ),
+        description=f"{icon}  **{word}**  ·  <:e_speaker:1519363314524881048>️ {player}  ·  {streak_fx} **#{count}**",
         color=KALADONT_COLOR,
     )
+    e.add_field(name="<:e_right:1519363367712591922>️  Sljedeća", value=f"**`{req}`**", inline=False)
     e.set_image(url=random.choice(KALADONT_PENGUIN_GIFS))
     e.set_footer(text=f"🐧 {BOT_NAME} Kaladont  •  #{count}")
     return e
