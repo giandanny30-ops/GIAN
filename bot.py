@@ -1644,18 +1644,7 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
     desc = _prepend_box(title, desc)
     # Dodaj > crtica + podvuci za svaki neprazan red opisa
     if desc:
-        styled = []
-        for _line in str(desc).split("\n"):
-            if _line.strip() and not _line.lstrip().startswith(">"):
-                _has_md = any(m in _line for m in ("**", "__", "```", "`", "##", "||")) or _line.lstrip().startswith("*")
-                _has_word = any(c.isalpha() for c in _line)
-                if _has_md or not _has_word:
-                    styled.append(f"> {_line}")
-                else:
-                    styled.append(f"> **{_line}**")
-            else:
-                styled.append(_line)
-        desc = "\n".join(styled)
+        desc = _apply_gt_bold(str(desc))
     e = discord.Embed(title=title, description=desc, color=color, timestamp=datetime.now(timezone.utc))
     if fields:
         for n, v, inline in fields:
@@ -1838,27 +1827,39 @@ def _fmt_title(t):
         return f"{emoji_part} {rest}"
     return t
 
+def _apply_gt_bold(text: str) -> str:
+    """Svaki neprazan red koji već ne počinje s '>' dobija > prefix.
+    Redovi sa markdown-om → '> red', čisti tekst → '> **red**'."""
+    styled = []
+    for _ln in str(text).split("\n"):
+        if _ln.strip() and not _ln.lstrip().startswith(">"):
+            _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
+            _has_word = any(c.isalpha() for c in _ln)
+            if _has_md or not _has_word:
+                styled.append(f"> {_ln}")
+            else:
+                styled.append(f"> **{_ln}**")
+        else:
+            styled.append(_ln)
+    return "\n".join(styled)
+
 def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
     _color = color if color is not None else colour
     if title:
         title = _fmt_title(title)
     if description and _color is not None:
-        _e_styled = []
-        for _ln in str(description).split("\n"):
-            if _ln.strip() and not _ln.lstrip().startswith(">"):
-                _has_md = any(m in _ln for m in ("**", "__", "```", "`", "##", "||")) or _ln.lstrip().startswith("*")
-                _has_word = any(c.isalpha() for c in _ln)
-                if _has_md or not _has_word:
-                    _e_styled.append(f"> {_ln}")
-                else:
-                    _e_styled.append(f"> **{_ln}**")
-            else:
-                _e_styled.append(_ln)
-        description = "\n".join(_e_styled)
+        description = _apply_gt_bold(str(description))
     _orig_embed_init(self, title=title, description=description, color=color, colour=colour, **kwargs)
 
+_orig_add_field = discord.Embed.add_field
+def _patched_add_field(self, *, name, value, inline=True):
+    if value and str(value).strip():
+        value = _apply_gt_bold(str(value))
+    _orig_add_field(self, name=name, value=value, inline=inline)
+discord.Embed.add_field = _patched_add_field
+
 discord.Embed.__init__ = _patched_embed_init
-print("[bold-embed] aktivan — sve embeds (osim slots) koriste > bold format")
+print("[bold-embed] aktivan — opis + polja (osim slots) koriste > bold format")
 
 # ═══════════════════════════════════════════
 #    GIF HELPER (nekos.best)
