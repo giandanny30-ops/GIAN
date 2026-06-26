@@ -2144,31 +2144,40 @@ async def on_guild_join(guild):
 # ═══════════════════════════════════════════
 #    🌹 MRAK WELCOME VIEW
 # ═══════════════════════════════════════════
+def _ge(guild: discord.Guild, name: str, fallback: str = "") -> str:
+    """Vrati emoji string po imenu s guilda, ili fallback ako ne postoji."""
+    e = discord.utils.get(guild.emojis, name=name)
+    return str(e) if e else fallback
+
 class MrakWelcomeView(discord.ui.View):
     """Welcome kartice za MRAK — dugme 'Poželi dobrodošlicu' + music link."""
     def __init__(self, new_member: discord.Member, music_ch_id: int):
         super().__init__(timeout=None)
         self.new_member = new_member
-        # Music link dugme (desno)
+        guild = new_member.guild
+        # Emoji za music dugme (traži po imenu s guilda)
+        ink_emoji = discord.utils.get(guild.emojis, name="ink") or "🍹"
         self.add_item(discord.ui.Button(
             label="play music",
-            emoji="<:46960sakurapinkdrink:1520092838006624287>",
-            url=f"https://discord.com/channels/{new_member.guild.id}/{music_ch_id}",
+            emoji=ink_emoji,
+            url=f"https://discord.com/channels/{guild.id}/{music_ch_id}",
             style=discord.ButtonStyle.link,
             row=0,
         ))
 
     @discord.ui.button(
         label="Poželi dobrodošlicu",
-        emoji="<:96983chococat:1520092321461440532>",
         style=discord.ButtonStyle.secondary,
         row=0,
     )
     async def greet_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         nm = self.new_member
+        guild = interaction.guild
+        flower = _ge(guild, "907007flower", "🌸")
+        rose   = _ge(guild, "4642rosewhite", "🌹")
         await interaction.response.send_message(
-            f"<:907007flower:1520092431528231093> **{interaction.user.display_name}** je poslao/la "
-            f"dobrodošlicu {nm.mention} na **MRAK**! <:4642rosewhite:1520092070700650566>",
+            f"{flower} **{interaction.user.display_name}** je poslao/la "
+            f"dobrodošlicu {nm.mention} na **MRAK**! {rose}",
             allowed_mentions=discord.AllowedMentions(users=False),
         )
 
@@ -2188,11 +2197,7 @@ async def on_member_join(member):
         vemoji = cfg_vj.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
         novi_v = _add_vatrica(member.guild.id, member.id, 1)
         save_data()
-        # <:e_down:1519363345252090081>️ Odmah ažuriraj nick da član dobije varicu pored nicka
-        try:
-            await _update_vatrice_nick(member, novi_v, vemoji)
-        except Exception:
-            pass
+        # Nick se ne mijenja — vatrice sistem bez promjene nadimka
         if vch_id := cfg_vj.get("vatrice_channel"):
             if vch := member.guild.get_channel(vch_id):
                 vj_e = discord.Embed(
@@ -2399,11 +2404,15 @@ async def on_member_join(member):
         _ch_uloge   = cfg.get("gws_channel",     1496860024121852087)
         _ch_music   = cfg.get("music_channel",   1496860024121852088)
 
+        _flower  = _ge(member.guild, "907007flower",  "🌸")
+        _rose    = _ge(member.guild, "4642rosewhite", "🌹")
+        _kawaii  = _ge(member.guild, "9339lolkawaii", "🎉")
+
         e = discord.Embed(
             description=(
-                f"<:907007flower:1520092431528231093> Dobrodošao/la **{_clean_name}** na **{member.guild.name}™**!\n\n"
-                f"<:4642rosewhite:1520092070700650566> Pročitaj <#{_ch_info}> i <#{_ch_pravila}>.\n\n"
-                f"<:9339lolkawaii:1520092073863282708> Dobrodošao/la na party — uzmi <#{_ch_uloge}> i ukrasi profil!\n"
+                f"{_flower} Dobrodošao/la **{_clean_name}** na **{member.guild.name}™**!\n\n"
+                f"{_rose} Pročitaj <#{_ch_info}> i <#{_ch_pravila}>.\n\n"
+                f"{_kawaii} Dobrodošao/la na party — uzmi <#{_ch_uloge}> i ukrasi profil!\n"
             ),
             color=_LP,
             timestamp=_now_utc,
@@ -2822,8 +2831,7 @@ async def on_message(message):
             novi_lvl = xp_d["level"]
             save_data()
 
-            try: await _update_vatrice_nick(message.author, novi_v, vemoji)
-            except Exception: pass
+            # Nick se ne mijenja — vatrice sistem bez promjene nadimka
             try: await _post_vatrice_objava(message.guild, None, message.author, novi_v, vemoji)
             except Exception: pass
 
@@ -9187,7 +9195,6 @@ async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolici
     emoji = cfg.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
     novi = _add_vatrica(i.guild.id, korisnik.id, kolicina)
     save_data()
-    await _update_vatrice_nick(korisnik, novi, emoji)
     await _post_vatrice_objava(i.guild, i.user, korisnik, novi, emoji)
     # <:e_chart:1519362656568475880> AKTIVNOST: napisane poruke + vatrice + level/XP
     msg_key = f"{i.guild.id}:{korisnik.id}"
@@ -9342,11 +9349,7 @@ async def vatrice_start(i: discord.Interaction):
         if m.id == i.guild.owner_id:
             skipped_owner += 1
             continue  # bot ne može mijenjati nick ownera servera
-        try:
-            await _update_vatrice_nick(m, store[key], emoji)
-            nick_ok += 1
-        except Exception:
-            pass
+        nick_ok += 1  # nick se ne mijenja
         await asyncio.sleep(0.4)  # rate limit zaštita za nick edits
     save_data()
     e = discord.Embed(
