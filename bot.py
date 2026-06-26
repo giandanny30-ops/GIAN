@@ -1645,10 +1645,7 @@ def em(title, desc="", color=COLORS["balkan"], fields=None, footer=None, thumb=N
     # Dodaj > crtica + podvuci za svaki neprazan red opisa
     if desc:
         desc = _apply_gt_bold(str(desc))
-    # Naslov se prikazuje kao prvi bold red opisa (ne kao embed title)
-    if title:
-        desc = f"**{title}**\n{desc}" if desc else f"**{title}**"
-    e = discord.Embed(description=desc, color=color, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title=title, description=desc, color=color, timestamp=datetime.now(timezone.utc))
     if fields:
         for n, v, inline in fields:
             e.add_field(name=n, value=v or "\u200b", inline=inline)
@@ -1773,9 +1770,7 @@ def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb
         desc = _apply_gt_bold(str(desc))
     if accent and not desc:
         desc = ""
-    if title:
-        desc = f"**<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>**\n{desc}" if desc else f"**<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>**"
-    e = discord.Embed(description=desc, color=color, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title=f"<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>", description=desc, color=color, timestamp=datetime.now(timezone.utc))
     if fields:
         for n, v, inline in fields:
             e.add_field(name=f"<:e_right:1519363367712591922> {n}", value=v or "\u200b", inline=inline)
@@ -1838,7 +1833,7 @@ def _apply_gt_bold(text: str) -> str:
             styled.append(_ln)
     return "\n".join(styled)
 
-def _patched_embed_init(self, *, description=None, color=None, colour=None, **kwargs):
+def _patched_embed_init(self, *, title=None, description=None, color=None, colour=None, **kwargs):
     _color = color if color is not None else colour
     if title:
         title = _fmt_title(title)
@@ -1896,8 +1891,8 @@ async def _license_check_and_shutdown_if_clone():
             ch = next((c for c in g.text_channels if c.permissions_for(g.me).send_messages), None)
             if ch:
                 e = discord.Embed(
+                    title="<:e_no:1519363018725658675> Nedozvoljena kopija bota",
                     description=(
-                        f"**<:e_no:1519363018725658675> Nedozvoljena kopija bota**\n"
                         f"Ovaj bot je **neovlaštena kopija** originalnog **{BOT_NAME}** bota.\n\n"
                         f"<:e_link:1519363321458065408> **Jedini originalni bot:** GIAN\n\n"
                         f"Bot će se sada automatski isključiti i napustiti server."
@@ -2103,7 +2098,7 @@ async def on_guild_join(guild):
             ch = next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
             if ch:
                 e = discord.Embed(
-                    description="**<:e_no:1519363018725658675> Nedozvoljena kopija bota**",
+                    title="<:e_no:1519363018725658675> Nedozvoljena kopija bota",
                     description=(
                         f"Ovaj bot je **neovlaštena kopija** originalnog **{BOT_NAME}** bota.\n\n"
                         f"<:e_link:1519363321458065408> **Jedini originalni bot:** GIAN\n\n"
@@ -2130,7 +2125,7 @@ async def on_guild_join(guild):
     if chan:
         try:
             e = discord.Embed(
-                description=f"**<:e_shake:1519362947766554737> Zdravo, {guild.name}!**",
+                title=f"<:e_shake:1519362947766554737> Zdravo, {guild.name}!",
                 description=(
                     f"Ja sam **{BOT_NAME}** — Balkan Discord bot!\n\n"
                     f"<:e_help2:1519362723148726534> Ukucaj `/help` da vidiš sve komande.\n"
@@ -2268,7 +2263,7 @@ async def on_member_join(member):
             ms_ch = member.guild.get_channel(cfg.get("welcome_channel") or 1494687347558715543) or member.guild.system_channel
             if ms_ch:
                 ms_e = discord.Embed(
-                    description=f"**<:e_confetti2:1519363348288901221> MILESTONE — {cnt} ČLANOVA! <:e_confetti2:1519363348288901221>**",
+                    title=f"<:e_confetti2:1519363348288901221> MILESTONE — {cnt} ČLANOVA! <:e_confetti2:1519363348288901221>",
                     description=(
                         f"<:e_trophy2:1519362624742232146> Upravo smo dostigli **{cnt}** članova!\n"
                         f"<:e_flower:1519362984818901173> Hvala svima koji su dio **× GIAN** porodice!\n"
@@ -2291,7 +2286,7 @@ async def on_member_join(member):
 
     # ── Log ────────────────────────────────────────────
     if log_ch := member.guild.get_channel(cfg.get("log_channel", 0)):
-        le = discord.Embed(description="**<:e_inbox:1519363351354937497> Novi Član**", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
+        le = discord.Embed(title="<:e_inbox:1519363351354937497> Novi Član", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
         le.set_author(name=str(member), icon_url=member.display_avatar.url)
         le.add_field(name="ID", value=f"`{member.id}`", inline=True)
         le.add_field(name="Nalog kreiran", value=member.created_at.strftime("%d.%m.%Y."), inline=True)
@@ -2510,7 +2505,7 @@ async def on_member_update(before, after):
 
         # ── MALI, ČIST EMBED ──
         e = discord.Embed(
-            description="**<:e_flower:1519362984818901173> Novi Boost!**",
+            title="<:e_flower:1519362984818901173> Novi Boost!",
             description=(
                 f"{after.mention} je upravo **boostovao server**! <:e_rocket2:1519363332266524813>\n"
                 f"Hvala ti na podršci — server je sad još jači! <:e_muscle:1519362764244652122>"
@@ -2558,7 +2553,7 @@ async def on_message(message):
             try: await message.add_reaction("<:e_no:1519363018725658675>")
             except Exception as e: print(f"[brojanje] reaction fail: {e}")
             warn_e = discord.Embed(
-                description="**<:e_no:1519363018725658675> OPOMENA — Ne možeš brojati iza sebe!**",
+                title="<:e_no:1519363018725658675> OPOMENA — Ne možeš brojati iza sebe!",
                 description=(
                     f"{message.author.mention}, **mora neko drugi nastaviti** prije nego što ti opet brojiš.\n\n"
                     f"<:e_right:1519363367712591922>️ Sljedeći broj je i dalje: **{expected}**"
@@ -2582,7 +2577,7 @@ async def on_message(message):
             user_total = mistakes[uid_str]
             save_data()
             err_e = discord.Embed(
-                description="**<:e_bomb:1519363456334168255> OPOMENA — Pogrešan broj!**",
+                title="<:e_bomb:1519363456334168255> OPOMENA — Pogrešan broj!",
                 description=(
                     f"{message.author.mention}, **pogriješio/la** si!\n\n"
                     f"<:icon_cross:1519358379917836508> Tvoj odgovor: **{num}**\n"
@@ -2739,7 +2734,9 @@ async def on_message(message):
                 eco["balance"] = eco.get("balance", 0) + nagrada
                 add_xp(message.author.id, 200)
                 save_data()
-                win_e = discord.Embed(description=f"**<:e_crown2:1519363047163166922>  **KALADONT — POBJEDA!**  {E_FIRE4}**\n{E_FIRE1}{E_FIRE2}{E_FIRE3}  {message.author.mention} je izrekao/la magičnu riječ!  {E_FIRE3}{E_FIRE2}{E_FIRE1}",
+                win_e = discord.Embed(
+                    title=f"<:e_crown2:1519363047163166922>  **KALADONT — POBJEDA!**  {E_FIRE4}",
+                    description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}  {message.author.mention} je izrekao/la magičnu riječ!  {E_FIRE3}{E_FIRE2}{E_FIRE1}",
                     color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
@@ -2897,7 +2894,7 @@ async def on_message_edit(before, after):
     cfg = get_guild_config(before.guild.id)
     log_ch = before.guild.get_channel(cfg.get("log_channel", 0))
     if not log_ch: return
-    e = discord.Embed(description="**<:e_pencil:1519363059909398610>️ Poruka Editovana**", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_pencil:1519363059909398610>️ Poruka Editovana", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
     e.set_author(name=str(before.author), icon_url=before.author.display_avatar.url)
     e.add_field(name="Kanal",   value=before.channel.mention,           inline=True)
     e.add_field(name="<:e_pin:1519363329259208836> Link", value=f"[Idi na poruku]({after.jump_url})", inline=True)
@@ -2911,7 +2908,7 @@ async def on_message_delete(message):
     cfg = get_guild_config(message.guild.id)
     log_ch = message.guild.get_channel(cfg.get("log_channel", 0))
     if not log_ch: return
-    e = discord.Embed(description="**<:e_trash:1519362951247691898>️ Poruka Obrisana**", color=COLORS["error"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_trash:1519362951247691898>️ Poruka Obrisana", color=COLORS["error"], timestamp=datetime.now(timezone.utc))
     e.set_author(name=str(message.author), icon_url=message.author.display_avatar.url)
     e.add_field(name="Kanal",    value=message.channel.mention,                         inline=True)
     e.add_field(name="Sadržaj",  value=(message.content[:1000] or "*prilog/prazno*"),   inline=False)
@@ -2968,7 +2965,9 @@ async def birthday_check():
             if not ch_id: continue
             chan = guild.get_channel(ch_id)
             if not chan: continue
-            e = discord.Embed(description=f"**<:e_party:1519363028334674070> Sretan Rođendan!**\nDanas je rođendan od {member.mention}! <:e_party:1519363028334674070>\nSvi mu/joj čestitajte! <:e_party:1519363028334674070>",
+            e = discord.Embed(
+                title="<:e_party:1519363028334674070> Sretan Rođendan!",
+                description=f"Danas je rođendan od {member.mention}! <:e_party:1519363028334674070>\nSvi mu/joj čestitajte! <:e_party:1519363028334674070>",
                 color=COLORS["fun"], timestamp=datetime.now(timezone.utc)
             )
             e.set_thumbnail(url=member.display_avatar.url)
@@ -3092,7 +3091,7 @@ async def on_member_ban(guild, user):
     try:
         cfg = get_guild_config(guild.id)
         if log_ch := guild.get_channel(cfg.get("log_channel", 0)):
-            e = discord.Embed(description="**<:e_hammer:1519362836671762494> Član Banovan**", color=COLORS["error"], timestamp=datetime.now(timezone.utc))
+            e = discord.Embed(title="<:e_hammer:1519362836671762494> Član Banovan", color=COLORS["error"], timestamp=datetime.now(timezone.utc))
             e.set_author(name=str(user), icon_url=user.display_avatar.url)
             e.add_field(name="ID", value=f"`{user.id}`", inline=True)
             await log_ch.send(embed=e)
@@ -3120,7 +3119,7 @@ async def on_member_remove(member):
     # ── Log ────────────────────────────────────────────
     try:
         if log_ch := member.guild.get_channel(cfg.get("log_channel", 0)):
-            le = discord.Embed(description="**<:e_box:1519363099478458498> Član Otišao**", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
+            le = discord.Embed(title="<:e_box:1519363099478458498> Član Otišao", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
             le.set_author(name=str(member), icon_url=member.display_avatar.url)
             le.add_field(name="ID", value=f"`{member.id}`", inline=True)
             le.add_field(name="Pridružio se", value=member.joined_at.strftime("%d.%m.%Y.") if member.joined_at else "?", inline=True)
@@ -3280,8 +3279,10 @@ async def spotify_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     bar = "▰" * filled + "▱" * (bar_len - filled)
     def fmt_t(td):
         s = int(td.total_seconds()); return f"{s//60}:{s%60:02d}"
-    e = discord.Embed(url=f"https://open.spotify.com/track/{spotify.track_id}",
-        description=f"**<:e_music2:1519362679310127114> {spotify.title}**\n**Izvođač:** {spotify.artist}\n**Album:** {spotify.album}\n\n`{fmt_t(elapsed)}` {bar} `{fmt_t(duration)}`",
+    e = discord.Embed(
+        title=f"<:e_music2:1519362679310127114> {spotify.title}",
+        url=f"https://open.spotify.com/track/{spotify.track_id}",
+        description=f"**Izvođač:** {spotify.artist}\n**Album:** {spotify.album}\n\n`{fmt_t(elapsed)}` {bar} `{fmt_t(duration)}`",
         color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
@@ -3805,7 +3806,7 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
         f"<:e_time2:1519362726952964227> Još **`{do_sljedeceg}`** poruka do sljedećeg levela!\n"
     )
     e = discord.Embed(
-        description="**<:e_chart:1519362656568475880> ᴀᴋᴛɪᴠɴᴏsᴛ**",
+        title="<:e_chart:1519362656568475880> ᴀᴋᴛɪᴠɴᴏsᴛ",
         description=desc,
         color=_LP,
         timestamp=datetime.now(timezone.utc)
@@ -3867,7 +3868,9 @@ class KPM(discord.ui.View):
         elif (cw, bw) in win_map: res, color = "<:e_trophy2:1519362624742232146> Pobijedio si!", COLORS["success"]
         else:                 res, color = "<:e_skull:1519362992502997125> Izgubio si!", COLORS["error"]
         for c in self.children: c.disabled = True
-        _kpm_res = discord.Embed(description=f"**<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze**\n{res}",
+        _kpm_res = discord.Embed(
+            title=f"<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze",
+            description=f"{res}",
             color=color,
             timestamp=datetime.now(timezone.utc)
         )
@@ -3887,7 +3890,9 @@ class KPM(discord.ui.View):
 @bot.tree.command(name="kpm", description="⌨️ Kamen-Papir-Makaze")
 async def kpm(i: discord.Interaction):
     v = KPM(i.user)
-    _kpm_e = discord.Embed(description=f"**<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze**\n<:e_shake:1519362947766554737>  {i.user.mention}, odaberi potez!",
+    _kpm_e = discord.Embed(
+        title="<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze",
+        description=f"<:e_shake:1519362947766554737>  {i.user.mention}, odaberi potez!",
         color=COLORS["balkan"],
         timestamp=datetime.now(timezone.utc)
     )
@@ -4041,12 +4046,12 @@ class VjesalaView(discord.ui.View):
     def display_word(self):
         return " ".join(c if c in self.guessed else "\\_ " for c in self.word)
 
-    def make_embed(self, color=None):
+    def make_embed(self, title=None, color=None):
         wrong_letters = [l for l in sorted(self.guessed) if l not in self.word]
         right_letters = [l for l in sorted(self.guessed) if l in self.word]
         t = title or "<:e_ctrl:1519362682296209498> Vješala"
         c = color or COLORS["balkan"]
-        e = discord.Embed(description=f"**{t}**\n🎮  **Pogodi skrivenu riječ slovo po slovo!**", color=c, timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(title=t, description="🎮  **Pogodi skrivenu riječ slovo po slovo!**", color=c, timestamp=datetime.now(timezone.utc))
         e.add_field(name="📝 Riječ", value=f"`{self.display_word()}`", inline=False)
         e.add_field(name="<:e_skull:1519362992502997125> Vješalo", value=VJASALA_FAZE[self.wrong], inline=True)
         e.add_field(name="<:icon_cross:1519358379917836508> Pogrešna", value=" ".join(wrong_letters) or "—", inline=True)
@@ -4156,7 +4161,7 @@ def kaladont_start_embed(game: dict, mention: str):
     tezina_label = tezina_map.get(letters, f"**{letters} slova**")
     tezina_icon  = {1: "<:e_green:1519362769047126028>", 2: "<:e_green:1519362769047126028>", 3: "<:e_red:1519362782192210041>"}.get(letters, "<:e_gear:1519362652516782194>")
     e = discord.Embed(
-        description="**📝  **KALADONT****",
+        title="📝  **KALADONT**",
         description=(
             f"Igra je počela! Prva riječ:\n"
             f"## <:e_bubble:1519363307998417148>  **{word}**\n\n"
@@ -4185,7 +4190,9 @@ def kaladont_active_embed(game: dict):
     last_player = game.get("last_player_name", "—")
     icon    = KALADONT_ICONS[(count - 1) % len(KALADONT_ICONS)]
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
-    e = discord.Embed(description=f"**{E_GAME}  **KALADONT**  {E_GAME}**\n{E_FIRE1}{E_FIRE2}{E_FIRE3}{E_FIRE4}  **aktivna igra**  {E_FIRE4}{E_FIRE3}{E_FIRE2}{E_FIRE1}",
+    e = discord.Embed(
+        title=f"{E_GAME}  **KALADONT**  {E_GAME}",
+        description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}{E_FIRE4}  **aktivna igra**  {E_FIRE4}{E_FIRE3}{E_FIRE2}{E_FIRE1}",
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
     )
@@ -4274,7 +4281,7 @@ async def _send_kaladont_help(i: discord.Interaction, channel_id: int):
             f"*(Npr. ako je `{req}` → razmisli o riječima koje počinju tim slovima)*"
         )
     e = discord.Embed(
-        description=f"**<:icon_warning:1519358274284032030> Pomoć — počni sa `{req}`**",
+        title=f"<:icon_warning:1519358274284032030> Pomoć — počni sa `{req}`",
         description=desc,
         color=_LP,
         timestamp=datetime.now(timezone.utc)
@@ -4302,7 +4309,9 @@ class KaladontView(discord.ui.View):
         count = len(game["chain"])
         del kaladont_games[self.channel_id]
         b.disabled = True
-        e = discord.Embed(description=f"**🎯 Kaladont završen!**\nIgra gotova! Ukupno izgovoreno **{count}** rijeci. <:e_party:1519363028334674070>",
+        e = discord.Embed(
+            title="🎯 Kaladont završen!",
+            description=f"Igra gotova! Ukupno izgovoreno **{count}** rijeci. <:e_party:1519363028334674070>",
             color=COLORS["gold"], timestamp=datetime.now(timezone.utc)
         )
         e.set_footer(text=f"{BOT_NAME} {VERSION}")
@@ -4427,7 +4436,9 @@ async def kaladont_stop(i: discord.Interaction):
     count = len(chain)
     last_word = game.get("word", "—")
     del kaladont_games[i.channel.id]
-    e = discord.Embed(description=f"**<:e_stop:1519363022399995914> Kaladont zaustavljen**\nIgru zaustavio: {i.user.mention}",
+    e = discord.Embed(
+        title="<:e_stop:1519363022399995914> Kaladont zaustavljen",
+        description=f"Igru zaustavio: {i.user.mention}",
         color=COLORS["warning"], timestamp=datetime.now(timezone.utc)
     )
     e.add_field(name="<:e_chart:1519362656568475880>  Riječi u nizu", value=f"**{count}**",        inline=True)
@@ -4623,7 +4634,7 @@ class ToploView(discord.ui.View):
         guesses = game.get("guesses", 0)
         history = game.get("history", [])[-5:]
         c = color or COLORS["info"]
-        e = discord.Embed( description="**☀️️ Toplo-Hladno**\n🔥  **Pogodi tajni broj — toplije ili hladnije!**", color=c, timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(title="☀️️ Toplo-Hladno", description="🔥  **Pogodi tajni broj — toplije ili hladnije!**", color=c, timestamp=datetime.now(timezone.utc))
         e.add_field(name="🎯 Raspon", value=f"`1 — {self.max_num}`", inline=True)
         e.add_field(name="<:e_chart:1519362656568475880> Pokušaji", value=f"`{guesses}`", inline=True)
         if result: e.add_field(name="<:e_satellite:1519363311207186482> Signal", value=result, inline=False)
@@ -4649,7 +4660,9 @@ class ToploView(discord.ui.View):
         if diff == 0:
             for c in self.children: c.disabled = True
             del toplo_games[self.channel_id]
-            e = discord.Embed(description=f"**🎯 {i.user.mention} pogodio/la!**\nTajna je bila **`{secret}`**!\n<:e_trophy2:1519362624742232146> Pogođeno za **{game['guesses']}** pokušaja!",
+            e = discord.Embed(
+                title=f"🎯 {i.user.mention} pogodio/la!",
+                description=f"Tajna je bila **`{secret}`**!\n<:e_trophy2:1519362624742232146> Pogođeno za **{game['guesses']}** pokušaja!",
                 color=COLORS["gold"], timestamp=datetime.now(timezone.utc)
             )
             e.set_footer(text=f"{BOT_NAME} {VERSION}")
@@ -4674,7 +4687,8 @@ class ToploView(discord.ui.View):
         secret = game["secret"]
         del toplo_games[self.channel_id]
         for c in self.children: c.disabled = True
-        e = discord.Embed(description=f"**🎯 Igra završena!**\nTajna je bila **`{secret}`**!\nNiko nije pogodio ovaj put. <:e_dizzy:1519362812554510509>",
+        e = discord.Embed(title="🎯 Igra završena!",
+            description=f"Tajna je bila **`{secret}`**!\nNiko nije pogodio ovaj put. <:e_dizzy:1519362812554510509>",
             color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
         e.set_footer(text=f"{BOT_NAME} {VERSION}")
         await i.response.edit_message(embed=e, view=self)
@@ -4844,8 +4858,8 @@ def _ag_player_list(players, show_roles=False):
 
 def _ag_lobby_embed(state):
     players = state["players"]
-    e = discord.Embed(color=_LP,
-                      description=f"**<:e_rocket2:1519363332266524813> Among Us — Lobby**\nPridruži se i čekaj da host pokrene igru!\n**Min 4 • Max 10 igrača**",
+    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — Lobby", color=_LP,
+                      description="Pridruži se i čekaj da host pokrene igru!\n**Min 4 • Max 10 igrača**",
                       timestamp=datetime.now(timezone.utc))
     e.add_field(name=f"<:e_users:1519363096601301120> Igrači ({len(players)}/10)",
                 value="\n".join(f"{p['color']} {p['name']}" for p in players.values()) or "*Čekamo...*",
@@ -4857,7 +4871,7 @@ def _ag_game_embed(state):
     alive = [p for p in state["players"].values() if p["alive"]]
     ac = sum(1 for p in alive if p["role"]=="crewmate")
     ai = sum(1 for p in alive if p["role"]=="impostor")
-    e = discord.Embed(description="**<:e_rocket2:1519363332266524813> Among Us — U Toku**", color=_LP, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_rocket2:1519363332266524813> Among Us — U Toku", color=_LP, timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_users:1519363096601301120> Igrači", value=_ag_player_list(state["players"]), inline=False)
     e.add_field(name="<:e_clipboard:1519363052871614627> Zadaci", value=_task_bar(state["done_tasks"], state["total_tasks"]), inline=True)
     e.add_field(name="<:e_masks:1519363003424706671> Živi", value=f"<:e_internet:1519363106395000994> {ac} crew | <:e_red:1519362782192210041> {ai} imp", inline=True)
@@ -4888,7 +4902,7 @@ async def _ag_end(state, channel, title, desc, color):
         f"{'<:e_red:1519362782192210041>' if p['role']=='impostor' else '<:e_internet:1519363106395000994>'} {p['color']} **{p['name']}** — {p['role'].upper()}"
         for p in state["players"].values()
     )
-    e = discord.Embed(description=f"**🎯 {title}**\n{desc}" if desc else f"**🎯 {title}**", color=color, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title=f"🎯 {title}", description=desc, color=color, timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_masks:1519363003424706671> Otkrivene uloge", value=reveal, inline=False)
     e.set_footer(text=f"{BOT_NAME} • Among Us")
     await channel.send(embed=e)
@@ -4914,7 +4928,9 @@ async def _ag_tally(channel, state):
     ejected_p  = state["players"][ejected_id]
     ejected_p["alive"] = False
     role_txt = "<:e_red:1519362782192210041> **IMPOSTOR**" if ejected_p["role"] == "impostor" else "<:e_internet:1519363106395000994> **CREWMATE**"
-    e = discord.Embed(description=f"**<:e_rocket2:1519363332266524813> {ejected_p['name']} je izbačen/a!**\n{ejected_p['color']} **{ejected_p['name']}** eliminisan/a sa **{max_v}** glasova.\nBio/la je: {role_txt}",
+    e = discord.Embed(
+        title=f"<:e_rocket2:1519363332266524813> {ejected_p['name']} je izbačen/a!",
+        description=f"{ejected_p['color']} **{ejected_p['name']}** eliminisan/a sa **{max_v}** glasova.\nBio/la je: {role_txt}",
         color=COLORS["error"] if ejected_p["role"]=="impostor" else COLORS["warning"],
         timestamp=datetime.now(timezone.utc)
     )
@@ -5002,7 +5018,7 @@ class AmogusLobbyView(discord.ui.View):
             if not member: continue
             is_imp = p["role"] == "impostor"
             dm_e = discord.Embed(
-                description=f"**{'<:e_red:1519362782192210041> IMPOSTOR' if is_imp else '<:e_internet:1519363106395000994> CREWMATE'} — Tvoja uloga!**",
+                title=f"{'<:e_red:1519362782192210041> IMPOSTOR' if is_imp else '<:e_internet:1519363106395000994> CREWMATE'} — Tvoja uloga!",
                 description=("<:e_red:1519362782192210041> **Eliminiši crewmate-e, ne budi uhvaćen!**\nKoristi dugme <:e_sword2:1519362631146930317> **Akcija** za ubijanje."
                              if is_imp else
                              "<:e_internet:1519363106395000994> **Završi zadatke, pronađi impostora!**\nKoristi dugme <:e_clipboard:1519363052871614627> **Zadatak** za rad."),
@@ -5024,7 +5040,7 @@ class AmogusLobbyView(discord.ui.View):
         gv = AmogusGameView(self.cid)
         state["game_view"] = gv
         extra = f"\n<:icon_warning:1519358274284032030>️ Nije mogao primiti DM: {', '.join(bad_dm)}" if bad_dm else ""
-        start_e = discord.Embed(description=f"**<:e_rocket2:1519363332266524813> Igra počinje!**\nUloge podijeljene! Provjeri **DM** za svoju ulogu.{extra}",
+        start_e = discord.Embed(title="<:e_rocket2:1519363332266524813> Igra počinje!", description=f"Uloge podijeljene! Provjeri **DM** za svoju ulogu.{extra}",
                                 color=_LP, timestamp=datetime.now(timezone.utc))
         await i.edit_original_response(embed=start_e, view=None)
         await i.channel.send(embed=_ag_game_embed(state), view=gv)
@@ -5364,8 +5380,8 @@ class AmogusGameView(discord.ui.View):
         await i.response.send_modal(AmogusGhostModal(self.cid, uid))
 
 def _ag_meeting_embed(state, caller, reason):
-    e = discord.Embed(color=_LP,
-                      description=f"**<:e_report2:1519362714198347886> EMERGENCY MEETING!**\n**{caller}** je sazvao/la meeting!\n*{reason}*\n\n**Glasajte koga eliminišete!**",
+    e = discord.Embed(title="<:e_report2:1519362714198347886> EMERGENCY MEETING!", color=_LP,
+                      description=f"**{caller}** je sazvao/la meeting!\n*{reason}*\n\n**Glasajte koga eliminišete!**",
                       timestamp=datetime.now(timezone.utc))
     alive = {k:v for k,v in state["players"].items() if v["alive"]}
     e.add_field(name="<:e_users:1519363096601301120> Živi igrači", value=_ag_player_list(alive), inline=False)
@@ -5513,7 +5529,7 @@ def _pk_set_bal(guild_id, user_id, amount):
 def _pk_lobby_embed(g):
     plist = "\n".join(f"▸ **{p['name']}**" for p in g["players"].values()) or "_Niko još nije ušao_"
     e = discord.Embed(
-        description="**<:e_cards2:1519362702835712010> POKER — Texas Hold'em**",
+        title="<:e_cards2:1519362702835712010> POKER — Texas Hold'em",
         description=(
             f"<:e_coins3:1519362621206298666> **Ulog po igraču:** `{g['ulog']:,} <:e_coins3:1519362621206298666>`\n"
             f"<:e_trophy2:1519362624742232146> **Trenutni pot:** `{g['pot']:,} <:e_coins3:1519362621206298666>`\n"
@@ -5622,7 +5638,9 @@ class PokerLobbyView(discord.ui.View):
                 try:
                     msg = g.get("msg")
                     if msg:
-                        await msg.edit(embed=discord.Embed(description=f"**<:icon_cross:1519358379917836508> Poker otkazan**\nNema dovoljno igrača (min 2). Ulozi vraćeni.",
+                        await msg.edit(embed=discord.Embed(
+                            title="<:icon_cross:1519358379917836508> Poker otkazan",
+                            description="Nema dovoljno igrača (min 2). Ulozi vraćeni.",
                             color=COLORS["error"]
                         ), view=None)
                 except Exception:
@@ -5925,7 +5943,7 @@ async def _pk_showdown(channel_id: int):
     winner_str = " & ".join(r[1] for r in winners)
     tie_note   = " *(Split pot)*" if len(winners) > 1 else ""
     e = discord.Embed(
-        description="**<:e_trophy2:1519362624742232146> SHOWDOWN — Poker**",
+        title="<:e_trophy2:1519362624742232146> SHOWDOWN — Poker",
         description=(
             f"<:e_cards2:1519362702835712010> **Zajedničke kartice:**\n{_pk_cards(community)}\n"
             + "\n\n".join(lines) +
@@ -5963,7 +5981,7 @@ async def _pk_end_game(channel_id: int, winner_ids: list, skip_embed: bool = Fal
         if not skip_embed and ch:
             name = g["players"].get(winner_ids[0], {}).get("name", "Pobjednik")
             e = discord.Embed(
-                description="**<:e_trophy2:1519362624742232146> Poker — Pobjednik!**",
+                title="<:e_trophy2:1519362624742232146> Poker — Pobjednik!",
                 description=(
                     f"<:e_trophy2:1519362624742232146> **{name}** pobijedio/la jer su svi ostali foldali!\n"
                     f"<:e_coins3:1519362621206298666> **Dobitak:** `{pot:,} <:e_coins3:1519362621206298666>`"
@@ -6320,7 +6338,9 @@ async def hunt(i: discord.Interaction):
 
     color = RARITY_COLORS[rarity]
     ri    = RARITY_EMOJI[rarity]
-    e = discord.Embed(description=f"**<:e_arrow:1519363399845154958>  Uhvatio si životinje!**\n🎯  **Uspješan lov!**\n## {emoji}  {animal}\n{ri} **{rarity.capitalize()}**  ·  <:e_sword2:1519362631146930317>️ Snaga `{power}`",
+    e = discord.Embed(
+        title=f"<:e_arrow:1519363399845154958>  Uhvatio si životinje!",
+        description=f"🎯  **Uspješan lov!**\n## {emoji}  {animal}\n{ri} **{rarity.capitalize()}**  ·  <:e_sword2:1519362631146930317>️ Snaga `{power}`",
         color=color,
         timestamp=datetime.now(timezone.utc)
     )
@@ -6349,7 +6369,9 @@ async def zoo_cmd(i: discord.Interaction, korisnik: discord.Member = None):
 
     total   = sum(zoo.values())
     power   = zoo_power(u.id)
-    e = discord.Embed(description=f"**<:e_lion:1519363402890346658> {u.display_name} — Zoo**\n\n\n".join(sections),
+    e = discord.Embed(
+        title=f"<:e_lion:1519363402890346658> {u.display_name} — Zoo",
+        description="\n\n".join(sections),
         color=COLORS["purple"],
         timestamp=datetime.now(timezone.utc)
     )
@@ -6389,7 +6411,7 @@ async def battle(i: discord.Interaction, korisnik: discord.Member):
     bar = f"`{'█' * p1_fill}{'░' * p2_fill}`"
 
     e = discord.Embed(
-        description="**<:e_sword2:1519362631146930317>️  BITKA!**",
+        title="<:e_sword2:1519362631146930317>️  BITKA!",
         description=(
             f"<:icon_sword:1519358255925825667>  **{i.user.display_name}** vs **{korisnik.display_name}**\n"
             f"{bar}\n"
@@ -6434,7 +6456,7 @@ async def sell(i: discord.Interaction, zivotinja: str, kolicina: int = 1):
 
 @bot.tree.command(name="animals", description="📋 Listu svih životinja i raritet (kao owo animals)")
 async def animals_cmd(i: discord.Interaction):
-    e = discord.Embed(description="**<:e_clipboard:1519363052871614627> Sve životinje — Raritetna lista**", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_clipboard:1519363052871614627> Sve životinje — Raritetna lista", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     for rarity in RARITY_ORDER:
         ri    = RARITY_EMOJI[rarity]
         pool  = [(n, d[0], d[2], d[3]) for n, d in ANIMALS.items() if d[1] == rarity]
@@ -6829,7 +6851,7 @@ def _bj_str(hand, hide=False):
     return "  ".join(f"`{r}{s}`" for r, s in hand)
 
 def _bj_embed(player, dealer, oklada, note="", hide=True):
-    e = discord.Embed( description="**🃏 Blackjack**\n💎  **Pobijedi dilera — cilj je 21!**", color=COLORS["dark"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🃏 Blackjack", description="💎  **Pobijedi dilera — cilj je 21!**", color=COLORS["dark"], timestamp=datetime.now(timezone.utc))
     e.add_field(name=f"Tvoje karte  ({_bj_val(player)})", value=_bj_str(player),         inline=False)
     e.add_field(name=f"Dealer  {'(?)' if hide else f'({_bj_val(dealer)})'}", value=_bj_str(dealer, hide), inline=False)
     if note:
@@ -6963,7 +6985,7 @@ class TriviaView(discord.ui.View):
                                           combo=self.combo + 1, total_won=new_total)
                     combo_fx = E_FIRE1 if self.combo < 3 else (E_FIRE2 if self.combo < 6 else (E_FIRE3 if self.combo < 10 else E_FIRE4))
                     e = discord.Embed(
-                        description=f"**{E_GAME} {self.title}**",
+                        title=f"{E_GAME} {self.title}",
                         description=(
                             f"<:icon_check:1519358376268533810> **Tačno!** `+{reward:,} <:e_coins3:1519362621206298666>` `+{xp_gain} XP`\n"
                             f"{combo_fx} **Combo:** `x{self.combo}` → sljedeće `x{self.combo+1}`\n"
@@ -7084,7 +7106,7 @@ async def geografija(i: discord.Interaction, oklada: int = 50):
         return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     question, correct, wrong = random.choice(GEOGRAFIJA_QS)
     view = TriviaView(correct, wrong, oklada, i.user.id, pool=GEOGRAFIJA_QS, title="<:e_globe2:1519362694887637004> Geografija")
-    e = discord.Embed(description=f"**<:e_globe2:1519362694887637004> Geografija**\n<:e_globe2:1519362694887637004>  **{question}**", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="<:e_globe2:1519362694887637004> Geografija", description=f"<:e_globe2:1519362694887637004>  **{question}**", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_coins3:1519362621206298666> Oklada", value=f"`{oklada}`", inline=True)
     e.add_field(name="<:e_time2:1519362726952964227>️ Vrijeme", value="`20 sekundi`", inline=True)
     e.set_footer(text=f"{BOT_NAME} • Putuj svijetom!")
@@ -7126,7 +7148,7 @@ def has_item(uid, key):
 
 @bot.tree.command(name="shop", description="🛒 Pogledaj šta možeš kupiti")
 async def shop(i: discord.Interaction):
-    e = discord.Embed( description="**🛒 GIAN Shop**\nKupi predmete sa `/kupi <id>` komandom:", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🛒 GIAN Shop", description="Kupi predmete sa `/kupi <id>` komandom:", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     for key, item in SHOP_ITEMS.items():
         dur = "Jednom" if not item["duration"] else f"{item['duration']//3600}h" if item["duration"] >= 3600 else f"{item['duration']//60}min"
         e.add_field(name=item["name"], value=f"**ID:** `{key}`\n{item['desc']}\n<:e_time2:1519362726952964227> `{dur}` • <:e_coins3:1519362621206298666> `{item['price']:,}`", inline=True)
@@ -7210,7 +7232,9 @@ async def quests_cmd(i: discord.Interaction):
         bar   = f"`{'█' * fill}{'░' * (quest['target'] - fill)}`"
         lines.append(f"{check} **{quest['name']}** — {quest['desc']}\n{bar} `{prog}/{quest['target']}` • <:e_coins3:1519362621206298666> `+{quest['reward']}`")
     done_count = sum(1 for qid in qd["assigned"] if qd["done"].get(qid))
-    e = discord.Embed(description=f"**<:e_clipboard:1519363052871614627> Dnevni Zadaci**\n\n\n".join(lines),
+    e = discord.Embed(
+        title="<:e_clipboard:1519363052871614627> Dnevni Zadaci",
+        description="\n\n".join(lines),
         color=COLORS["info"], timestamp=datetime.now(timezone.utc)
     )
     e.add_field(name="<:icon_check:1519358376268533810> Završeno", value=f"`{done_count}/3`", inline=True)
@@ -7300,7 +7324,9 @@ async def giveaway_start(i: discord.Interaction, nagrada: str, minuta: int = 60,
     end  = datetime.now(timezone.utc) + timedelta(minutes=minuta)
     end_ts = int(end.timestamp())
     duration_txt = _gw_fmt_duration(minuta)
-    e = discord.Embed(description=f"**<:e_party:1519363028334674070> NAGRADNA IGRA!**\n## <:e_trophy2:1519362624742232146>  {nagrada}\n\nKlikni dugme **<:e_party:1519363028334674070> Učestvuj** da se prijaviš!",
+    e = discord.Embed(
+        title="<:e_party:1519363028334674070> NAGRADNA IGRA!",
+        description=f"## <:e_trophy2:1519362624742232146>  {nagrada}\n\nKlikni dugme **<:e_party:1519363028334674070> Učestvuj** da se prijaviš!",
         color=COLORS["gold"], timestamp=end
     )
     e.add_field(name="<:e_time2:1519362726952964227> Trajanje",  value=f"`{duration_txt}` ({minuta} min)",       inline=True)
@@ -7343,11 +7369,13 @@ async def _end_giveaway(msg_id, channel):
     try: msg = await channel.fetch_message(msg_id)
     except: return
     if not ga["entrants"]:
-        e = discord.Embed( description="**🎉 Nagradna igra završena**\nNiko se nije prijavio! 😢", color=COLORS["error"])
+        e = discord.Embed(title="🎉 Nagradna igra završena", description="Niko se nije prijavio! 😢", color=COLORS["error"])
         await msg.edit(embed=e, view=None); return
     winner_id = random.choice(list(ga["entrants"]))
     winner    = channel.guild.get_member(winner_id)
-    e = discord.Embed(description=f"**<:e_party:1519363028334674070> Nagradna igra ZAVRŠENA!**\n## <:e_trophy2:1519362624742232146> {ga['prize']}\n\n<:e_party:1519363028334674070> Pobjednik: **{winner.mention if winner else f'<@{winner_id}>'}**!",
+    e = discord.Embed(
+        title="<:e_party:1519363028334674070> Nagradna igra ZAVRŠENA!",
+        description=f"## <:e_trophy2:1519362624742232146> {ga['prize']}\n\n<:e_party:1519363028334674070> Pobjednik: **{winner.mention if winner else f'<@{winner_id}>'}**!",
         color=COLORS["gold"], timestamp=datetime.now(timezone.utc)
     )
     e.add_field(name="<:e_users:1519363096601301120> Učesnici", value=f"`{len(ga['entrants'])}`", inline=True)
@@ -7366,7 +7394,9 @@ async def _reset_gw_worker(chan: discord.TextChannel, host: discord.Member, nagr
         await asyncio.sleep(300)
         end    = datetime.now(timezone.utc) + timedelta(minutes=60)
         end_ts = int(end.timestamp())
-        ga_e = discord.Embed(description=f"**<:e_party:1519363028334674070> NAGRADNA IGRA!**\n## <:e_trophy2:1519362624742232146>  {nagrada}\n\nKlikni dugme **<:e_party:1519363028334674070> Učestvuj** da se prijaviš!",
+        ga_e = discord.Embed(
+            title="<:e_party:1519363028334674070> NAGRADNA IGRA!",
+            description=f"## <:e_trophy2:1519362624742232146>  {nagrada}\n\nKlikni dugme **<:e_party:1519363028334674070> Učestvuj** da se prijaviš!",
             color=COLORS["gold"], timestamp=end
         )
         ga_e.add_field(name="<:e_time2:1519362726952964227> Trajanje",  value="`1h` (60 min)",               inline=True)
@@ -7397,7 +7427,7 @@ async def reset_gw_cmd(i: discord.Interaction, nagrada: str, kanal: discord.Text
     start_ts = int((datetime.now(timezone.utc) + timedelta(minutes=5)).timestamp())
     sep = "═══════════════════════════"
     countdown_e = discord.Embed(
-        description="**<:e_refresh:1519362959187509461> ɢɪᴠᴇᴀᴡᴀʏ ʀᴇꜱᴇᴛ!**",
+        title="<:e_refresh:1519362959187509461> ɢɪᴠᴇᴀᴡᴀʏ ʀᴇꜱᴇᴛ!",
         description=(
             f"```ansi\n\u001b[1;36m{sep}\u001b[0m\n```"
             f"<:e_time2:1519362726952964227> **Novi giveaway počinje za 5 minuta!** (<t:{start_ts}:R>)\n\n"
@@ -7439,7 +7469,7 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
         eco["balance"] += iznos
         save_data()
         await i.response.send_message(embed=discord.Embed(
-            description="**<:e_coins3:1519362621206298666> ᴅᴏᴅᴀɴᴏ ᴄᴏɪɴᴀ!**",
+            title="<:e_coins3:1519362621206298666> ᴅᴏᴅᴀɴᴏ ᴄᴏɪɴᴀ!",
             description=(
                 f"```yaml\n"
                 f"Korisnik : {korisnik.display_name}\n"
@@ -7454,7 +7484,7 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
         eco["balance"] = max(0, eco["balance"] - iznos)
         save_data()
         await i.response.send_message(embed=discord.Embed(
-            description="**<:e_moneywing:1519362955437805771> ᴏᴅᴜᴢᴇᴛᴏ ᴄᴏɪɴᴀ!**",
+            title="<:e_moneywing:1519362955437805771> ᴏᴅᴜᴢᴇᴛᴏ ᴄᴏɪɴᴀ!",
             description=(
                 f"```yaml\n"
                 f"Korisnik : {korisnik.display_name}\n"
@@ -7475,7 +7505,7 @@ async def poll(i: discord.Interaction, pitanje: str, opcija1: str, opcija2: str,
     opts   = [o for o in [opcija1, opcija2, opcija3, opcija4] if o]
     emojis = ["1️⃣","2️⃣","3️⃣","4️⃣"]
     desc   = "\n".join(f"{emojis[idx]}  **{opt}**" for idx, opt in enumerate(opts))
-    e = discord.Embed(description=f"**<:e_chart:1519362656568475880> {pitanje}**\n{desc}", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title=f"<:e_chart:1519362656568475880> {pitanje}", description=desc, color=COLORS["info"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"Glasaj sa emoji reakcijama • {BOT_NAME}")
     e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
     await i.response.send_message(embed=e)
@@ -7543,7 +7573,7 @@ class TicketOpenView(discord.ui.View):
             return await i.followup.send(f"<:icon_cross:1519358379917836508> Greška: `{ex}`", ephemeral=True)
 
         e = discord.Embed(
-            description="**<:e_ticket3:1519362637534597221> Ticket Otvoren**",
+            title="<:e_ticket3:1519362637534597221> Ticket Otvoren",
             description=(
                 f"Zdravo {i.user.mention}! <:e_shake:1519362947766554737>\n\n"
                 f"Opiši problem ili pitanje i tim će ti odgovoriti uskoro. <:e_pray:1519363406078021863>\n\n"
@@ -7577,7 +7607,7 @@ async def ticket_setup(i: discord.Interaction):
         )
 
     e = discord.Embed(
-        description="**<:e_ticket3:1519362637534597221>  Otvori Tiket**",
+        title="<:e_ticket3:1519362637534597221>  Otvori Tiket",
         description=(
             f"📚  Trebaš pomoć? **Otvori tiket!**\n\n"
             f"🎀  Popuni formu i naš staff će ti odgovoriti što prije.\n"
@@ -7661,7 +7691,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
             )
 
         e = discord.Embed(
-            description="**<:e_ticket3:1519362637534597221>  Novi Tiket za Podršku**",
+            title="<:e_ticket3:1519362637534597221>  Novi Tiket za Podršku",
             description=(
                 f"<:e_user:1519363093736718518> **{i.user.display_name}** ({i.user.mention})\n"
                 f"🆔 ID: `{i.user.id}`\n"
@@ -7689,7 +7719,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
         await chan.send(content=i.user.mention, embed=e, view=TicketCloseView())
 
         potvrda = discord.Embed(
-            description="**<:icon_check:1519358376268533810>  Tiket otvoren!**",
+            title="<:icon_check:1519358376268533810>  Tiket otvoren!",
             description=(
                 f"## <:e_party:1519363028334674070> Tvoj tiket je kreiran!\n"
                 f"Privatni kanal: {chan.mention}\n\n"
@@ -7715,7 +7745,7 @@ class SupportTicketModal(discord.ui.Modal, title="🎫 Otvori Tiket za Podršku"
 @bot.tree.command(name="tiket", description="🎟 Otvori tiket za podršku")
 async def tiket_cmd(i: discord.Interaction):
     e = discord.Embed(
-        description="**<:e_ticket3:1519362637534597221>  Otvori Tiket**",
+        title="<:e_ticket3:1519362637534597221>  Otvori Tiket",
         description=(
             f"📚  Trebaš pomoć? **Otvori tiket!**\n\n"
             f"🎀  Popuni formu i naš staff će ti odgovoriti što prije.\n"
@@ -7810,7 +7840,9 @@ class StaffApplyModal(discord.ui.Modal, title="📋 Staff Prijava"):
                 ephemeral=True
             )
 
-        prijava_e = discord.Embed(description=f"**📋  Nova Staff Prijava**\n👤  **{i.user.display_name}** ({i.user.mention})  ·  🆔 `{i.user.id}`",
+        prijava_e = discord.Embed(
+            title="📋  Nova Staff Prijava",
+            description=f"👤  **{i.user.display_name}** ({i.user.mention})  ·  🆔 `{i.user.id}`",
             color=_LP,
             timestamp=datetime.now(timezone.utc)
         )
@@ -7843,7 +7875,7 @@ class StaffApplyView(discord.ui.View):
 async def staff_cmd(i: discord.Interaction):
     await i.response.defer(ephemeral=True)
     e = discord.Embed(
-        description="**STAFF PRIJAVA**",
+        title="STAFF PRIJAVA",
         description=(
             "Otvorene su prijave za **Staff tim** servera!\n\n"
             "📌 **Kako se prijaviti:**\n"
@@ -7978,7 +8010,7 @@ async def sort_roles(ctx: commands.Context):
             positions[role] = base + idx
         await guild.edit_role_positions(positions=positions)
         ordered_txt = "\n".join(f"`{idx+1}.` {name}" for idx, (name, _) in enumerate(found))
-        e = discord.Embed(description="**<:icon_check:1519358376268533810> Uloge poređane!**", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
+        e = discord.Embed(title="<:icon_check:1519358376268533810> Uloge poređane!", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
         e.add_field(name="<:e_clipboard:1519363052871614627> Novi redoslijed (gore → dolje)", value=ordered_txt, inline=False)
         if missing:
             e.add_field(name="<:icon_warning:1519358274284032030>️ Nisu pronađene na serveru", value="\n".join(missing), inline=False)
@@ -8014,7 +8046,7 @@ async def setup_roles(i: discord.Interaction):
             skipped.append(f"{role_data['name']} <:icon_cross:1519358379917836508> ({ex})")
 
     e = discord.Embed(
-        description="**<:e_label:1519363326109417613>️ GIAN Uloge — Setup Završen!**",
+        title="<:e_label:1519363326109417613>️ GIAN Uloge — Setup Završen!",
         color=COLORS["gold"],
         timestamp=datetime.now(timezone.utc)
     )
@@ -8106,7 +8138,9 @@ async def setup_all(
         )
 
     save_data()
-    e = discord.Embed(description=f"**<:icon_check:1519358376268533810> Server konfigurisan!**\n\n".join(lines),
+    e = discord.Embed(
+        title="<:icon_check:1519358376268533810> Server konfigurisan!",
+        description="\n".join(lines),
         color=COLORS["success"],
         timestamp=datetime.now(timezone.utc)
     )
@@ -8121,7 +8155,7 @@ async def setup_welcome(i: discord.Interaction, kanal: discord.TextChannel):
     cfg["welcome_channel"] = kanal.id
     save_data()
     e_out = discord.Embed(
-        description="**<:icon_check:1519358376268533810> Welcome kanal postavljen!**",
+        title="<:icon_check:1519358376268533810> Welcome kanal postavljen!",
         description=(
             f"**Kanal:** {kanal.mention}\n\n"
             f"Svaki novi član će dobiti embed sa:\n"
@@ -8162,7 +8196,9 @@ async def aktivnost_setup(
             ephemeral=True
         )
     save_data()
-    e_out = discord.Embed(description=f"**<:icon_check:1519358376268533810> Aktivnost Setup — Sačuvano!**\n\n".join(linije),
+    e_out = discord.Embed(
+        title="<:icon_check:1519358376268533810> Aktivnost Setup — Sačuvano!",
+        description="\n".join(linije),
         color=_LP,
         timestamp=datetime.now(timezone.utc)
     )
@@ -8176,7 +8212,7 @@ async def setup_leave(i: discord.Interaction, kanal: discord.TextChannel):
     get_guild_config(i.guild.id)["leave_channel"] = kanal.id
     save_data()
     e_out = discord.Embed(
-        description="**<:icon_check:1519358376268533810> Leave kanal postavljen!**",
+        title="<:icon_check:1519358376268533810> Leave kanal postavljen!",
         description=(
             f"**Kanal:** {kanal.mention}\n\n"
             f"Kad član napusti server, bot će poslati embed sa:\n"
@@ -8237,7 +8273,7 @@ async def server_config_cmd(i: discord.Interaction):
     def ro(rid): return f"<@&{rid}>" if rid else "*nije postavljeno*"
     lr = cfg.get("level_roles", {})
     lr_txt = "\n".join(f"Level **{k}** → <@&{v}>" for k, v in sorted(lr.items(), key=lambda x: int(x[0]))) or "*nema*"
-    e = discord.Embed(description=f"**<:e_gear:1519362652516782194>️ Konfiguracija — {i.guild.name}**", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title=f"<:e_gear:1519362652516782194>️ Konfiguracija — {i.guild.name}", color=COLORS["purple"], timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_shake:1519362947766554737> Welcome kanal",    value=ch(cfg.get("welcome_channel")),   inline=True)
     e.add_field(name="<:e_shake:1519362947766554737> Leave kanal",      value=ch(cfg.get("leave_channel")),     inline=True)
     e.add_field(name="<:e_label:1519363326109417613>️ Auto-Uloga",      value=ro(cfg.get("auto_role")),         inline=True)
@@ -8644,9 +8680,12 @@ async def event_cmd(i: discord.Interaction, naslov: str, opis: str):
             embed=em("<:e_crown2:1519363047163166922> Nemaš pristup!", "Ova komanda je rezervisana samo za **Vlasnika** bota.", color=COLORS["error"]),
             ephemeral=True,
         )
-    e = discord.Embed(description=f"**<:e_circus:1519363558809272371>  {naslov}**\n{opis}",
+    e = discord.Embed(
+        title=f"<:e_circus:1519363558809272371>  {naslov}",
+        description=f"{opis}",
         color=_LP,
-        timestamp=datetime.now(timezone.utc))
+        timestamp=datetime.now(timezone.utc),
+    )
     e.set_author(
         name=f"× GIAN — NOVI EVENT!",
         icon_url=bot.user.display_avatar.url,
@@ -8795,7 +8834,9 @@ class GamesView(discord.ui.View):
 
     def _build_embed_and_file(self):
         g = GAMES_CATALOG[self.idx]
-        e = discord.Embed(description=f"**{g['emoji']}  {g['name']}**\n**`{g['cmd']}`**\n\n{g['desc']}",
+        e = discord.Embed(
+            title=f"{g['emoji']}  {g['name']}",
+            description=f"**`{g['cmd']}`**\n\n{g['desc']}",
             color=g["color"], timestamp=datetime.now(timezone.utc)
         )
         e.add_field(name="<:e_help2:1519362723148726534> Kako se igra", value=g["kako"], inline=False)
@@ -8835,7 +8876,9 @@ class GamesView(discord.ui.View):
         if i.user.id != self.uid:
             return await i.response.send_message("Ovo nije tvoj meni!", ephemeral=True)
         lines = [f"{g['emoji']} `{g['cmd']:<22}` — {g['name']}" for g in GAMES_CATALOG]
-        e = discord.Embed(description=f"**<:e_ctrl:1519362682296209498> Sve GIAN igre**\n\n".join(lines) + f"\n\n*Ukupno: **{len(GAMES_CATALOG)} igara***",
+        e = discord.Embed(
+            title="<:e_ctrl:1519362682296209498> Sve GIAN igre",
+            description="\n".join(lines) + f"\n\n*Ukupno: **{len(GAMES_CATALOG)} igara***",
             color=COLORS["gold"]
         )
         e.set_footer(text=f"{BOT_NAME} {VERSION}")
@@ -8877,7 +8920,7 @@ async def topchatters_cmd(i: discord.Interaction):
         m = i.guild.get_member(uid)
         name = m.display_name if m else f"User {uid}"
         desc.append(f"{medals[idx]} **{name}** — `{cnt:,}` poruka")
-    e = discord.Embed( description="**🏆 Top 10 Najaktivnijih**\n\n".join(desc), color=COLORS["success"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🏆 Top 10 Najaktivnijih", description="\n".join(desc), color=COLORS["success"], timestamp=datetime.now(timezone.utc))
     await i.response.send_message(embed=e)
 
 # ─── <:e_bank2:1519362662515871744> BANKA ───
@@ -8935,7 +8978,7 @@ async def lottery_cmd(i: discord.Interaction, akcija: str = "info"):
     my = lot["tickets"].get(uid, 0)
     chance = (my/total*100) if total else 0
     next_draw = lot["last_draw"] + 7*86400
-    e = discord.Embed(description="**<:e_slotm:1519362699014967297> Sedmična Loto**", color=COLORS["info"])
+    e = discord.Embed(title="<:e_slotm:1519362699014967297> Sedmična Loto", color=COLORS["info"])
     e.add_field(name="<:e_coins3:1519362621206298666> Pot", value=f"`{lot['pot']:,}` coina", inline=True)
     e.add_field(name="<:e_ticket3:1519362637534597221> Tvoji tiketi", value=f"`{my}` / `{total}`", inline=True)
     e.add_field(name="🎯 Šansa", value=f"`{chance:.1f}%`", inline=True)
@@ -8950,7 +8993,7 @@ async def heist_cmd(i: discord.Interaction):
     cd = data["heist_cooldown"].get(uid, 0)
     if int(time.time()) < cd:
         return await i.response.send_message(embed=em("<:e_time2:1519362726952964227>", f"Pokušaj ponovo <t:{cd}:R>.", color=COLORS["warning"]), ephemeral=True)
-    e = discord.Embed(description=f"**<:e_coins3:1519362621206298666> RAZBOJ U PRIPREMI**\n{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
+    e = discord.Embed(title="<:e_coins3:1519362621206298666> RAZBOJ U PRIPREMI", description=f"{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
     crew = {i.user.id}
     class HeistView(discord.ui.View):
         def __init__(self): super().__init__(timeout=30)
@@ -8982,7 +9025,7 @@ async def heist_cmd(i: discord.Interaction):
 @bot.tree.command(name="qr", description="📱 Generiši QR kod iz teksta ili URL-a")
 async def qr_cmd(i: discord.Interaction, tekst: str):
     url = f"https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={discord.utils.escape_markdown(tekst).replace(' ', '%20')}"
-    e = discord.Embed(description=f"**<:e_phone:1519362788462559323> QR Kod**\n```{tekst[:200]}```", color=COLORS["info"])
+    e = discord.Embed(title="<:e_phone:1519362788462559323> QR Kod", description=f"```{tekst[:200]}```", color=COLORS["info"])
     e.set_image(url=url)
     e.set_footer(text=f"{BOT_NAME} • QR Generator")
     await i.response.send_message(embed=e)
@@ -9172,7 +9215,7 @@ async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolici
     lvl = xp_info.get("level", 0)
     xp_v = xp_info.get("xp", 0)
     e = discord.Embed(
-        description=f"**{emoji} Vatrice poslane!**",
+        title=f"{emoji} Vatrice poslane!",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
             f"{i.user.mention} je dao **+{kolicina}** 🔥 {korisnik.mention}!\n\n"
@@ -9260,7 +9303,7 @@ async def vatrice_pup(i: discord.Interaction):
     desc += f"\n{moje_line}"
 
     e = discord.Embed(
-        description=f"**{emoji} ᴛᴏᴘ ᴠᴀᴛʀɪᴄᴇ — {i.guild.name} {emoji}**",
+        title=f"{emoji} ᴛᴏᴘ ᴠᴀᴛʀɪᴄᴇ — {i.guild.name} {emoji}",
         description=desc,
         color=_LP,
         timestamp=datetime.now(timezone.utc),
@@ -9319,7 +9362,7 @@ async def vatrice_start(i: discord.Interaction):
         await asyncio.sleep(0.4)  # rate limit zaštita za nick edits
     save_data()
     e = discord.Embed(
-        description=f"**🔥 Vatrice — START!**",
+        title=f"🔥 Vatrice — START!",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
             f"<:e_party:1519363028334674070> **Sezona vatrica je započela!**\n\n"
@@ -9382,7 +9425,7 @@ async def vatrice_resetnik(i: discord.Interaction):
             errors += 1
         await asyncio.sleep(1.1)  # rate limit zaštita (5 nick edits / 5s po serveru)
     e = discord.Embed(
-        description="**<:icon_check:1519358376268533810> Vatrice — Nickovi resetovani!**",
+        title="<:icon_check:1519358376268533810> Vatrice — Nickovi resetovani!",
         description=(
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
             f"<:e_users:1519363096601301120> Ukupno članova: **{total}**\n"
@@ -9415,7 +9458,7 @@ async def auto_game_loop():
 
         now_str = datetime.now(timezone.utc).strftime("%H:%M")
         e = discord.Embed(
-            description="**🎯  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  🎯**",
+            title="🎯  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  🎯",
             description=(
                 "🎯 **Klikni dugme ispod i unesi 5 brojeva (1–75)!**\n"
                 "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins3:1519362621206298666>\n\n"
@@ -9490,7 +9533,7 @@ async def active_member_week():
         data["money"][mkey] = data["money"].get(mkey, 0) + 500
         add_xp(top_member.id, 100)
         e = discord.Embed(
-            description="**<:e_trophy2:1519362624742232146> ᴀᴄᴛɪᴠᴇ ᴍᴇᴍʙᴇʀ ᴏꜰ ᴛʜᴇ ᴡᴇᴇᴋ <:e_trophy2:1519362624742232146>**",
+            title="<:e_trophy2:1519362624742232146> ᴀᴄᴛɪᴠᴇ ᴍᴇᴍʙᴇʀ ᴏꜰ ᴛʜᴇ ᴡᴇᴇᴋ <:e_trophy2:1519362624742232146>",
             description=(
                 f"━━━━━━━━━━━━━━━━━━━━━━\n"
                 f"<:e_crown2:1519363047163166922> Najaktivniji član ove sedmice je:\n\n"
@@ -9540,7 +9583,7 @@ async def bingo_cmd(i: discord.Interaction):
 
     now_str = datetime.now(timezone.utc).strftime("%H:%M")
     e = discord.Embed(
-        description="**🎯  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  🎯**",
+        title="🎯  <:e_diamond3:1519363370694738072>  B  I  N  G  O  <:e_diamond3:1519363370694738072>  🎯",
         description=(
             "🎯 **Klikni dugme ispod i unesi 5 brojeva (1–75)!**\n"
             "<:e_ticket3:1519362637534597221> Tiket košta samo **500 coina** <:e_coins3:1519362621206298666>\n\n"
@@ -9659,7 +9702,7 @@ class PupModal(discord.ui.Modal, title="<:e_ticket3:1519362637534597221>️ Unes
 
         # ── Potvrda — rezultati se otkrivaju tek nakon 2 minute ──
         potvrda = discord.Embed(
-            description="**<:e_ticket3:1519362637534597221>️  Tiket primljen!  <:icon_check:1519358376268533810>**",
+            title="<:e_ticket3:1519362637534597221>️  Tiket primljen!  <:icon_check:1519358376268533810>",
             description=(
                 f"<:e_check2:1519362730057007268>️ Tvoji brojevi su **tajno zabilježeni** i čekaju kraj runde!\n"
                 f"<:e_pray:1519363406078021863> Drži fige i čekaj objavu!"
@@ -9688,9 +9731,12 @@ async def _bingo_reveal(session: dict, channel: discord.TextChannel):
     drawn_display = " ".join(f"`{n:02d}`" for n in drawn)
 
     if not players:
-        e = discord.Embed(description=f"**🎯  Bingo — Runda završena**\n😢 **Niko nije uzeo tiket ovaj put.**\n💡 Sljedeći auto-bingo za **~3 sata**! ⏰",
+        e = discord.Embed(
+            title="🎯  Bingo — Runda završena",
+            description="😢 **Niko nije uzeo tiket ovaj put.**\n💡 Sljedeći auto-bingo za **~3 sata**! ⏰",
             color=_LP,
-            timestamp=datetime.now(timezone.utc))
+            timestamp=datetime.now(timezone.utc),
+        )
         e.add_field(
             name="<:e_dice2:1519362633763913931>  Izvučenih 20 brojeva",
             value=drawn_display,
@@ -9820,7 +9866,7 @@ async def post_pvc_info():
         try:
             sep = "━━━━━━━━━━━━━━━━━━━━━━"
             e = discord.Embed(
-                description="**<:e_speaker:1519363314524881048> ᴋᴀᴋᴏ ᴋᴏʀɪꜱᴛɪᴛɪ ᴘʀɪᴠᴀᴛɴɪ ᴠᴏɪᴄᴇ?**",
+                title="<:e_speaker:1519363314524881048> ᴋᴀᴋᴏ ᴋᴏʀɪꜱᴛɪᴛɪ ᴘʀɪᴠᴀᴛɴɪ ᴠᴏɪᴄᴇ?",
                 description=(
                     f"{sep}\n"
                     f"<:e_idea:1519363006599794799> Napravi **svoj vlastiti voice kanal** koji možeš zaključati, sakriti, "
@@ -10055,7 +10101,7 @@ async def on_voice_state_update(member, before, after):
             # Pošalji panel u kanal (text chat unutar VC-a, Discord 2024+ feature)
             try:
                 e = discord.Embed(
-                    description=f"**<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!**",
+                    title=f"<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!",
                     description=(
                         "**Ti si vlasnik!** <:e_crown2:1519363047163166922> Koristi dugmad ispod:\n\n"
                         "<:e_lock3:1519362717394403432> **Lock** — niko ne može ući\n"
@@ -10124,7 +10170,7 @@ async def report_cmd(i: discord.Interaction, korisnik: discord.Member, razlog: s
     target_ch = i.guild.get_channel(ch_id) if ch_id else None
 
     e = discord.Embed(
-        description="**<:e_report2:1519362714198347886> NOVA PRIJAVA**",
+        title="<:e_report2:1519362714198347886> NOVA PRIJAVA",
         color=COLORS["error"],
         timestamp=discord.utils.utcnow(),
     )
@@ -10287,7 +10333,7 @@ class StaffApplicationModal(discord.ui.Modal, title="<:e_clipboard:1519363052871
 
         BAR = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         e = discord.Embed(
-            description="**<:e_clipboard:1519363052871614627>  Nova Staff Prijava**",
+            title="<:e_clipboard:1519363052871614627>  Nova Staff Prijava",
             description=(
                 f"{BAR}\n"
                 f"<:e_user:1519363093736718518> **{i.user.display_name}** ({i.user.mention})\n"
@@ -10343,14 +10389,17 @@ class StaffApplicationModal(discord.ui.Modal, title="<:e_clipboard:1519363052871
         notify_ch = guild.get_channel(notify_id) if notify_id else None
         if notify_ch and notify_ch != chan:
             try:
-                notif = discord.Embed(description=f"**<:e_bell:1519363063738925187> Nova Staff Prijava**\n**{i.user.display_name}** je podnio/la prijavu!\n<:e_folder:1519363642808729690> Pogledaj: {chan.mention}",
-                    color=_LP)
+                notif = discord.Embed(
+                    title="<:e_bell:1519363063738925187> Nova Staff Prijava",
+                    description=f"**{i.user.display_name}** je podnio/la prijavu!\n<:e_folder:1519363642808729690> Pogledaj: {chan.mention}",
+                    color=_LP,
+                )
                 await notify_ch.send(embed=notif)
             except Exception:
                 pass
 
         potvrda = discord.Embed(
-            description="**<:icon_check:1519358376268533810>  Prijava primljena!**",
+            title="<:icon_check:1519358376268533810>  Prijava primljena!",
             description=(
                 f"## <:e_party:1519363028334674070> Uspješno si se prijavio/la za Staff!\n"
                 f"<:e_folder:1519363642808729690> Tvoja prijava je objavljena: {chan.mention}\n\n"
@@ -10416,7 +10465,7 @@ class StaffVoteView(discord.ui.View):
             try:
                 member = i.guild.get_member(aid) or await i.guild.fetch_member(aid)
                 dm_e = discord.Embed(
-                    description="**<:e_party:1519363028334674070>  Čestitamo — Primljeni si u Staff!**",
+                    title="<:e_party:1519363028334674070>  Čestitamo — Primljeni si u Staff!",
                     description=(
                         f"## <:icon_check:1519358376268533810> Tvoja prijava na **{i.guild.name}** je **PRIHVAĆENA**!\n\n"
                         f"Kontaktiraj administratora da dobiješ Staff ulogu.\n"
@@ -10453,7 +10502,7 @@ class StaffVoteView(discord.ui.View):
             try:
                 member = i.guild.get_member(aid) or await i.guild.fetch_member(aid)
                 dm_e = discord.Embed(
-                    description="**<:e_clipboard:1519363052871614627>  Staff Prijava — Odgovor**",
+                    title="<:e_clipboard:1519363052871614627>  Staff Prijava — Odgovor",
                     description=(
                         f"## <:icon_cross:1519358379917836508> Nažalost, tvoja prijava na **{i.guild.name}** je **ODBIJENA**.\n\n"
                         f"Možeš pokušati ponovo za **30 dana**.\n"
@@ -10614,7 +10663,7 @@ async def tiketstaff_cmd(ctx: commands.Context):
         return await ctx.send(embed=em("<:icon_cross:1519358379917836508> Nemaš pristup", "Samo admin može postaviti panel.", color=COLORS["error"]))
     BAR = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     e = discord.Embed(
-        description="**<:e_clipboard:1519363052871614627>  STAFF PRIJAVA**",
+        title="<:e_clipboard:1519363052871614627>  STAFF PRIJAVA",
         description=(
             f"{BAR}\n"
             f"Otvorene su prijave za **Staff tim** servera **{ctx.guild.name}**!\n\n"
@@ -10655,7 +10704,7 @@ async def info_cmd(ctx: commands.Context):
     LINE = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
     e = discord.Embed(
-        description="**<:e_ctrl:1519362682296209498> <:e_diamond3:1519363370694738072> GIAN (Custom) — Komande <:e_diamond3:1519363370694738072> <:e_ctrl:1519362682296209498>**",
+        title="<:e_ctrl:1519362682296209498> <:e_diamond3:1519363370694738072> GIAN (Custom) — Komande <:e_diamond3:1519363370694738072> <:e_ctrl:1519362682296209498>",
         description=(
             f"```fix\n<:e_laptop:1519363516002467871> Kompjuter: /komanda   <:e_phone:1519362788462559323> Mobitel: .komanda```\n"
             f"{LINE}"
@@ -10763,7 +10812,7 @@ async def pravila_cmd(ctx: commands.Context):
         return await ctx.send(embed=em("<:icon_cross:1519358379917836508> Nemaš pristup", "Ova komanda je dostupna samo vlasniku bota.", color=COLORS["error"]))
 
     e = discord.Embed(
-        description="**📝  P R A V I L N I K  S E R V E R A**",
+        title="📝  P R A V I L N I K  S E R V E R A",
         description=(
             "Dobrodošli na **GIAN** zajednicu!\n"
             "Molimo pročitajte i poštujte sljedeća pravila."
@@ -10933,7 +10982,7 @@ class VoiceCreateButton(discord.ui.View):
             # Pošalji panel u sam voice kanal
             try:
                 ev = discord.Embed(
-                    description=f"**<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!**",
+                    title=f"<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!",
                     description=(
                         "**Ti si vlasnik!** <:e_crown2:1519363047163166922> Koristi dugmad ispod:\n\n"
                         "<:e_lock3:1519362717394403432> **Lock / Unlock** — kontrola ulaza\n"
@@ -10984,7 +11033,7 @@ async def pravila_voice_cmd(ctx: commands.Context):
             e.set_footer(text="<:e_speaker:1519363314524881048> GIAN • Voice Pravila", icon_url=ctx.guild.icon.url if ctx.guild and ctx.guild.icon else None)
     else:
         e = discord.Embed(
-            description="**<:e_speaker:1519363314524881048>  P R I V A T N I  V O I C E  K A N A L I**",
+            title="<:e_speaker:1519363314524881048>  P R I V A T N I  V O I C E  K A N A L I",
             description=(
                 f"Uđi u <#{JTC_VOICE_ID}> i bot ti **automatski** kreira vlastiti voice kanal.\n"
                 "Postaješ **vlasnik** <:e_crown2:1519363047163166922> i dobijaš puni kontrolni panel."
@@ -11067,9 +11116,12 @@ async def sync_cmd(i: discord.Interaction, scope: app_commands.Choice[str] = Non
             results.append(f"<:icon_check:1519358376268533810> **Global sync:** {len(synced)} komandi (cache do 1h)")
         except Exception as e:
             results.append(f"<:icon_cross:1519358379917836508> **Global sync error:** `{e}`")
-    e = discord.Embed(description=f"**<:e_refresh:1519362959187509461> Sync rezultati**\n\n".join(results) if results else "Ništa nije sinhronizovano.",
+    e = discord.Embed(
+        title="<:e_refresh:1519362959187509461> Sync rezultati",
+        description="\n".join(results) if results else "Ništa nije sinhronizovano.",
         color=COLORS["success"],
-        timestamp=datetime.now(timezone.utc))
+        timestamp=datetime.now(timezone.utc),
+    )
     e.set_footer(text=f"{BOT_NAME} • Force Sync")
     await i.followup.send(embed=e, ephemeral=True)
 
@@ -11923,7 +11975,7 @@ async def poo_cmd(i: discord.Interaction):
         uname = m.display_name if m else f'User #{uid_str[:4]}'
         top_text += f"{medals[idx]} **{uname}** — `+{pts} Poo XP`\n"
     e = discord.Embed(
-        description=f'**<:e_skull:1519362992502997125> Serverski POO — Stage {stage_idx + 1}/{len(POO_STAGES)}**',
+        title=f'<:e_skull:1519362992502997125> Serverski POO — Stage {stage_idx + 1}/{len(POO_STAGES)}',
         description=(
             f'{emoji}  **{stage_name}**\n'
             f'*{stage_desc}*\n\n'
@@ -11967,7 +12019,7 @@ async def poo_zadaci_cmd(i: discord.Interaction, stranica: int = 1):
         desc += f'> `{mini_bar}` `{prog}/{goal}` · <:e_skull:1519362992502997125>+{poo_contrib} · <:e_coins3:1519362621206298666>+{coin_r:,}\n\n'
     done_count = sum(1 for r in POO_ZADACI if user_tasks.get(r[0], 0) >= r[4])
     e = discord.Embed(
-        description=f'**<:e_skull:1519362992502997125> POO Zadaci — Stranica {stranica}/10**',
+        title=f'<:e_skull:1519362992502997125> POO Zadaci — Stranica {stranica}/10',
         description=desc or 'Nema zadataka.',
         color=_LP,
         timestamp=datetime.now(timezone.utc)
@@ -11991,7 +12043,9 @@ async def poo_top_cmd(i: discord.Interaction):
         lines.append(f'{medals[idx]} **{uname}** — `+{pts} Poo XP`')
     stage_idx = _poo_stage_for(poo.get('xp', 0))
     semo, snm = POO_STAGES[stage_idx][1], POO_STAGES[stage_idx][2]
-    e = discord.Embed(description=f"**<:e_skull:1519362992502997125> Top 10 Cuvara Poo-a**\n\n".join(lines),
+    e = discord.Embed(
+        title='<:e_skull:1519362992502997125> Top 10 Cuvara Poo-a',
+        description='\n'.join(lines),
         color=_LP, timestamp=datetime.now(timezone.utc))
     e.add_field(name='<:e_skull:1519362992502997125> Trenutni Stage', value=f'{semo} **{snm}** (XP: {poo.get("xp",0):,})', inline=True)
     e.set_footer(text=f'Budi aktivan i hrani Poo-a! · {BOT_NAME}')
@@ -12045,7 +12099,7 @@ async def poo_info_cmd(i: discord.Interaction):
     my_rank = next((idx + 1 for idx, (uid, pts) in enumerate(sorted_c) if uid == uid_str), None)
     rank_txt = f'#{my_rank}' if my_rank else '—'
     e = discord.Embed(
-        description='**<:e_skull:1519362992502997125> Tvoj Poo Profil**',
+        title='<:e_skull:1519362992502997125> Tvoj Poo Profil',
         description=(
             f'<:e_skull:1519362992502997125> Serverski Poo: {semo} **{snm}**\n'
             f'<:e_shake:1519362947766554737> Tvoj doprinos: **{my_contrib} Poo XP**\n'
