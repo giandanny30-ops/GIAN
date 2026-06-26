@@ -1896,8 +1896,8 @@ async def _license_check_and_shutdown_if_clone():
             ch = next((c for c in g.text_channels if c.permissions_for(g.me).send_messages), None)
             if ch:
                 e = discord.Embed(
-                    description="**<:e_no:1519363018725658675> Nedozvoljena kopija bota**",
                     description=(
+                        f"**<:e_no:1519363018725658675> Nedozvoljena kopija bota**\n"
                         f"Ovaj bot je **neovlaštena kopija** originalnog **{BOT_NAME}** bota.\n\n"
                         f"<:e_link:1519363321458065408> **Jedini originalni bot:** GIAN\n\n"
                         f"Bot će se sada automatski isključiti i napustiti server."
@@ -7084,7 +7084,7 @@ async def geografija(i: discord.Interaction, oklada: int = 50):
         return await i.response.send_message(embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Imaš `{eco['balance']:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
     question, correct, wrong = random.choice(GEOGRAFIJA_QS)
     view = TriviaView(correct, wrong, oklada, i.user.id, pool=GEOGRAFIJA_QS, title="<:e_globe2:1519362694887637004> Geografija")
-    e = discord.Embed( description=f"**{"<:e_globe2:1519362694887637004> Geografija"}**\n<:e_globe2:1519362694887637004>  **{question}**", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(description=f"**<:e_globe2:1519362694887637004> Geografija**\n<:e_globe2:1519362694887637004>  **{question}**", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_coins3:1519362621206298666> Oklada", value=f"`{oklada}`", inline=True)
     e.add_field(name="<:e_time2:1519362726952964227>️ Vrijeme", value="`20 sekundi`", inline=True)
     e.set_footer(text=f"{BOT_NAME} • Putuj svijetom!")
@@ -8982,7 +8982,7 @@ async def heist_cmd(i: discord.Interaction):
 @bot.tree.command(name="qr", description="📱 Generiši QR kod iz teksta ili URL-a")
 async def qr_cmd(i: discord.Interaction, tekst: str):
     url = f"https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={discord.utils.escape_markdown(tekst).replace(' ', '%20')}"
-    e = discord.Embed( description=f"**{"<:e_phone:1519362788462559323> QR Kod"}**\n```{tekst[:200]}```", color=COLORS["info"])
+    e = discord.Embed(description=f"**<:e_phone:1519362788462559323> QR Kod**\n```{tekst[:200]}```", color=COLORS["info"])
     e.set_image(url=url)
     e.set_footer(text=f"{BOT_NAME} • QR Generator")
     await i.response.send_message(embed=e)
