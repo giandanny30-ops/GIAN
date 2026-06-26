@@ -2141,6 +2141,37 @@ async def on_guild_join(guild):
         except Exception:
             pass
 
+# ═══════════════════════════════════════════
+#    🌹 MRAK WELCOME VIEW
+# ═══════════════════════════════════════════
+class MrakWelcomeView(discord.ui.View):
+    """Welcome kartice za MRAK — dugme 'Poželi dobrodošlicu' + music link."""
+    def __init__(self, new_member: discord.Member, music_ch_id: int):
+        super().__init__(timeout=None)
+        self.new_member = new_member
+        # Music link dugme (desno)
+        self.add_item(discord.ui.Button(
+            label="play music",
+            emoji="<:46960sakurapinkdrink:1520092838006624287>",
+            url=f"https://discord.com/channels/{new_member.guild.id}/{music_ch_id}",
+            style=discord.ButtonStyle.link,
+            row=0,
+        ))
+
+    @discord.ui.button(
+        label="Poželi dobrodošlicu",
+        emoji="<:96983chococat:1520092321461440532>",
+        style=discord.ButtonStyle.secondary,
+        row=0,
+    )
+    async def greet_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        nm = self.new_member
+        await interaction.response.send_message(
+            f"<:907007flower:1520092431528231093> **{interaction.user.display_name}** je poslao/la "
+            f"dobrodošlicu {nm.mention} na **MRAK**! <:4642rosewhite:1520092070700650566>",
+            allowed_mentions=discord.AllowedMentions(users=False),
+        )
+
 @bot.event
 async def on_member_join(member):
     cfg = get_guild_config(member.guild.id)
@@ -2354,27 +2385,41 @@ async def on_member_join(member):
         e.set_footer(text=_footer_text, icon_url=member.guild.icon.url if member.guild.icon else None)
 
     else:
+        # Ukloni vatrice sufix iz display_name (npr. "Jamie <:e_fire2:...>1" → "Jamie")
+        _vatrice_sfx = re.compile(
+            r"\s*(?:<a?:[^:>]{1,50}:\d{0,20}>?\s*\d*"
+            r"|[\U00002600-\U000027BF\U0001F300-\U0001FAFF\U00002702-\U000027B0]+\s*\d*)\s*$",
+            re.UNICODE,
+        )
+        _clean_name = _vatrice_sfx.sub("", member.display_name).strip() or member.name
+
+        # ── MRAK Welcome Embed ──
+        _ch_info    = cfg.get("info_channel",    1496860023093989475)
+        _ch_pravila = cfg.get("staff_channel",   1496860023093989472)
+        _ch_uloge   = cfg.get("gws_channel",     1496860024121852087)
+        _ch_music   = cfg.get("music_channel",   1496860024121852088)
+
         e = discord.Embed(
-            title=f"<:e_diamond3:1519363370694738072> Dobrodošao/la, {member.display_name}! <:e_diamond3:1519363370694738072>",
             description=(
-                f"```\n"
-                f"  <:e_sparkles:1519363032185176198>  Novi član se pridružio serveru!  <:e_sparkles:1519363032185176198>\n"
-                f"```\n"
-                f"<:e_shake:1519362947766554737> Hej {member.mention}! Drago nam je što si tu!\n\n"
-                f"<:e_pushpin:1519363357436543099> **Korisni kanali:**\n"
-                f"┣ <:e_bubble:1519363307998417148> {chat_lnk}\n"
-                f"┣ <:e_clipboard:1519363052871614627> {info_lnk}\n"
-                f"┗ <:e_gift:1519362618341462067> {gws_lnk}\n\n"
-                f"<:e_feather:1519363362322907218> Ti si **{member_count}.** član servera!"
+                f"<:907007flower:1520092431528231093> Dobrodošao/la **{_clean_name}** na **{member.guild.name}™**!\n\n"
+                f"<:4642rosewhite:1520092070700650566> Pročitaj <#{_ch_info}> i <#{_ch_pravila}>.\n\n"
+                f"<:9339lolkawaii:1520092073863282708> Dobrodošao/la na party — uzmi <#{_ch_uloge}> i ukrasi profil!\n"
             ),
             color=_LP,
-            timestamp=_now_utc
+            timestamp=_now_utc,
         )
-        e.set_thumbnail(url=member.display_avatar.url)
-        e.set_footer(text=f"<:e_diamond3:1519363370694738072> {member.guild.name} • Welcome <:e_diamond3:1519363370694738072>",
-                     icon_url=member.guild.icon.url if member.guild.icon else None)
+        e.set_author(name=_clean_name, icon_url=member.display_avatar.url)
+        e.set_image(url="https://share.creavite.co/6a3e9d8b65f8f74c0f9a4486.gif")
+        e.set_footer(
+            text=f"Vi ste naš {member_count}. član! • {member.guild.name}",
+            icon_url=member.guild.icon.url if member.guild.icon else None,
+        )
 
-    # ── Dugmadi ──
+        wv = MrakWelcomeView(member, _ch_music)
+        await chan.send(content=member.mention, embed=e, view=wv)
+        return
+
+    # ── Panel embed dugmadi ──
     wv = discord.ui.View()
     pw_buttons = (_pw or {}).get("buttons") or []
     _has_linked = any(pb.get("channelId") or pb.get("url") for pb in pw_buttons)
@@ -2397,7 +2442,6 @@ async def on_member_join(member):
                 style=discord.ButtonStyle.link,
             ))
     else:
-        # Fallback — hardkodovani game/music kanali
         if ch_game:
             wv.add_item(discord.ui.Button(
                 label="game",
