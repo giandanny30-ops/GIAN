@@ -1773,7 +1773,9 @@ def em_pro(title, desc="", color=COLORS["gold"], fields=None, footer=None, thumb
         desc = _apply_gt_bold(str(desc))
     if accent and not desc:
         desc = ""
-    e = discord.Embed(description=f"**<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>**", description=desc, color=color, timestamp=datetime.now(timezone.utc))
+    if title:
+        desc = f"**<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>**\n{desc}" if desc else f"**<:e_diamond3:1519363370694738072> {title} <:e_diamond3:1519363370694738072>**"
+    e = discord.Embed(description=desc, color=color, timestamp=datetime.now(timezone.utc))
     if fields:
         for n, v, inline in fields:
             e.add_field(name=f"<:e_right:1519363367712591922> {n}", value=v or "\u200b", inline=inline)
@@ -4886,7 +4888,7 @@ async def _ag_end(state, channel, title, desc, color):
         f"{'<:e_red:1519362782192210041>' if p['role']=='impostor' else '<:e_internet:1519363106395000994>'} {p['color']} **{p['name']}** — {p['role'].upper()}"
         for p in state["players"].values()
     )
-    e = discord.Embed(description=f"**🎯 {title}**", description=desc, color=color, timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(description=f"**🎯 {title}**\n{desc}" if desc else f"**🎯 {title}**", color=color, timestamp=datetime.now(timezone.utc))
     e.add_field(name="<:e_masks:1519363003424706671> Otkrivene uloge", value=reveal, inline=False)
     e.set_footer(text=f"{BOT_NAME} • Among Us")
     await channel.send(embed=e)
@@ -7473,7 +7475,7 @@ async def poll(i: discord.Interaction, pitanje: str, opcija1: str, opcija2: str,
     opts   = [o for o in [opcija1, opcija2, opcija3, opcija4] if o]
     emojis = ["1️⃣","2️⃣","3️⃣","4️⃣"]
     desc   = "\n".join(f"{emojis[idx]}  **{opt}**" for idx, opt in enumerate(opts))
-    e = discord.Embed(description=f"**<:e_chart:1519362656568475880> {pitanje}**", description=desc, color=COLORS["info"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(description=f"**<:e_chart:1519362656568475880> {pitanje}**\n{desc}", color=COLORS["info"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"Glasaj sa emoji reakcijama • {BOT_NAME}")
     e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
     await i.response.send_message(embed=e)
@@ -8948,7 +8950,7 @@ async def heist_cmd(i: discord.Interaction):
     cd = data["heist_cooldown"].get(uid, 0)
     if int(time.time()) < cd:
         return await i.response.send_message(embed=em("<:e_time2:1519362726952964227>", f"Pokušaj ponovo <t:{cd}:R>.", color=COLORS["warning"]), ephemeral=True)
-    e = discord.Embed(description="**<:e_coins3:1519362621206298666> RAZBOJ U PRIPREMI**", description=f"{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
+    e = discord.Embed(description=f"**<:e_coins3:1519362621206298666> RAZBOJ U PRIPREMI**\n{i.user.mention} organizuje razboj!\n**Klikni dugme da se pridružiš** (treba 3+ ljudi za uspjeh)\n<:e_time2:1519362726952964227> 30 sekundi do akcije!", color=COLORS["warning"])
     crew = {i.user.id}
     class HeistView(discord.ui.View):
         def __init__(self): super().__init__(timeout=30)
