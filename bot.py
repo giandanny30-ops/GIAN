@@ -2426,7 +2426,7 @@ async def on_member_join(member):
             color=_LP,
             timestamp=_now_utc,
         )
-        e.set_author(name=_clean_name, icon_url=member.display_avatar.url)
+        e.set_thumbnail(url=member.display_avatar.url)
         e.set_image(url="https://share.creavite.co/6a3e9d8b65f8f74c0f9a4486.gif")
         e.set_footer(
             text=f"Vi ste naš {member_count}. član! • {member.guild.name}",
