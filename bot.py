@@ -2149,13 +2149,38 @@ def _ge(guild: discord.Guild, name: str, fallback: str = "") -> str:
     e = discord.utils.get(guild.emojis, name=name)
     return str(e) if e else fallback
 
+class _GreetBtn(discord.ui.Button):
+    """Interaktivno dugme 'Poželi dobrodošlicu' s dinamičkim emoji."""
+    def __init__(self, new_member: discord.Member, cat_emoji):
+        super().__init__(
+            label="Poželi dobrodošlicu",
+            emoji=cat_emoji,
+            style=discord.ButtonStyle.secondary,
+            row=0,
+        )
+        self.new_member = new_member
+
+    async def callback(self, interaction: discord.Interaction):
+        nm = self.new_member
+        guild = interaction.guild
+        flower = _ge(guild, "907007flower", "🌸")
+        rose   = _ge(guild, "4642rosewhite", "🌹")
+        await interaction.response.send_message(
+            f"{flower} **{interaction.user.display_name}** je poslao/la "
+            f"dobrodošlicu {nm.mention} na **MRAK**! {rose}",
+            allowed_mentions=discord.AllowedMentions(users=True),
+        )
+
 class MrakWelcomeView(discord.ui.View):
     """Welcome kartice za MRAK — dugme 'Poželi dobrodošlicu' + music link."""
     def __init__(self, new_member: discord.Member, music_ch_id: int):
         super().__init__(timeout=None)
         self.new_member = new_member
         guild = new_member.guild
-        # Emoji za music dugme (traži po imenu s guilda)
+        # Poželi dobrodošlicu — chococat emoji s guilda
+        cat_emoji = discord.utils.get(guild.emojis, name="96983chococat") or "🐱"
+        self.add_item(_GreetBtn(new_member, cat_emoji))
+        # Music link dugme
         ink_emoji = discord.utils.get(guild.emojis, name="ink") or "🍹"
         self.add_item(discord.ui.Button(
             label="play music",
@@ -2164,22 +2189,6 @@ class MrakWelcomeView(discord.ui.View):
             style=discord.ButtonStyle.link,
             row=0,
         ))
-
-    @discord.ui.button(
-        label="Poželi dobrodošlicu",
-        style=discord.ButtonStyle.secondary,
-        row=0,
-    )
-    async def greet_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        nm = self.new_member
-        guild = interaction.guild
-        flower = _ge(guild, "907007flower", "🌸")
-        rose   = _ge(guild, "4642rosewhite", "🌹")
-        await interaction.response.send_message(
-            f"{flower} **{interaction.user.display_name}** je poslao/la "
-            f"dobrodošlicu {nm.mention} na **MRAK**! {rose}",
-            allowed_mentions=discord.AllowedMentions(users=False),
-        )
 
 @bot.event
 async def on_member_join(member):
@@ -2410,7 +2419,7 @@ async def on_member_join(member):
 
         e = discord.Embed(
             description=(
-                f"{_flower} Dobrodošao/la **{_clean_name}** na **{member.guild.name}™**!\n\n"
+                f"{_flower} Dobrodošao/la {member.mention} na **{member.guild.name}™**!\n\n"
                 f"{_rose} Pročitaj <#{_ch_info}> i <#{_ch_pravila}>.\n\n"
                 f"{_kawaii} Dobrodošao/la na party — uzmi <#{_ch_uloge}> i ukrasi profil!\n"
             ),
@@ -2425,7 +2434,7 @@ async def on_member_join(member):
         )
 
         wv = MrakWelcomeView(member, _ch_music)
-        await chan.send(content=member.mention, embed=e, view=wv)
+        await chan.send(embed=e, view=wv)
         return
 
     # ── Panel embed dugmadi ──
