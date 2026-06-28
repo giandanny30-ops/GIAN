@@ -35,7 +35,7 @@ E_TIME    = "<:icon_time:1519358368773308457>"
 E_PARTY   = "<:e_party:1519363028334674070>"
 E_SKULL   = "<:e_skull:1519362992502997125>"
 E_DEVIL   = "<:e_devil:1519362989470253187>"
-BOT_PREFIX = "-"
+BOT_PREFIX = "."
 # ═════════════════════════════════════════════════════════════════════════════
 
 try: _sys.stdout.reconfigure(line_buffering=True)
@@ -1054,7 +1054,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.presences = True  # potrebno za /vanity (čitanje custom statusa)
-bot = commands.Bot(command_prefix="-", intents=intents, help_command=None)
+bot = commands.Bot(command_prefix=["-", "."], intents=intents, help_command=None)
 
 # ═══════════════════════════════════════════
 #    PREFIX BRIDGE — .kpm radi kao /kpm
