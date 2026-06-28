@@ -2345,41 +2345,21 @@ async def on_ready():
         "gaming":    ["hunt","fish","zoo","battle","sell","animals","pray","wordle","wordle-stop","toplo-hladno","amogus","amogus-stop"],
         "comanda":   ["rank","aktivnost","leaderboard","spotify","ping","serverinfo","userinfo","avatar","invite","afk"],
     }
+    # ── Jednokratni cleanup: briše stare auto-postavljene per-cmd kanale (v3.1) ──
+    # Auto-setup je uklonjen jer je postavljao ograničenja bez znanja admina.
+    # Ova sekcija briše stare podatke samo jednom (flag "kk_autosetup_cleared").
     try:
         for guild in bot.guilds:
-            gcfg    = get_guild_config(guild.id)
-            per_cmd = gcfg.get("cmd_per_channel", {})
-            if not per_cmd:  # samo ako nema postojeće konfiguracije (ne gazi ručno postavljeno)
-                import re as _re, unicodedata as _ud
-                def _strip(s):
-                    # Normalizuj unicode italic/bold → ASCII (𝘤𝘢𝘴𝘪𝘯𝘰 → casino)
-                    n = _ud.normalize('NFKD', s.lower())
-                    a = n.encode('ascii', 'ignore').decode('ascii')
-                    return _re.sub(r'[^a-z0-9]', '', a)
-                ch_list = [(ch.name, ch) for ch in guild.text_channels]
-                postavljeno = 0
-                for naziv, komande in AUTO_MAP.items():
-                    key_s = _strip(naziv)
-                    # Tačan match: stripped ime kanala == ključ (staff-chat → staffchat ≠ chat)
-                    nadjeni = next((ch for ime, ch in ch_list if _strip(ime) == key_s), None)
-                    # Fallback: stripped ime ZAVRŠAVA ključem samo ako je dio cjeline (npr. bot-casino)
-                    if not nadjeni:
-                        nadjeni = next((ch for ime, ch in ch_list
-                                        if _strip(ime).endswith(key_s)
-                                        and _strip(ime) != "staff" + key_s
-                                        and _strip(ime) != "mod" + key_s
-                                        and _strip(ime) != "admin" + key_s), None)
-                    if nadjeni:
-                        for k in komande:
-                            per_cmd[k] = nadjeni.id
-                        postavljeno += 1
-                gcfg["cmd_per_channel"] = per_cmd
+            gcfg = get_guild_config(guild.id)
+            if not gcfg.get("kk_autosetup_cleared"):
+                gcfg["cmd_per_channel"] = {}
+                gcfg["kk_autosetup_cleared"] = True
                 save_data()
-                print(f"  ✅ Auto-setup kanala: {postavljeno}/{len(AUTO_MAP)} kanala nađeno na '{guild.name}'")
+                print(f"  ✅ Cleanup: per-cmd kanali obrisani na '{guild.name}' (auto-setup uklonjen)")
             else:
-                print(f"  ℹ️  Kanal-setup preskočen — već postavljeno na '{guild.name}'")
+                print(f"  ℹ️  Cleanup preskočen — već urađen na '{guild.name}'")
     except Exception as _as:
-        print(f"  ❌ Auto-setup greška: {_as}")
+        print(f"  ❌ Cleanup greška: {_as}")
     # ── Sync komandi na svaki restart (guild-only, bez duplikata) ──
     synced_count = 0
     for guild in bot.guilds:
