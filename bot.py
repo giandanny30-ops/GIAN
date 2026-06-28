@@ -1302,6 +1302,30 @@ async def try_prefix_command(message):
                 )
                 return True
 
+    # ── Per-command kanal (prefix) ──
+    if message.guild and message.author.id not in OWNER_IDS:
+        gcfg = get_guild_config(message.guild.id)
+        per_cmd = gcfg.get("cmd_per_channel", {})
+        if cmd_name in per_cmd:
+            required_ch = per_cmd[cmd_name]
+            is_admin = (
+                hasattr(message.author, "guild_permissions") and
+                (message.author.guild_permissions.administrator or message.author.guild_permissions.manage_guild)
+            )
+            if not is_admin and message.channel.id != required_ch:
+                try:
+                    await message.delete()
+                except: pass
+                await message.channel.send(
+                    embed=em(
+                        f"{E_CROSS} Pogrešan kanal",
+                        f"{message.author.mention} — komanda `.{cmd_name}` se koristi samo u <#{required_ch}>!",
+                        color=COLORS["error"]
+                    ),
+                    delete_after=8
+                )
+                return True
+
     fake = FakeInteraction(message)
     kwargs = {}
     try:
@@ -4080,12 +4104,12 @@ async def rank(i: discord.Interaction, korisnik: discord.Member = None):
     needed = max(d["level"] * 75, 1)
     filled = min(d["xp"] * 10 // needed, 10)
     empty  = 10 - filled
-    bar    = "█" * filled + "░" * empty
+    bar    = "<:e_sun:1519362860218843399>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
     pct    = min(round(d["xp"] / needed * 100), 100)
     rank_e = discord.Embed(
         description=(
             f"**{u.display_name}**\n"
-            f"```\n[{bar}] {pct}%\n```"
+            f"{bar}  `{pct}%`"
         ),
         color=COLORS["purple"],
         timestamp=datetime.now(timezone.utc)
@@ -4319,7 +4343,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
     elif two_same:
         win          = ulog
         d["balance"] += 0
-        title        = "🎰 | Par — ulog vraćen | 🎰"
+        title        = "🎰 ゛| Par — ulog vraćen"
         status       = f"✨ **Dva ista!**  **{win:,}** <:e_coins3:1519362621206298666>  `×1.0`"
 
     else:
@@ -6506,6 +6530,35 @@ async def _combined_interaction_check(interaction: discord.Interaction) -> bool:
                     return False
     except Exception as _cc:
         print(f"[cmd-channel-check] {_cc}")
+    # 4) per-command kanal restrict — svaka komanda ima SVOJ kanal
+    try:
+        if interaction.guild and interaction.type == discord.InteractionType.application_command:
+            cmd_name = interaction.command.name if interaction.command else None
+            if cmd_name:
+                gcfg = get_guild_config(interaction.guild.id)
+                per_cmd = gcfg.get("cmd_per_channel", {})
+                if cmd_name in per_cmd:
+                    required_ch = per_cmd[cmd_name]
+                    member = interaction.user
+                    is_admin = (
+                        hasattr(member, "guild_permissions") and
+                        (member.guild_permissions.administrator or member.guild_permissions.manage_guild)
+                    )
+                    if not is_admin and interaction.channel_id != required_ch:
+                        try:
+                            await interaction.response.send_message(
+                                embed=em(
+                                    f"{E_CROSS} Pogrešan kanal",
+                                    f"{member.mention} — komanda `/{cmd_name}` se koristi samo u <#{required_ch}>!",
+                                    color=COLORS["error"]
+                                ),
+                                ephemeral=True
+                            )
+                        except Exception:
+                            pass
+                        return False
+    except Exception as _pcc:
+        print(f"[per-cmd-channel-check] {_pcc}")
     return True
 
 bot.tree.interaction_check = _combined_interaction_check
@@ -11552,6 +11605,117 @@ async def kanal_komandi_resetuj(i: discord.Interaction):
     )
 
 bot.tree.add_command(kanal_komandi_group)
+
+# ═══════════════════════════════════════════
+#    /komanda-kanal — Per-command kanal sistem
+#    Svaka komanda može imati SVOJ kanal.
+#    Admin postavlja: /komanda-kanal postavi <komanda> <kanal>
+# ═══════════════════════════════════════════
+# ── Autocomplete: lista svih bot komandi ──────────────────────────────────
+_ALL_BOT_CMDS = [
+    "slots","blackjack","poker","rulet",
+    "kaladont","wordle","kviz","geografija","vjasala","toplo-hladno","amogus",
+    "rank","aktivnost","leaderboard","profil",
+    "posao","daily","kradi","balans","bank","transfer","lottery",
+    "hunt","fish",
+    "meme","8ball","ljubav","kompatibilnost","iq",
+    "spotify","invite","ping","help","setup",
+    "shop","kupi","poeni",
+    "warn","kick","ban","mute","unmute","clear",
+    "poll","say","remind","qr",
+    "kanal-komandi","komanda-kanal",
+]
+
+async def _cmd_autocomplete(interaction: discord.Interaction, current: str):
+    current = current.lower()
+    matches = [c for c in _ALL_BOT_CMDS if current in c][:25]
+    return [app_commands.Choice(name=c, value=c) for c in matches]
+
+komanda_kanal_group = app_commands.Group(
+    name="komanda-kanal",
+    description="⚙ [ADMIN] Postavi koji kanal smije koristiti određenu komandu"
+)
+
+@komanda_kanal_group.command(name="postavi", description="📌 Postavi kanal za određenu komandu")
+@app_commands.describe(
+    komanda="Naziv komande (npr: kaladont, slots, rank, kviz...)",
+    kanal="Kanal u kojem ta komanda smije raditi"
+)
+@app_commands.autocomplete(komanda=_cmd_autocomplete)
+@app_commands.checks.has_permissions(manage_guild=True)
+async def komanda_kanal_postavi(i: discord.Interaction, komanda: str, kanal: discord.TextChannel):
+    komanda = komanda.lower().strip().lstrip("/").lstrip(".")
+    gcfg = get_guild_config(i.guild.id)
+    per_cmd = gcfg.get("cmd_per_channel", {})
+    per_cmd[komanda] = kanal.id
+    gcfg["cmd_per_channel"] = per_cmd
+    save_data()
+    lista = "\n".join(f"• `{k}` → <#{v}>" for k, v in per_cmd.items())
+    await i.response.send_message(
+        embed=em(
+            f"{E_CHECK} Kanal postavljen",
+            f"Komanda `{komanda}` se od sada koristi samo u {kanal.mention}\n\n"
+            f"**Sve postavljene komande:**\n{lista}\n\n"
+            f"{E_WARN} Admini mogu koristiti komande svugdje.",
+            color=COLORS["success"]
+        ),
+        ephemeral=True
+    )
+
+@komanda_kanal_group.command(name="ukloni", description="➖ Ukloni kanal-ograničenje za komandu")
+@app_commands.describe(komanda="Naziv komande čije ograničenje uklanjаš")
+@app_commands.autocomplete(komanda=_cmd_autocomplete)
+@app_commands.checks.has_permissions(manage_guild=True)
+async def komanda_kanal_ukloni(i: discord.Interaction, komanda: str):
+    komanda = komanda.lower().strip().lstrip("/").lstrip(".")
+    gcfg = get_guild_config(i.guild.id)
+    per_cmd = gcfg.get("cmd_per_channel", {})
+    if komanda not in per_cmd:
+        await i.response.send_message(
+            embed=em(f"{E_WARN} Nije postavljeno", f"Komanda `{komanda}` nema postavljeni kanal.", color=COLORS["warning"]),
+            ephemeral=True
+        )
+        return
+    del per_cmd[komanda]
+    gcfg["cmd_per_channel"] = per_cmd
+    save_data()
+    if per_cmd:
+        lista = "\n".join(f"• `{k}` → <#{v}>" for k, v in per_cmd.items())
+        opis = f"Komanda `{komanda}` može se koristiti svugdje.\n\n**Preostala ograničenja:**\n{lista}"
+    else:
+        opis = f"Komanda `{komanda}` može se koristiti svugdje.\n\n⚠ Nema više per-komanda ograničenja."
+    await i.response.send_message(
+        embed=em(f"{E_CHECK} Ograničenje uklonjeno", opis, color=COLORS["success"]),
+        ephemeral=True
+    )
+
+@komanda_kanal_group.command(name="lista", description="📋 Prikaži sve komande i njihove kanale")
+@app_commands.checks.has_permissions(manage_guild=True)
+async def komanda_kanal_lista(i: discord.Interaction):
+    gcfg = get_guild_config(i.guild.id)
+    per_cmd = gcfg.get("cmd_per_channel", {})
+    if not per_cmd:
+        opis = "Nema per-komanda ograničenja.\n\nKoristi `/komanda-kanal postavi` da dodijeliš komandi njen kanal."
+    else:
+        lista = "\n".join(f"• `{k}` → <#{v}>" for k, v in per_cmd.items())
+        opis = f"**Komande i njihovi kanali:**\n{lista}\n\n{E_WARN} Admini mogu koristiti komande svugdje."
+    await i.response.send_message(
+        embed=em(f"{E_SHIELD} Per-komanda kanali", opis, color=COLORS["info"]),
+        ephemeral=True
+    )
+
+@komanda_kanal_group.command(name="resetuj", description="🔄 Ukloni sva per-komanda ograničenja")
+@app_commands.checks.has_permissions(manage_guild=True)
+async def komanda_kanal_resetuj(i: discord.Interaction):
+    gcfg = get_guild_config(i.guild.id)
+    gcfg["cmd_per_channel"] = {}
+    save_data()
+    await i.response.send_message(
+        embed=em(f"{E_CHECK} Resetovano", "Sva per-komanda ograničenja uklonjena — sve komande rade svugdje.", color=COLORS["success"]),
+        ephemeral=True
+    )
+
+bot.tree.add_command(komanda_kanal_group)
 
 # ═══════════════════════════════════════════
 #    POKRETANJE
