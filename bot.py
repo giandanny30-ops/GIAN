@@ -187,8 +187,8 @@ def _prot_raid() -> dict:
         "enabled":      ar.get("enabled", True),
         "window":       ar.get("windowSeconds", 30),
         "limit":        ar.get("joinLimit", 5),
-        "age_days":     ar.get("suspiciousAgeDays", 7),
-        "lockdown_min": ar.get("lockdownMinutes", 5),
+        "age_days":     ar.get("suspiciousAgeDays", 3),  # manji prag (3 dana)
+        "lockdown_min": ar.get("lockdownMinutes", 2),  # kraći lockdown (2 min)
         "action":       ar.get("action", "kick"),
     }
 
@@ -2995,7 +2995,7 @@ async def birthday_check():
 # ═══════════════════════════════════════════
 _FUN_CD: dict[str, float] = {}
 
-def _fun_cooldown_ok(uid: int, cmd: str, secs: int = 30) -> tuple[bool, float]:
+def _fun_cooldown_ok(uid: int, cmd: str, secs: int = 60) -> tuple[bool, float]:
     import time
     key = f"{cmd}:{uid}"
     now = time.time()
@@ -3040,7 +3040,7 @@ async def iq_cmd(ctx, member: discord.Member = None):
         emoji = "<:e_crown2:1519363047163166922>"
 
     e = discord.Embed(
-        title=f"🍹 ゛*IQ Test — {target.display_name}*゛",
+        title=f"゛🍹 IQ Test — {target.display_name}",
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
     )
@@ -3052,7 +3052,17 @@ async def iq_cmd(ctx, member: discord.Member = None):
     await ctx.send(embed=e)
 
 @bot.command(name="simp")
-async def simp_cmd(ctx, member: discord.Member = None):
+async def simp_cmd(ctx, *, args: str = ""):
+    # Pokušaj naći member iz mentions ili konvertovanjem stringa
+    member = None
+    if ctx.message.mentions:
+        member = ctx.message.mentions[0]
+    elif args.strip():
+        try:
+            member = await commands.MemberConverter().convert(ctx, args.strip())
+        except Exception:
+            member = None
+
     if member is None:
         e = discord.Embed(
             description="<:icon_cross:1519358379917836508> Moraš tagovati nekoga! Primjer: `.simp @korisnik`",
@@ -3060,50 +3070,150 @@ async def simp_cmd(ctx, member: discord.Member = None):
         )
         return await ctx.send(embed=e, delete_after=8)
 
+    if member.id == ctx.author.id:
+        e = discord.Embed(
+            description="<:e_devil:1519362989470253187> Ne možeš biti simp samom sebi, brate/sestro!",
+            color=COLORS["error"]
+        )
+        return await ctx.send(embed=e, delete_after=8)
+
     ok, left = _fun_cooldown_ok(ctx.author.id, "simp")
     if not ok:
         e = discord.Embed(
-            description=f"<:e_time2:1519362726952964227> **Cooldown!** Čekaj još `{left:.1f}s` prije sljedeće komande.",
+            description=f"<:e_time2:1519362726952964227> **Cooldown!** Čekaj još `{left:.1f}s`.",
             color=COLORS["warning"]
         )
         e.set_footer(text=f"{BOT_NAME} • Anti-spam")
         return await ctx.send(embed=e, delete_after=8)
 
-    pct = random.randint(0, 100)
+    # Seed baziran na parovima da je konzistentan tokom dana
+    import hashlib as _hl
+    seed_str = f"{ctx.author.id}{member.id}{datetime.now(timezone.utc).date()}"
+    pct = int(_hl.md5(seed_str.encode()).hexdigest(), 16) % 101
     filled = min(pct // 10, 10)
     bar = "<:e_heart2:1519362668644012133>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
 
-    if pct < 20:
-        label, color_key = "Hladan/na kao led <:e_moon:1519363445466595522>", "info"
+    if pct < 15:
+        label = "Nema simpa <:e_moon:1519363445466595522>"
+        color_key = "info"
         emoji = "<:e_moon:1519363445466595522>"
-    elif pct < 50:
-        label, color_key = "Malo simpa 😏", "success"
+        opis = f"**{ctx.author.display_name}** i ne gleda u stranu **{member.display_name}**-a/e. Hladno. 🥶"
+    elif pct < 35:
+        label = "Malo simpa 😏"
+        color_key = "success"
         emoji = "<:e_sparkles:1519363032185176198>"
-    elif pct < 75:
-        label, color_key = "Solidni simp 💘", "warning"
+        opis = f"**{ctx.author.display_name}** bi možda lajkovao/la selfi **{member.display_name}**-a/e. Otprilike. 👀"
+    elif pct < 60:
+        label = "Solidni simp 💘"
+        color_key = "warning"
         emoji = "<:e_heart2:1519362668644012133>"
-    elif pct < 95:
-        label, color_key = "Mega simp 😍", "pink" if "pink" in COLORS else "error"
+        opis = f"**{ctx.author.display_name}** prati sve storije **{member.display_name}**-a/e. Bez komentara. 🫣"
+    elif pct < 85:
+        label = "Mega simp 😍"
+        color_key = "error"
         emoji = "<:e_fire2:1519362671491678280>"
+        opis = f"**{ctx.author.display_name}** bi napisao/la sonet o **{member.display_name}**-u/i. Svaki dan. 📝🔥"
     else:
-        label, color_key = "100% SIMP KING/QUEEN 👑", "error"
+        label = "100% SIMP KING/QUEEN 👑"
+        color_key = "error"
         emoji = "<:e_crown2:1519363047163166922>"
+        opis = f"**{ctx.author.display_name}** JE LEGENDARNI SIMP za **{member.display_name}**-a/e. Nema spasa. 💀👑"
 
     e = discord.Embed(
-        title=f"🍹 ゛*Simp Metar*゛",
-        description=(
-            f"**{ctx.author.display_name}** je **{pct}%** simp za "
-            f"**{member.display_name}** {member.mention}"
-        ),
+        title=f"゛🍹 Simp Metar",
+        description=opis,
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
     )
-    e.set_thumbnail(url=ctx.author.display_avatar.url)
-    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value=f"**{pct}%**", inline=True)
+    e.set_thumbnail(url=member.display_avatar.url)
+    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value=f"## {pct}%", inline=True)
     e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"**{label}**", inline=True)
     e.add_field(name="<:e_chart:1519362656568475880> Metar", value=f"{bar}  `{pct}/100`", inline=False)
     e.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
-    e.set_footer(text=f"{BOT_NAME} • Simp Detektor • Generisano nasumično")
+    e.set_footer(text=f"{BOT_NAME} • Simp Detektor • Generisano za danas")
+    await ctx.send(embed=e)
+
+
+@bot.command(name="ljubav")
+async def ljubav_cmd(ctx, *, args: str = ""):
+    """゛🍹 Ljubavni postotak između tebe i nekog člana"""
+    member = None
+    if ctx.message.mentions:
+        member = ctx.message.mentions[0]
+    elif args.strip():
+        try:
+            member = await commands.MemberConverter().convert(ctx, args.strip())
+        except Exception:
+            member = None
+
+    if member is None:
+        e = discord.Embed(
+            description="<:e_heart2:1519362668644012133> Koga voliš? Primjer: `.ljubav @korisnik`",
+            color=COLORS["love"]
+        )
+        return await ctx.send(embed=e, delete_after=8)
+
+    if member.id == ctx.author.id:
+        e = discord.Embed(
+            description="<:e_heart2:1519362668644012133> Samoljublje je divno, ali moraš tagovati drugu osobu! 💕",
+            color=COLORS["love"]
+        )
+        return await ctx.send(embed=e, delete_after=8)
+
+    ok, left = _fun_cooldown_ok(ctx.author.id, "ljubav")
+    if not ok:
+        e = discord.Embed(
+            description=f"<:e_time2:1519362726952964227> **Cooldown!** Čekaj još `{left:.1f}s`.",
+            color=COLORS["warning"]
+        )
+        e.set_footer(text=f"{BOT_NAME} • Anti-spam")
+        return await ctx.send(embed=e, delete_after=8)
+
+    import hashlib as _hl
+    ids_sorted = sorted([ctx.author.id, member.id])
+    seed_str = f"{ids_sorted[0]}{ids_sorted[1]}{datetime.now(timezone.utc).date()}"
+    pct = int(_hl.md5(seed_str.encode()).hexdigest(), 16) % 101
+    filled = min(pct // 10, 10)
+    bar = "<:e_rose:1519363697728815175>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
+
+    if pct < 20:
+        label = "Drugarstvo <:e_shake:1519362947766554737>"
+        emoji = "<:e_shake:1519362947766554737>"
+        color_key = "info"
+        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** su samo prijatelji. Za sada... 👀"
+    elif pct < 45:
+        label = "Simpatija <:e_sparkles:1519363032185176198>"
+        emoji = "<:e_sparkles:1519363032185176198>"
+        color_key = "success"
+        komentar = f"Između **{ctx.author.display_name}** i **{member.display_name}** ima iskrica! ✨ Ko će prvi potez?"
+    elif pct < 70:
+        label = "Zaljubljenost 💕"
+        emoji = "<:e_heart2:1519362668644012133>"
+        color_key = "warning"
+        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** — srca kucaju malo brže! 💓"
+    elif pct < 90:
+        label = "Velika ljubav 💖"
+        emoji = "<:e_rose:1519363697728815175>"
+        color_key = "love"
+        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** su match made in heaven! Slatko! 🌹"
+    else:
+        label = "SAVRŠENA LJUBAV 💍"
+        emoji = "<:e_ring:1519362941617438750>"
+        color_key = "love"
+        komentar = f"**{ctx.author.display_name}** ❤️ **{member.display_name}** = 100% ljubav! Bogu hvala! 💍👑"
+
+    e = discord.Embed(
+        title=f"゛🍹 Ljubavni Metar",
+        description=komentar,
+        color=COLORS[color_key],
+        timestamp=datetime.now(timezone.utc)
+    )
+    e.set_thumbnail(url=member.display_avatar.url)
+    e.add_field(name="<:e_rose:1519363697728815175> Ljubav", value=f"## {pct}%", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Status", value=f"**{label}**", inline=True)
+    e.add_field(name="<:e_chart:1519362656568475880> Skala", value=f"{bar}  `{pct}/100`", inline=False)
+    e.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
+    e.set_footer(text=f"{BOT_NAME} • Ljubavni Metar • {ctx.author.display_name} → {member.display_name}")
     await ctx.send(embed=e)
 
 @bot.command(name="sync")
@@ -3125,9 +3235,9 @@ NUKE_BAN_LIMIT = 3      # max banova/kickova/brisanja u prozoru
 nuke_tracker: dict = defaultdict(lambda: defaultdict(deque))
 
 # ── PAMETNI Anti-Raid (NE LOCKUJE server, samo kickuje sumnjive) ───
-RAID_WINDOW = 30            # sekundi (5+ joinova u 30s = raid lockdown 5 min)
-RAID_JOIN_LIMIT = 5         # 5+ NOVIH naloga u 30s = raid
-SUSPICIOUS_AGE_DAYS = 7     # nalozi mlađi od ovoliko dana = sumnjivi
+RAID_WINDOW = 20            # sekundi (10+ joinova u 20s = raid lockdown)
+RAID_JOIN_LIMIT = 10        # 10+ NOVIH naloga u 20s = raid (relaksirani prag)
+SUSPICIOUS_AGE_DAYS = 3     # nalozi mlađi od 3 dana = sumnjivi (manje agresivno)
 join_tracker: dict = defaultdict(deque)   # guild_id -> deque[(timestamp, member_id, account_age_days)]
 raid_mode: dict = {}        # guild_id -> until_timestamp (period gdje se sumnjivi auto-kickaju)
 
@@ -5602,7 +5712,7 @@ async def social_cmd(i: discord.Interaction, target: discord.Member, action: str
     await i.response.defer()
     gif = await get_gif(action)
     opis = txt.replace("{from}", i.user.mention).replace("{to}", target.mention)
-    embed_title = f"🍹 ゛*{title}*゛" if title else None
+    embed_title = f"゛🍹 {title}" if title else None
     e = discord.Embed(title=embed_title, description=opis, color=COLORS[color_key], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     if gif: e.set_image(url=gif)
@@ -5640,7 +5750,7 @@ async def srce(i: discord.Interaction, korisnik: discord.Member):
         "<:e_rose:1519363697728815175> {from} poklanja ruže {to}! Romantično! <:e_rose:1519363697728815175>",
         "<:e_heart2:1519362668644012133> {from} šalje ljubav {to}! Neka traje! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(title="🍹 ゛*Srce*゛", description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="゛🍹 Srce", description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -5653,7 +5763,7 @@ async def brak(i: discord.Interaction, korisnik: discord.Member):
         f"<:e_ring:1519362941617438750> {i.user.mention} klekne pred {korisnik.mention} i kaže: 'Hoćeš li biti moj/moja?' <:e_ring:1519362941617438750>",
         f"<:e_rose:1519363697728815175> {i.user.mention} donosi ruže i prsten {korisnik.mention}! Romantika! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(title="🍹 ゛*Brak*゛", description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="゛🍹 Brak", description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -5673,7 +5783,7 @@ async def fun_cooldown(i: discord.Interaction, cmd: str) -> bool:
             ephemeral=True
         )
         return True
-    _fun_cd[key] = now + random.randint(5, 7)
+    _fun_cd[key] = now + 60
     return False
 
 POZZ_PORUKE = [
@@ -6070,6 +6180,9 @@ SAFE_DOMAINS = (
     "media1.giphy.com", "media2.giphy.com",
     "cdn.discordapp.com", "media.discordapp.net",
     "discord.com/channels",
+    # Discord embedded activities & voice apps — uvijek sigurni
+    "discord.com/activities", "discordactivities.com",
+    "discord.gg", "discord.com", "discordapp.com",
 )
 
 def _contains_nsfw_site(text: str) -> str | None:
