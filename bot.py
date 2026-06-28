@@ -2345,17 +2345,19 @@ async def on_ready():
         "gaming":    ["hunt","fish","zoo","battle","sell","animals","pray","wordle","wordle-stop","toplo-hladno","amogus","amogus-stop"],
         "comanda":   ["rank","aktivnost","leaderboard","spotify","ping","serverinfo","userinfo","avatar","invite","afk"],
     }
-    # ── Jednokratni cleanup: briše stare auto-postavljene per-cmd kanale (v3.1) ──
-    # Auto-setup je uklonjen jer je postavljao ograničenja bez znanja admina.
-    # Ova sekcija briše stare podatke samo jednom (flag "kk_autosetup_cleared").
+    # ── Jednokratni cleanup: briše sva kanal-ograničenja (v3.2) ──
+    # cmd_channels i cmd_per_channel se brišu jednom — admin ih može ponovo
+    # ručno postaviti komandama /kanal-komandi i /komanda-kanal.
     try:
         for guild in bot.guilds:
             gcfg = get_guild_config(guild.id)
-            if not gcfg.get("kk_autosetup_cleared"):
+            if not gcfg.get("kk_autosetup_v2_cleared"):
                 gcfg["cmd_per_channel"] = {}
+                gcfg["cmd_channels"] = []
                 gcfg["kk_autosetup_cleared"] = True
+                gcfg["kk_autosetup_v2_cleared"] = True
                 save_data()
-                print(f"  ✅ Cleanup: per-cmd kanali obrisani na '{guild.name}' (auto-setup uklonjen)")
+                print(f"  ✅ Cleanup v3.2: sva kanal-ograničenja obrisana na '{guild.name}'")
             else:
                 print(f"  ℹ️  Cleanup preskočen — već urađen na '{guild.name}'")
     except Exception as _as:
