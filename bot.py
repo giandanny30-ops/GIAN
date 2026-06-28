@@ -2349,7 +2349,7 @@ async def on_ready():
         for guild in bot.guilds:
             gcfg    = get_guild_config(guild.id)
             per_cmd = gcfg.get("cmd_per_channel", {})
-            if True:  # uvijek osvježi auto-setup pri pokretanju
+            if not per_cmd:  # samo ako nema postojeće konfiguracije (ne gazi ručno postavljeno)
                 import re as _re, unicodedata as _ud
                 def _strip(s):
                     # Normalizuj unicode italic/bold → ASCII (𝘤𝘢𝘴𝘪𝘯𝘰 → casino)
