@@ -2200,29 +2200,6 @@ async def on_member_join(member):
             return  # Kickovan, ne radi welcome
     except Exception as _e: print(f"[anti-raid] {_e}")
 
-    # ── <:e_fire2:1519362671491678280> VATRICE — novi član dobija 1 auto vatricu pri ulasku + ažurira nick ──
-    try:
-        cfg_vj = get_guild_config(member.guild.id)
-        vemoji = cfg_vj.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-        novi_v = _add_vatrica(member.guild.id, member.id, 1)
-        save_data()
-        # Nick se ne mijenja — vatrice sistem bez promjene nadimka
-        if vch_id := cfg_vj.get("vatrice_channel"):
-            if vch := member.guild.get_channel(vch_id):
-                vj_e = discord.Embed(
-                    description=(
-                        f"<:e_gift:1519362618341462067> {member.mention} dobio/la **1 {vemoji} vatricu** kao poklon dobrodošlice!\n"
-                        f"{vemoji} Ukupno: **{novi_v}**  ·  Još vatrica zarađuješ svakih **150 poruka!**"
-                    ),
-                    color=_LP,
-                    timestamp=datetime.now(timezone.utc)
-                )
-                vj_e.set_author(name=f"{member.display_name} se pridružio/la!", icon_url=member.display_avatar.url)
-                vj_e.set_footer(text=f"GIAN (Custom) • Vatrice sistem")
-                await vch.send(embed=vj_e)
-    except Exception as _e:
-        print(f"[vatrica-join] {_e}")
-
     # ── Invite Tracking ────────────────────────────────
     try:
         gkey = str(member.guild.id)
@@ -2810,40 +2787,27 @@ async def on_message(message):
     data.setdefault("msg_count_week", {})
     data["msg_count_week"][mkey] = data["msg_count_week"].get(mkey, 0) + 1
 
-    # ── <:e_fire2:1519362671491678280> VATRICE — auto +1 svakih 100 poruka (threshold-based, otporno na restart/upload) ────────
+    # ── XP / LEVEL — auto +100 XP + 1 LVL svakih 100 poruka ────────
     try:
-        VATRICA_PRAG = 100
+        PRAG = 100
         ukupno_msgs = data["msg_count"][mkey]
-        # threshold-based: koristimo "last_vatrica_msg" tracker u data["vatrice_threshold"]
         data.setdefault("vatrice_threshold", {})
         last_v_msg = int(data["vatrice_threshold"].get(mkey, 0))
-        # auto-init: ako je threshold 0 a već ima >150 poruka, postavi na najbliži milestone ispod
-        if last_v_msg == 0 and ukupno_msgs >= VATRICA_PRAG:
-            last_v_msg = (ukupno_msgs // VATRICA_PRAG) * VATRICA_PRAG
+        if last_v_msg == 0 and ukupno_msgs >= PRAG:
+            last_v_msg = (ukupno_msgs // PRAG) * PRAG
             data["vatrice_threshold"][mkey] = last_v_msg
-        # award svaku vatricu koja je dosegnuta od zadnjeg threshold-a (može biti više ako je preskočeno)
         awarded = 0
-        while ukupno_msgs - last_v_msg >= VATRICA_PRAG:
-            last_v_msg += VATRICA_PRAG
+        while ukupno_msgs - last_v_msg >= PRAG:
+            last_v_msg += PRAG
             awarded += 1
         if awarded > 0:
             data["vatrice_threshold"][mkey] = last_v_msg
             cfg_v = get_guild_config(message.guild.id)
-            vemoji = cfg_v.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-            novi_v = _add_vatrica(message.guild.id, message.author.id, awarded)
-
-            # ── XP / LEVEL — sve zaključano na 100 poruka ──
-            # Svakih 100 poruka = +1 vatrica + +1 LEVEL + +100 XP
             xp_d = get_xp(message.author.id)
             xp_d["level"] = xp_d.get("level", 1) + awarded
             xp_d["xp"]    = xp_d.get("xp", 0) + (awarded * 100)
             novi_lvl = xp_d["level"]
             save_data()
-
-            # Nick se ne mijenja — vatrice sistem bez promjene nadimka
-            try: await _post_vatrice_objava(message.guild, None, message.author, novi_v, vemoji)
-            except Exception: pass
-
             # ── Level-up notifikacija (uloge + embed) ──
             try:
                 lr = cfg_v.get("level_roles", {})
@@ -2867,8 +2831,7 @@ async def on_message(message):
                     color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
-                lv_em.add_field(name="<:e_bolt:1519362674717102160> XP", value=f"+100", inline=True)
-                lv_em.add_field(name=f"{vemoji} Vatrice", value=f"+{awarded}", inline=True)
+                lv_em.add_field(name="<:e_bolt:1519362674717102160> XP", value="+100", inline=True)
                 lv_em.set_thumbnail(url=message.author.display_avatar.url)
                 lv_em.set_footer(text=f"<:e_bolt:1519362674717102160> {BOT_NAME} • /rank za statistiku")
                 if lvl_ch.id == message.channel.id:
@@ -2877,7 +2840,7 @@ async def on_message(message):
                     await lvl_ch.send(content=message.author.mention, embed=lv_em)
             except Exception as _e:
                 print(f"[level-up] {_e}")
-    except Exception as _e: print(f"[vatrica-500] {_e}")
+    except Exception as _e: print(f"[xp-system] {_e}")
 
     await bot.process_commands(message)
 
@@ -2974,6 +2937,132 @@ async def birthday_check():
             e.set_footer(text=f"{BOT_NAME} • Rođendani")
             try: await chan.send(content=member.mention, embed=e)
             except: pass
+
+
+# ═══════════════════════════════════════════
+#    .iq — Random IQ score za člana
+#    .simp — Simp postotak prema nekome
+# ═══════════════════════════════════════════
+_FUN_CD: dict[str, float] = {}
+
+def _fun_cooldown_ok(uid: int, cmd: str, secs: int = 30) -> tuple[bool, float]:
+    import time
+    key = f"{cmd}:{uid}"
+    now = time.time()
+    last = _FUN_CD.get(key, 0)
+    left = secs - (now - last)
+    if left > 0:
+        return False, left
+    _FUN_CD[key] = now
+    return True, 0.0
+
+@bot.command(name="iq")
+async def iq_cmd(ctx, member: discord.Member = None):
+    target = member or ctx.author
+    ok, left = _fun_cooldown_ok(ctx.author.id, "iq")
+    if not ok:
+        e = discord.Embed(
+            description=f"<:e_time2:1519362726952964227> **Cooldown!** Čekaj još `{left:.1f}s` prije sljedeće komande.",
+            color=COLORS["warning"]
+        )
+        e.set_footer(text=f"{BOT_NAME} • Anti-spam")
+        return await ctx.send(embed=e, delete_after=8)
+
+    score = random.randint(50, 150)
+    # Vizuelni bar (10 blokova)
+    filled = min(int((score - 50) / 100 * 10), 10)
+    bar = "<:e_sun:1519362860218843399>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
+
+    if score < 70:
+        label, color_key = "Ispod prosjeka 😬", "error"
+        emoji = "<:e_skull:1519362992502997125>"
+    elif score < 90:
+        label, color_key = "Prosječan 🤔", "warning"
+        emoji = "<:e_bubble:1519363307998417148>"
+    elif score < 110:
+        label, color_key = "Normalan <:e_check2:1519362730057007268>", "info"
+        emoji = "<:e_sparkles:1519363032185176198>"
+    elif score < 130:
+        label, color_key = "Iznad prosjeka <:e_star2:1519363084253266031>", "success"
+        emoji = "<:e_trophy2:1519362624742232146>"
+    else:
+        label, color_key = "GENIJALAC <:e_diamond2:1519362640961474601>", "purple"
+        emoji = "<:e_crown2:1519363047163166922>"
+
+    e = discord.Embed(
+        title=f"{emoji} IQ Test — {target.display_name}",
+        color=COLORS[color_key],
+        timestamp=datetime.now(timezone.utc)
+    )
+    e.set_thumbnail(url=target.display_avatar.url)
+    e.add_field(name="<:e_search:1519363103064723547> IQ Rezultat", value=f"```fix
+{score} IQ
+```", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"```yaml
+{label}
+```", inline=True)
+    e.add_field(name="<:e_chart:1519362656568475880> Skala", value=f"{bar}  `{score}/150`", inline=False)
+    e.set_footer(text=f"{BOT_NAME} • IQ Kalkulator • Generisano nasumično")
+    await ctx.send(embed=e)
+
+@bot.command(name="simp")
+async def simp_cmd(ctx, member: discord.Member = None):
+    if member is None:
+        e = discord.Embed(
+            description="<:icon_cross:1519358379917836508> Moraš tagovati nekoga! Primjer: `.simp @korisnik`",
+            color=COLORS["error"]
+        )
+        return await ctx.send(embed=e, delete_after=8)
+
+    ok, left = _fun_cooldown_ok(ctx.author.id, "simp")
+    if not ok:
+        e = discord.Embed(
+            description=f"<:e_time2:1519362726952964227> **Cooldown!** Čekaj još `{left:.1f}s` prije sljedeće komande.",
+            color=COLORS["warning"]
+        )
+        e.set_footer(text=f"{BOT_NAME} • Anti-spam")
+        return await ctx.send(embed=e, delete_after=8)
+
+    pct = random.randint(0, 100)
+    filled = min(pct // 10, 10)
+    bar = "<:e_heart2:1519362668644012133>" * filled + "<:e_stop:1519363022399995914>" * (10 - filled)
+
+    if pct < 20:
+        label, color_key = "Hladan/na kao led <:e_moon:1519363445466595522>", "info"
+        emoji = "<:e_moon:1519363445466595522>"
+    elif pct < 50:
+        label, color_key = "Malo simpa 😏", "success"
+        emoji = "<:e_sparkles:1519363032185176198>"
+    elif pct < 75:
+        label, color_key = "Solidni simp 💘", "warning"
+        emoji = "<:e_heart2:1519362668644012133>"
+    elif pct < 95:
+        label, color_key = "Mega simp 😍", "pink" if "pink" in COLORS else "error"
+        emoji = "<:e_fire2:1519362671491678280>"
+    else:
+        label, color_key = "100% SIMP KING/QUEEN 👑", "error"
+        emoji = "<:e_crown2:1519363047163166922>"
+
+    e = discord.Embed(
+        title=f"{emoji} Simp Metar",
+        description=(
+            f"**{ctx.author.display_name}** je **{pct}%** simp za "
+            f"**{member.display_name}** {member.mention}"
+        ),
+        color=COLORS[color_key],
+        timestamp=datetime.now(timezone.utc)
+    )
+    e.set_thumbnail(url=ctx.author.display_avatar.url)
+    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value=f"```fix
+{pct}%
+```", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"```yaml
+{label}
+```", inline=True)
+    e.add_field(name="<:e_chart:1519362656568475880> Metar", value=f"{bar}  `{pct}/100`", inline=False)
+    e.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
+    e.set_footer(text=f"{BOT_NAME} • Simp Detektor • Generisano nasumično")
+    await ctx.send(embed=e)
 
 @bot.command(name="sync")
 @commands.has_permissions(administrator=True)
@@ -3792,7 +3881,6 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
     xp_d = get_xp(u.id)
     lvl  = int(xp_d.get("level", 1))
     xp   = int(xp_d.get("xp", 0))
-    vat  = _get_vatrice(gid, u.id) if gid else 0
 
     # Napredak do sljedećeg levela (svakih 100 poruka)
     do_sljedeceg = 100 - (msgs % 100) if msgs % 100 != 0 else 100
@@ -3815,8 +3903,7 @@ async def aktivnost(i: discord.Interaction, korisnik: discord.Member = None):
     e.add_field(name="<:e_trophy2:1519362624742232146> Level",    value=f"```fix\n<:e_star2:1519363084253266031> {lvl} <:e_star2:1519363084253266031>\n```", inline=True)
     e.add_field(name="<:e_star2:1519363084253266031> XP",       value=f"```py\n{xp:,}\n```",      inline=True)
     e.add_field(name="<:e_bubble:1519363307998417148> Poruke",   value=f"```css\n{msgs:,}\n```",   inline=True)
-    e.add_field(name="<:e_fire2:1519362671491678280> Vatrice",  value=f"```yaml\n{vat}\n```",     inline=True)
-    e.add_field(name="<:e_level2:1519362739749785610> Sistem",   value="```ini\n[100 poruka = 1 LVL + 1 vatrica + 100 XP]\n```", inline=False)
+    e.add_field(name="<:e_level2:1519362739749785610> Sistem",   value="```ini\n[100 poruka = 1 LVL + 100 XP]\n```", inline=False)
     e.set_footer(text=f"<:e_bolt:1519362674717102160> {BOT_NAME} • Aktivnost • Svakih 100 poruka novi level!")
     await i.response.send_message(embed=e)
 
@@ -5465,583 +5552,6 @@ async def amogus_stop(i: discord.Interaction):
     amogus_games.pop(i.channel.id, None)
     await i.response.send_message(embed=em("<:e_rocket2:1519363332266524813> Igra zaustavljena","Among Us igra je prekinuta.", color=COLORS["warning"]))
 
-# ═══════════════════════════════════════════
-#    <:e_cards2:1519362702835712010> POKER — Texas Hold'em za pravi novac
-# ═══════════════════════════════════════════
-
-_PK_RANKS  = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"]
-_PK_SUITS  = ["<:e_cards2:1519362702835712010>","<:e_heart2:1519362668644012133>","<:e_diamond2:1519362640961474601>","<:e_cards2:1519362702835712010>"]
-_PK_SE     = {"<:e_cards2:1519362702835712010>":"<:e_cards2:1519362702835712010>️","<:e_heart2:1519362668644012133>":"<:e_heart2:1519362668644012133>️","<:e_diamond2:1519362640961474601>":"<:e_diamond2:1519362640961474601>️","<:e_cards2:1519362702835712010>":"<:e_cards2:1519362702835712010>️"}
-_PK_RV     = {r: i+2 for i, r in enumerate(_PK_RANKS)}
-_PK_HNAMES = [
-    "Visoka karta","Par","Dva para","Tri iste","Strit",
-    "Flush","Full house","Četiri iste","Strit flush","Rojal flush"
-]
-
-def _pk_deck():
-    d = [(r, s) for s in _PK_SUITS for r in _PK_RANKS]
-    random.shuffle(d)
-    return d
-
-def _pk_card(c):
-    return f"`{c[0]}{_PK_SE[c[1]]}`"
-
-def _pk_cards(cards):
-    return " ".join(_pk_card(c) for c in cards) if cards else "`?` `?`"
-
-def _pk_hand_rank(five):
-    vals  = sorted([_PK_RV[c[0]] for c in five], reverse=True)
-    suits = [c[1] for c in five]
-    flush = len(set(suits)) == 1
-    straight = (vals == list(range(vals[0], vals[0]-5, -1)))
-    if not straight and sorted(vals) == [2, 3, 4, 5, 14]:
-        straight = True; vals = [5, 4, 3, 2, 1]
-    cnt = Counter(vals)
-    grp = sorted(cnt.items(), key=lambda x: (x[1], x[0]), reverse=True)
-    gc  = [g[1] for g in grp]
-    gv  = [g[0] for g in grp]
-    if flush and straight:
-        return (9 if vals[0] == 14 and vals[1] == 13 else 8, vals)
-    if gc[0] == 4:                return (7, gv)
-    if gc[:2] == [3, 2]:          return (6, gv)
-    if flush:                     return (5, vals)
-    if straight:                  return (4, vals)
-    if gc[0] == 3:                return (3, gv)
-    if gc[:2] == [2, 2]:          return (2, gv)
-    if gc[0] == 2:                return (1, gv)
-    return (0, vals)
-
-def _pk_best(hole, community):
-    all7 = hole + community
-    if len(all7) < 5:
-        return (_pk_hand_rank(all7), all7)
-    return max(((_pk_hand_rank(list(c)), list(c)) for c in _pk_comb(all7, 5)), key=lambda x: x[0])
-
-poker_games: dict = {}  # channel_id -> game dict
-
-def _pk_get_bal(guild_id, user_id):
-    mkey = f"{guild_id}:{user_id}"
-    return data["money"].get(mkey, data["economy"].get(str(user_id), {}).get("balance", 0))
-
-def _pk_set_bal(guild_id, user_id, amount):
-    data["money"][f"{guild_id}:{user_id}"] = max(0, int(amount))
-
-def _pk_lobby_embed(g):
-    plist = "\n".join(f"▸ **{p['name']}**" for p in g["players"].values()) or "_Niko još nije ušao_"
-    e = discord.Embed(
-        title="<:e_cards2:1519362702835712010> POKER — Texas Hold'em",
-        description=(
-            f"<:e_coins3:1519362621206298666> **Ulog po igraču:** `{g['ulog']:,} <:e_coins3:1519362621206298666>`\n"
-            f"<:e_trophy2:1519362624742232146> **Trenutni pot:** `{g['pot']:,} <:e_coins3:1519362621206298666>`\n"
-            f"<:e_users:1519363096601301120> **Igrači ({len(g['players'])}/9):**\n{plist}\n\n"
-            f"▸ Klikni **Ulazi u igru** da se pridružiš\n"
-            f"▸ Domaćin klika **Počni igru** kad je spreman\n"
-            f"▸ Igra automatski kreće za **60 sekundi**"
-        ),
-        color=_LP,
-        timestamp=datetime.now(timezone.utc)
-    )
-    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Poker • Min 2, Max 9 igrača")
-    return e
-
-def _pk_game_embed(g):
-    phase_titles = {
-        "preflop": "<:e_cards2:1519362702835712010> Pre-Flop — Kartice podijeljene",
-        "flop":    "<:e_dolphin:1519363432615510078> Flop — 3 zajedničke kartice",
-        "turn":    "<:e_refresh:1519362959187509461> Turn — 4. zajednička kartica",
-        "river":   "<:e_dolphin:1519363432615510078> River — 5. zajednička kartica",
-    }
-    community_str = _pk_cards(g["community"]) if g["community"] else "`?` `?` `?` `?` `?`"
-    active = [(uid, p) for uid, p in g["players"].items() if not p["folded"]]
-    folded = [(uid, p) for uid, p in g["players"].items() if p["folded"]]
-    act_str  = "\n".join(f"<:icon_check:1519358376268533810> **{p['name']}**" for _, p in active) or "_nema_"
-    fold_str = "\n".join(f"<:icon_cross:1519358379917836508> ~~{p['name']}~~" for _, p in folded)
-    needs = g.get("needs_action", set())
-    wait_str = "\n".join(f"<:e_time2:1519362726952964227> {g['players'][uid]['name']}" for uid in needs if uid in g["players"]) or "_Svi su djelovali_"
-    desc = (
-        f"<:e_cards2:1519362702835712010> **Zajedničke kartice:**\n{community_str}\n"
-        f"<:e_coins3:1519362621206298666> **Pot:** `{g['pot']:,} <:e_coins3:1519362621206298666>`\n"
-        f"<:e_users:1519363096601301120> **Aktivni:**\n{act_str}\n"
-    )
-    if fold_str:
-        desc += f"<:icon_cross:1519358379917836508> **Foldali:**\n{fold_str}\n"
-    desc += f"<:e_time2:1519362726952964227> **Čekamo potez:**\n{wait_str}"
-    e = discord.Embed(
-        title=phase_titles.get(g["phase"], "<:e_cards2:1519362702835712010> POKER"),
-        description=desc,
-        color=_LP,
-        timestamp=datetime.now(timezone.utc)
-    )
-    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Klikni 'Vidi kartice' za svoju ruku • Pot: {g['pot']:,} <:e_coins3:1519362621206298666>")
-    return e
-
-class PokerLobbyView(discord.ui.View):
-    def __init__(self, channel_id: int):
-        super().__init__(timeout=60)
-        self.channel_id = channel_id
-        self._started   = False
-
-    @discord.ui.button(label="Ulazi u igru <:e_cards2:1519362702835712010>", style=discord.ButtonStyle.success, row=0)
-    async def join_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] != "join":
-            return await interaction.response.send_message("<:icon_cross:1519358379917836508> Prijava je zatvorena.", ephemeral=True)
-        uid = interaction.user.id
-        if uid in g["players"]:
-            return await interaction.response.send_message("Već si u igri!", ephemeral=True)
-        if len(g["players"]) >= 9:
-            return await interaction.response.send_message("<:icon_cross:1519358379917836508> Igra je puna (max 9)!", ephemeral=True)
-        ulog = g["ulog"]
-        bal  = _pk_get_bal(g["guild_id"], uid)
-        if bal < ulog:
-            return await interaction.response.send_message(
-                f"<:icon_cross:1519358379917836508> Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins3:1519362621206298666>`, a imaš `{bal:,} <:e_coins3:1519362621206298666>`.", ephemeral=True)
-        _pk_set_bal(g["guild_id"], uid, bal - ulog)
-        save_data()
-        g["players"][uid] = {"name": interaction.user.display_name, "hole": [], "folded": False}
-        g["pot"] += ulog
-        try:
-            await interaction.message.edit(embed=_pk_lobby_embed(g))
-        except Exception:
-            pass
-        await interaction.response.send_message(
-            f"<:icon_check:1519358376268533810> Ušao/la si u igru! Skinuto `{ulog:,} <:e_coins3:1519362621206298666>`. Pot: `{g['pot']:,} <:e_coins3:1519362621206298666>`", ephemeral=True)
-
-    @discord.ui.button(label="Počni igru <:e_right:1519363367712591922>️", style=discord.ButtonStyle.primary, row=0)
-    async def start_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g:
-            return await interaction.response.send_message("Nema aktivne igre.", ephemeral=True)
-        if interaction.user.id != g["host_id"] and interaction.user.id not in OWNER_IDS:
-            return await interaction.response.send_message("<:icon_cross:1519358379917836508> Samo domaćin može pokrenuti igru!", ephemeral=True)
-        if len(g["players"]) < 2:
-            return await interaction.response.send_message("<:icon_cross:1519358379917836508> Trebaju minimalno **2 igrača**!", ephemeral=True)
-        if self._started:
-            return await interaction.response.send_message("Igra već počinje...", ephemeral=True)
-        self._started = True
-        await interaction.response.defer()
-        await _pk_begin(self.channel_id)
-
-    async def on_timeout(self):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] != "join":
-            return
-        if len(g["players"]) >= 2:
-            await _pk_begin(self.channel_id)
-        else:
-            for uid in g["players"]:
-                _pk_set_bal(g["guild_id"], uid, _pk_get_bal(g["guild_id"], uid) + g["ulog"])
-            save_data()
-            del poker_games[self.channel_id]
-            ch = bot.get_channel(self.channel_id)
-            if ch:
-                try:
-                    msg = g.get("msg")
-                    if msg:
-                        await msg.edit(embed=discord.Embed(
-                            title="<:icon_cross:1519358379917836508> Poker otkazan",
-                            description="Nema dovoljno igrača (min 2). Ulozi vraćeni.",
-                            color=COLORS["error"]
-                        ), view=None)
-                except Exception:
-                    pass
-
-class PokerRaiseModal(discord.ui.Modal, title="<:e_coins3:1519362621206298666> Raise / Podigni ulog"):
-    iznos = discord.ui.TextInput(label="Koliko podižeš (<:e_coins3:1519362621206298666>)?", placeholder="npr. 100", max_length=10)
-
-    def __init__(self, channel_id: int):
-        super().__init__()
-        self.channel_id = channel_id
-
-    async def on_submit(self, interaction: discord.Interaction):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] in ("join", "showdown"):
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Igra nije aktivna!", color=COLORS["error"]), ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"] or g["players"][uid]["folded"]:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nisi u igri ili si foldo!", color=COLORS["error"]), ephemeral=True)
-        if uid not in g.get("needs_action", set()):
-            return await interaction.response.send_message(
-                embed=em("<:e_time2:1519362726952964227>","Već si djelovao/la!", color=COLORS["warning"]), ephemeral=True)
-        try:
-            amt = int(self.iznos.value.strip())
-        except Exception:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Mora biti broj!", color=COLORS["error"]), ephemeral=True)
-        if amt < 10:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Min raise je `10 <:e_coins3:1519362621206298666>`!", color=COLORS["error"]), ephemeral=True)
-        bal = _pk_get_bal(g["guild_id"], uid)
-        if bal < amt:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nemaš dovoljno!", f"Imaš `{bal:,} <:e_coins3:1519362621206298666>`, treba `{amt:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]),
-                ephemeral=True)
-        _pk_set_bal(g["guild_id"], uid, bal - amt)
-        g["pot"] += amt
-        save_data()
-        # Resetuj needs_action: svi ostali aktivni MORAJU reagovati
-        active = [u for u, p in g["players"].items() if not p["folded"] and u != uid]
-        g["needs_action"] = set(active)
-        await interaction.response.send_message(
-            embed=em("<:e_coins3:1519362621206298666> Raise!", f"Podigao/la si **`{amt:,} <:e_coins3:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Novi pot: **`{g['pot']:,} <:e_coins3:1519362621206298666>`**\n<:e_time2:1519362726952964227> Ostali igrači moraju reagovati.",
-                     color=COLORS.get("gold", 0xFFD700)),
-            ephemeral=False
-        )
-        # Update embed
-        try:
-            msg = g.get("msg")
-            if msg:
-                await msg.edit(embed=_pk_game_embed(g), view=PokerActionView(self.channel_id))
-        except Exception:
-            pass
-
-class PokerActionView(discord.ui.View):
-    def __init__(self, channel_id: int):
-        super().__init__(timeout=120)
-        self.channel_id = channel_id
-
-    @discord.ui.button(label="<:e_cards2:1519362702835712010> Vidi kartice", style=discord.ButtonStyle.secondary, row=0)
-    async def see_cards(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g:
-            return await interaction.response.send_message("Nema aktivne igre.", ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"]:
-            return await interaction.response.send_message("Nisi u ovoj igri!", ephemeral=True)
-        p      = g["players"][uid]
-        hole   = p["hole"]
-        status = "<:icon_cross:1519358379917836508> **FOLDO si**" if p["folded"] else "<:icon_check:1519358376268533810> **Aktivno igraš**"
-        community = g.get("community", [])
-        if community and len(hole) == 2:
-            rank_t, best5 = _pk_best(hole, community)
-            best_str = f"\n<:e_trophy2:1519362624742232146> Tvoja trenutna ruka: **{_PK_HNAMES[rank_t[0]]}**\n→ {_pk_cards(best5)}"
-        else:
-            best_str = ""
-        await interaction.response.send_message(
-            f"<:e_cards2:1519362702835712010> **Tvoje kartice:** {_pk_cards(hole)}\n{status}{best_str}", ephemeral=True)
-
-    @discord.ui.button(label="<:icon_check:1519358376268533810> Prati", style=discord.ButtonStyle.success, row=1)
-    async def check_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g:
-            return await interaction.response.send_message("Nema igre.", ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"]:
-            return await interaction.response.send_message("Nisi u igri!", ephemeral=True)
-        if g["players"][uid]["folded"]:
-            return await interaction.response.send_message("Već si foldo!", ephemeral=True)
-        if uid not in g.get("needs_action", set()):
-            return await interaction.response.send_message("Već si djelovao/la u ovoj rundi.", ephemeral=True)
-        g["needs_action"].discard(uid)
-        await interaction.response.send_message(
-            embed=em("<:icon_check:1519358376268533810> Pratiš!", "Tvoja akcija je registrovana.", color=COLORS["success"]),
-            ephemeral=True
-        )
-        await _pk_check_advance(self.channel_id)
-
-    @discord.ui.button(label="<:icon_cross:1519358379917836508> Fold", style=discord.ButtonStyle.danger, row=1)
-    async def fold_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g:
-            return await interaction.response.send_message("Nema igre.", ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"]:
-            return await interaction.response.send_message("Nisi u igri!", ephemeral=True)
-        if g["players"][uid]["folded"]:
-            return await interaction.response.send_message("Već si foldo!", ephemeral=True)
-        if uid not in g.get("needs_action", set()):
-            return await interaction.response.send_message("Već si djelovao/la u ovoj rundi.", ephemeral=True)
-        g["players"][uid]["folded"] = True
-        g["needs_action"].discard(uid)
-        active_left = [u for u, p in g["players"].items() if not p["folded"]]
-        await interaction.response.send_message(
-            f"<:icon_cross:1519358379917836508> Foldo/la si! Ostalo **{len(active_left)}** aktivnih igrača.", ephemeral=True)
-        await _pk_check_advance(self.channel_id)
-
-    @discord.ui.button(label="<:e_coins3:1519362621206298666> Raise", style=discord.ButtonStyle.primary, row=1)
-    async def raise_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] in ("join", "showdown"):
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Igra nije aktivna!", color=COLORS["error"]), ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"] or g["players"][uid]["folded"]:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nisi u igri ili si foldo!", color=COLORS["error"]), ephemeral=True)
-        if uid not in g.get("needs_action", set()):
-            return await interaction.response.send_message(
-                embed=em("<:e_time2:1519362726952964227>","Već si djelovao/la!", color=COLORS["warning"]), ephemeral=True)
-        await interaction.response.send_modal(PokerRaiseModal(self.channel_id))
-
-    @discord.ui.button(label="<:e_fire2:1519362671491678280> ALL-IN", style=discord.ButtonStyle.danger, row=2)
-    async def allin_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] in ("join", "showdown"):
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Igra nije aktivna!", color=COLORS["error"]), ephemeral=True)
-        uid = interaction.user.id
-        if uid not in g["players"] or g["players"][uid]["folded"]:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nisi u igri ili si foldo!", color=COLORS["error"]), ephemeral=True)
-        if uid not in g.get("needs_action", set()):
-            return await interaction.response.send_message(
-                embed=em("<:e_time2:1519362726952964227>","Već si djelovao/la!", color=COLORS["warning"]), ephemeral=True)
-        bal = _pk_get_bal(g["guild_id"], uid)
-        if bal <= 0:
-            return await interaction.response.send_message(
-                embed=em("<:icon_cross:1519358379917836508>","Nemaš novca za all-in!", color=COLORS["error"]), ephemeral=True)
-        _pk_set_bal(g["guild_id"], uid, 0)
-        g["pot"] += bal
-        save_data()
-        active = [u for u, p in g["players"].items() if not p["folded"] and u != uid]
-        g["needs_action"] = set(active)
-        await interaction.response.send_message(
-            embed=em("<:e_fire2:1519362671491678280> ALL-IN!", f"**{interaction.user.display_name}** ide ALL-IN sa **`{bal:,} <:e_coins3:1519362621206298666>`**!\n<:e_trophy2:1519362624742232146> Pot: **`{g['pot']:,} <:e_coins3:1519362621206298666>`**",
-                     color=COLORS["error"]),
-            ephemeral=False
-        )
-        try:
-            msg = g.get("msg")
-            if msg:
-                await msg.edit(embed=_pk_game_embed(g), view=PokerActionView(self.channel_id))
-        except Exception:
-            pass
-
-    async def on_timeout(self):
-        g = poker_games.get(self.channel_id)
-        if not g or g["phase"] in ("join", "showdown"):
-            return
-        for uid in list(g.get("needs_action", set())):
-            if uid in g["players"] and not g["players"][uid]["folded"]:
-                g["players"][uid]["folded"] = True
-        g["needs_action"] = set()
-        await _pk_check_advance(self.channel_id)
-
-async def _pk_begin(channel_id: int):
-    g = poker_games.get(channel_id)
-    if not g:
-        return
-    g["phase"]     = "preflop"
-    deck           = _pk_deck()
-    g["deck"]      = deck
-    g["community"] = []
-    for uid in g["players"]:
-        g["players"][uid]["hole"]   = [deck.pop(), deck.pop()]
-        g["players"][uid]["folded"] = False
-    g["needs_action"] = set(g["players"].keys())
-    ch = bot.get_channel(channel_id)
-    if not ch:
-        return
-    e    = _pk_game_embed(g)
-    view = PokerActionView(channel_id)
-    try:
-        msg = g.get("msg")
-        if msg:
-            await msg.edit(embed=e, view=view)
-        else:
-            msg = await ch.send(embed=e, view=view)
-            g["msg"] = msg
-    except Exception:
-        msg = await ch.send(embed=e, view=view)
-        g["msg"] = msg
-    await ch.send(
-        "<:e_cards2:1519362702835712010> **Kartice su podijeljene!**\n"
-        "▸ Klikni **Vidi kartice** da vidiš svoju ruku (samo ti vidiš)\n"
-        "▸ Klikni **Prati** da ostaneš u igri ili **Fold** da odustaneš."
-    )
-
-async def _pk_check_advance(channel_id: int):
-    g = poker_games.get(channel_id)
-    if not g:
-        return
-    active = [uid for uid, p in g["players"].items() if not p["folded"]]
-    if len(active) <= 1:
-        await _pk_end_game(channel_id, active)
-        return
-    if not g.get("needs_action"):
-        await _pk_next_phase(channel_id)
-
-async def _pk_next_phase(channel_id: int):
-    g = poker_games.get(channel_id)
-    if not g:
-        return
-    ch = bot.get_channel(channel_id)
-    if not ch:
-        return
-    active = [uid for uid, p in g["players"].items() if not p["folded"]]
-    phase  = g["phase"]
-    if phase == "preflop":
-        g["community"] = [g["deck"].pop(), g["deck"].pop(), g["deck"].pop()]
-        g["phase"]     = "flop"
-        ann_title = "<:e_dolphin:1519363432615510078> FLOP"
-        ann_desc  = f"Zajedničke kartice:\n{_pk_cards(g['community'])}"
-        ann_color = COLORS["info"]
-    elif phase == "flop":
-        g["community"].append(g["deck"].pop())
-        g["phase"] = "turn"
-        ann_title = "<:e_refresh:1519362959187509461> TURN"
-        ann_desc  = f"Kartice:\n{_pk_cards(g['community'])}"
-        ann_color = COLORS["purple"]
-    elif phase == "turn":
-        g["community"].append(g["deck"].pop())
-        g["phase"] = "river"
-        ann_title = "<:e_dolphin:1519363432615510078> RIVER"
-        ann_desc  = f"Kartice:\n{_pk_cards(g['community'])}"
-        ann_color = COLORS["gold"]
-    elif phase == "river":
-        await _pk_showdown(channel_id)
-        return
-    else:
-        return
-    g["needs_action"] = set(active)
-    e    = _pk_game_embed(g)
-    view = PokerActionView(channel_id)
-    try:
-        msg = g.get("msg")
-        if msg:
-            await msg.edit(embed=e, view=view)
-    except Exception:
-        pass
-    await ch.send(embed=em(ann_title, ann_desc, color=ann_color))
-
-async def _pk_showdown(channel_id: int):
-    g = poker_games.get(channel_id)
-    if not g:
-        return
-    g["phase"] = "showdown"
-    ch = bot.get_channel(channel_id)
-    if not ch:
-        return
-    active = [(uid, p) for uid, p in g["players"].items() if not p["folded"]]
-    if not active:
-        del poker_games[channel_id]
-        return
-    if len(active) == 1:
-        await _pk_end_game(channel_id, [active[0][0]])
-        return
-    community = g["community"]
-    results   = []
-    for uid, p in active:
-        rank_t, best5 = _pk_best(p["hole"], community)
-        results.append((uid, p["name"], rank_t, best5, p["hole"]))
-    results.sort(key=lambda x: x[2], reverse=True)
-    best_rank  = results[0][2]
-    winners    = [r for r in results if r[2] == best_rank]
-    winner_ids = [r[0] for r in winners]
-    pot        = g["pot"]
-    split      = pot // len(winners)
-    lines = []
-    for uid, name, rank_t, best5, hole in results:
-        crown = "<:e_trophy2:1519362624742232146>" if uid in winner_ids else "  "
-        lines.append(
-            f"{crown} **{name}**\n"
-            f"   Ruka: {_pk_cards(hole)}\n"
-            f"   → **{_PK_HNAMES[rank_t[0]]}** | {_pk_cards(best5)}"
-        )
-    winner_str = " & ".join(r[1] for r in winners)
-    tie_note   = " *(Split pot)*" if len(winners) > 1 else ""
-    e = discord.Embed(
-        title="<:e_trophy2:1519362624742232146> SHOWDOWN — Poker",
-        description=(
-            f"<:e_cards2:1519362702835712010> **Zajedničke kartice:**\n{_pk_cards(community)}\n"
-            + "\n\n".join(lines) +
-            f"\n<:e_trophy2:1519362624742232146> **Pobjednik:** {winner_str}{tie_note}\n"
-            f"<:e_coins3:1519362621206298666> **Dobitak:** `{split:,} <:e_coins3:1519362621206298666>` po pobjedniku"
-        ),
-        color=COLORS.get("gold", 0xFFD700),
-        timestamp=datetime.now(timezone.utc)
-    )
-    e.set_footer(text=f"<:e_cards2:1519362702835712010> {BOT_NAME} • Poker završen • Ukupni pot: {pot:,} <:e_coins3:1519362621206298666>")
-    try:
-        msg = g.get("msg")
-        if msg:
-            await msg.edit(embed=e, view=None)
-        else:
-            await ch.send(embed=e)
-    except Exception:
-        await ch.send(embed=e)
-    await _pk_end_game(channel_id, winner_ids, skip_embed=True)
-
-async def _pk_end_game(channel_id: int, winner_ids: list, skip_embed: bool = False):
-    g = poker_games.get(channel_id)
-    if not g:
-        return
-    pot      = g["pot"]
-    guild_id = g["guild_id"]
-    ch       = bot.get_channel(channel_id)
-    if winner_ids:
-        split     = pot // len(winner_ids)
-        remainder = pot % len(winner_ids)
-        for idx, uid in enumerate(winner_ids):
-            amt = split + (remainder if idx == 0 else 0)
-            _pk_set_bal(guild_id, uid, _pk_get_bal(guild_id, uid) + amt)
-        save_data()
-        if not skip_embed and ch:
-            name = g["players"].get(winner_ids[0], {}).get("name", "Pobjednik")
-            e = discord.Embed(
-                title="<:e_trophy2:1519362624742232146> Poker — Pobjednik!",
-                description=(
-                    f"<:e_trophy2:1519362624742232146> **{name}** pobijedio/la jer su svi ostali foldali!\n"
-                    f"<:e_coins3:1519362621206298666> **Dobitak:** `{pot:,} <:e_coins3:1519362621206298666>`"
-                ),
-                color=COLORS.get("gold", 0xFFD700),
-                timestamp=datetime.now(timezone.utc)
-            )
-            try:
-                msg = g.get("msg")
-                if msg:
-                    await msg.edit(embed=e, view=None)
-                else:
-                    await ch.send(embed=e)
-            except Exception:
-                await ch.send(embed=e)
-    poker_games.pop(channel_id, None)
-
-@bot.tree.command(name="poker", description="🃏 Pokreni Texas Hold'em Poker za pravi novac (2–9 igrača)")
-@app_commands.describe(ulog="Iznos uloga po igraču u <:e_coins3:1519362621206298666> (default: 200, min: 50, max: 50000)")
-async def poker_cmd(i: discord.Interaction, ulog: int = 200):
-    ok, left = _check_game_cooldown(i.user, i.guild_id, "poker")
-    if not ok:
-        return await _send_cooldown_msg(i, "poker", left)
-    if poker_games.get(i.channel_id):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", "Poker igra je već aktivna u ovom kanalu!", color=COLORS["error"]), ephemeral=True)
-    if ulog < 50:
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", "Minimalni ulog je `50 <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
-    if ulog > 50000:
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", "Maksimalni ulog je `50,000 <:e_coins3:1519362621206298666>`.", color=COLORS["error"]), ephemeral=True)
-    uid = i.user.id
-    bal = _pk_get_bal(i.guild.id, uid)
-    if bal < ulog:
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508>", f"Nemaš dovoljno! Trebaš `{ulog:,} <:e_coins3:1519362621206298666>`, a imaš `{bal:,} <:e_coins3:1519362621206298666>`.", color=COLORS["error"]),
-            ephemeral=True)
-    _pk_set_bal(i.guild.id, uid, bal - ulog)
-    save_data()
-    _set_game_cooldown(i.user, i.guild_id, "poker")
-    g = {
-        "guild_id":    i.guild.id,
-        "channel_id":  i.channel_id,
-        "host_id":     uid,
-        "ulog":        ulog,
-        "pot":         ulog,
-        "phase":       "join",
-        "players":     {uid: {"name": i.user.display_name, "hole": [], "folded": False}},
-        "deck":        [],
-        "community":   [],
-        "needs_action": set(),
-        "msg":         None,
-    }
-    poker_games[i.channel_id] = g
-    view = PokerLobbyView(i.channel_id)
-    e    = _pk_lobby_embed(g)
-    await i.response.send_message(embed=e, view=view)
-    msg  = await i.original_response()
-    g["msg"] = msg
 
 # ═══════════════════════════════════════════
 #    LJUBAVNE / SOCIJALNE KOMANDE
@@ -7495,23 +7005,6 @@ async def novac_cmd(i: discord.Interaction, akcija: str, korisnik: discord.Membe
             ),
             color=COLORS["warning"], timestamp=datetime.now(timezone.utc)
         ).set_footer(text=f"<:e_moneywing:1519362955437805771> {BOT_NAME} • Owner Komanda"), ephemeral=True)
-
-# ═══════════════════════════════════════════
-#    POLL / GLASANJE
-# ═══════════════════════════════════════════
-@bot.tree.command(name="poll", description="📊 Napravi glasanje sa reakcijama")
-@app_commands.describe(pitanje="Pitanje", opcija1="1. opcija", opcija2="2. opcija", opcija3="3. opcija (opcionalno)", opcija4="4. opcija (opcionalno)")
-async def poll(i: discord.Interaction, pitanje: str, opcija1: str, opcija2: str, opcija3: str = None, opcija4: str = None):
-    opts   = [o for o in [opcija1, opcija2, opcija3, opcija4] if o]
-    emojis = ["1️⃣","2️⃣","3️⃣","4️⃣"]
-    desc   = "\n".join(f"{emojis[idx]}  **{opt}**" for idx, opt in enumerate(opts))
-    e = discord.Embed(title=f"<:e_chart:1519362656568475880> {pitanje}", description=desc, color=COLORS["info"], timestamp=datetime.now(timezone.utc))
-    e.set_footer(text=f"Glasaj sa emoji reakcijama • {BOT_NAME}")
-    e.set_author(name=i.user.display_name, icon_url=i.user.display_avatar.url)
-    await i.response.send_message(embed=e)
-    msg = await i.original_response()
-    for idx in range(len(opts)):
-        await msg.add_reaction(emojis[idx])
 
 # ═══════════════════════════════════════════
 #    TICKET SISTEM
@@ -9022,14 +8515,6 @@ async def heist_cmd(i: discord.Interaction):
         await i.followup.send(embed=em("<:e_taxi:1519363380513603615> UHVAĆENI!", f"Policija je sve pohvatala! Svako je izgubio 200 coina.", color=COLORS["error"]))
 
 # ─── <:e_phone:1519362788462559323> QR KOD ───
-@bot.tree.command(name="qr", description="📱 Generiši QR kod iz teksta ili URL-a")
-async def qr_cmd(i: discord.Interaction, tekst: str):
-    url = f"https://api.qrserver.com/v1/create-qr-code/?size=400x400&data={discord.utils.escape_markdown(tekst).replace(' ', '%20')}"
-    e = discord.Embed(title="<:e_phone:1519362788462559323> QR Kod", description=f"```{tekst[:200]}```", color=COLORS["info"])
-    e.set_image(url=url)
-    e.set_footer(text=f"{BOT_NAME} • QR Generator")
-    await i.response.send_message(embed=e)
-
 # ─── <:e_lock3:1519362717394403432> CONFESS (anonimno) ───
 # /confess uklonjeno (v2.1) — anonimnost se može zloupotrijebiti za uznemiravanje.
 
@@ -9046,401 +8531,6 @@ async def setchannel_cmd(i: discord.Interaction, tip: app_commands.Choice[str], 
         return await i.response.send_message("<:icon_cross:1519358379917836508> Samo admin.", ephemeral=True)
     get_guild_config(i.guild.id)[tip.value] = kanal.id; save_data()
     await i.response.send_message(embed=em("<:icon_check:1519358376268533810>", f"{tip.name.capitalize()} kanal: {kanal.mention}", color=COLORS["success"]), ephemeral=True)
-
-# ═══════════════════════════════════════════
-#    <:e_fire2:1519362671491678280> VATRICE — sistem vatrica (zamjena za /vanity)
-#    /vatrice ember — daj vatricu članu (embed, radi za sve članove)
-#    /vatrice pup    — top lista (pup = popularni)
-#    /vatrice oblik  — postavke (admin: emoji/oblik vatrice)
-# ═══════════════════════════════════════════
-def _vatrice_store():
-    if "vatrice" not in data: data["vatrice"] = {}
-    return data["vatrice"]
-
-def _vatrice_cd():
-    if "vatrice_cd" not in data: data["vatrice_cd"] = {}
-    return data["vatrice_cd"]
-
-def _get_vatrice(guild_id: int, user_id: int) -> int:
-    return int(_vatrice_store().get(f"{guild_id}:{user_id}", 0))
-
-def _add_vatrica(guild_id: int, user_id: int, n: int = 1) -> int:
-    store = _vatrice_store()
-    key = f"{guild_id}:{user_id}"
-    store[key] = int(store.get(key, 0)) + n
-    return store[key]
-
-vatrice_group = app_commands.Group(name="vatrice", description="🔥 Sistem vatrica — VLASNIK ONLY (daj, top, postavke)")
-
-def _vatrice_owner_only(i: discord.Interaction) -> bool:
-    return i.user.id in OWNER_IDS
-
-async def _update_vatrice_nick(member: discord.Member, count: int, emoji: str):
-    """Doda/ažurira sufix kraj nicka, npr. 'Marko <:e_fire2:1519362671491678280>3'. Skida postojeći sufix sa baš tim emoji-em."""
-    try:
-        base = member.display_name
-        # Ukloni stari sufix samo ako se završava sa konkretnim 'emoji + brojevi'
-        # (preciznije od starog \W+\d+$ koji je sjekao i obične nickove poput 'Marko!2024')
-        try:
-            base = re.sub(rf"\s*{re.escape(emoji)}\d+\s*$", "", base).strip() or member.name
-        except re.error:
-            base = member.name
-        novi_nick = f"{base} {emoji}{count}"[:32]
-        if member.nick != novi_nick:
-            await member.edit(nick=novi_nick, reason="Vatrice update")
-    except (discord.Forbidden, discord.HTTPException):
-        pass
-
-def _vatrice_rank(guild_id: int, user_id: int) -> tuple[int, int]:
-    """Vrati (mjesto, ukupno_korisnika) na vatrice top listi za server."""
-    store = _vatrice_store()
-    gprefix = f"{guild_id}:"
-    items = [(int(k.split(":")[1]), int(v)) for k, v in store.items() if k.startswith(gprefix) and int(v) > 0]
-    items.sort(key=lambda x: x[1], reverse=True)
-    for idx, (uid, _v) in enumerate(items, start=1):
-        if uid == user_id:
-            return idx, len(items)
-    return 0, len(items)
-
-async def _post_vatrice_objava(guild: discord.Guild, davalac: discord.Member | None, primalac: discord.Member, novi: int, emoji: str):
-    """Pošalji LIJEPU objavu u podešen kanal kad neko zaradi vatricu (stil sličan level-up porukama)."""
-    cfg = get_guild_config(guild.id)
-    cid = cfg.get("vatrice_channel")
-    if not cid: return
-    ch = guild.get_channel(int(cid))
-    if not ch: return
-
-    sep = "━━━━━━━━━━━━━━━━━━━━━━"
-    mjesto, ukupno = _vatrice_rank(guild.id, primalac.id)
-
-    # naslov sa malo "milestone" osjećaja
-    if novi == 1:
-        naslov = f"{emoji} ᴘʀᴠᴀ ᴠᴀᴛʀɪᴄᴀ! {emoji}"
-        cestit = f"<:e_party:1519363028334674070> Dobrodošao/la u vatreni klub, {primalac.mention}!"
-    elif novi % 10 == 0:
-        naslov = f"{emoji}{emoji}{emoji}  ᴍɪʟᴇsᴛᴏɴᴇ — {novi} ᴠᴀᴛʀɪᴄᴀ!  {emoji}{emoji}{emoji}"
-        cestit = f"<:e_fire2:1519362671491678280> Bravo {primalac.mention} — okrugla brojka **{novi}**!"
-    else:
-        naslov = f"{emoji} ɴᴏᴠᴀ ᴠᴀᴛʀɪᴄᴀ! {emoji}"
-        cestit = f"<:e_party:1519363028334674070> Čestitamo {primalac.mention}!"
-
-    if davalac:
-        izvor_line = f"<:e_gift:1519362618341462067> Vatricu poklonio: {davalac.mention}"
-    else:
-        izvor_line = f"<:e_bubble:1519363307998417148> Zarađeno aktivnošću u chatu (svakih 150 poruka)"
-
-    # progres bar do sljedeće vatrice po porukama (samo informativno za primaoca)
-    msg_key = f"{guild.id}:{primalac.id}"
-    msgs_total = data.get("msg_count", {}).get(msg_key, 0)
-    do_sljedece = 150 - (msgs_total % 150) if msgs_total > 0 else 150
-    progress = max(0, min(150, 150 - do_sljedece))
-    bar_full = "█" * (progress // 15)
-    bar_empty = "░" * (10 - len(bar_full))
-    bar = f"`{bar_full}{bar_empty}`"
-
-    # podij (top 3) za kontekst
-    store = _vatrice_store()
-    gprefix = f"{guild.id}:"
-    items = [(int(k.split(":")[1]), int(v)) for k, v in store.items() if k.startswith(gprefix) and int(v) > 0]
-    items.sort(key=lambda x: x[1], reverse=True)
-    medals = ["<:e_star2:1519363084253266031>", "<:icon_rank2:1519358512336212091>", "<:icon_rank3:1519358517633355919>"]
-    top_lines = []
-    for idx, (uid, cnt) in enumerate(items[:3]):
-        m = guild.get_member(uid)
-        ime = m.display_name if m else f"ID {uid}"
-        top_lines.append(f"{medals[idx]} **{ime}** — {emoji} {cnt}")
-    top_block = "\n".join(top_lines) if top_lines else "_još niko nema vatrica_"
-
-    rank_line = f"<:e_chart:1519362656568475880> Tvoje mjesto: **#{mjesto}** od **{ukupno}**" if mjesto else ""
-
-    desc = (
-        f"{sep}\n"
-        f"{cestit}\n"
-        f"Imaš sada **`{novi}`** {emoji}\n"
-        f"{sep}\n"
-        f"{izvor_line}\n"
-        f"{rank_line}\n"
-        f"\n**Do sljedeće vatrice:** {bar}  `{progress}/150`\n"
-        f"\n**<:e_trophy2:1519362624742232146> Trenutni podij:**\n{top_block}\n"
-        f"{sep}\n"
-        f"_Pogledaj kompletnu top listu sa_ `/vatrice pup`"
-    )
-
-    e = discord.Embed(
-        title=naslov,
-        description=desc,
-        color=_LP,
-        timestamp=datetime.now(timezone.utc),
-    )
-    e.set_thumbnail(url=primalac.display_avatar.url)
-    e.set_author(name=str(primalac), icon_url=primalac.display_avatar.url)
-    e.set_footer(text=f"<:e_fire2:1519362671491678280> {BOT_NAME} • Vatrice sistem")
-    try:
-        await ch.send(content=primalac.mention, embed=e)
-    except (discord.Forbidden, discord.HTTPException):
-        pass
-
-@vatrice_group.command(name="ember", description="[VLASNIK] Daj vatricu(e) članu — ažurira nick i šalje objavu")
-@app_commands.describe(korisnik="Kome daješ vatricu?", kolicina="Koliko vatrica dati (default 1, max 100)")
-async def vatrice_ember(i: discord.Interaction, korisnik: discord.Member, kolicina: int = 1):
-    if not _vatrice_owner_only(i):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik bota može davati vatrice.", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    if korisnik.bot:
-        return await i.response.send_message(
-            embed=em("<:e_fire2:1519362671491678280> Vatrice", "Botovima ne dajemo vatrice!", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    # <:e_chart:1519362656568475880> sigurno ograniči količinu
-    try:
-        kolicina = int(kolicina)
-    except Exception:
-        kolicina = 1
-    if kolicina < 1: kolicina = 1
-    if kolicina > 100: kolicina = 100
-    cfg = get_guild_config(i.guild.id)
-    emoji = cfg.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-    novi = _add_vatrica(i.guild.id, korisnik.id, kolicina)
-    save_data()
-    await _post_vatrice_objava(i.guild, i.user, korisnik, novi, emoji)
-    # <:e_chart:1519362656568475880> AKTIVNOST: napisane poruke + vatrice + level/XP
-    msg_key = f"{i.guild.id}:{korisnik.id}"
-    msgs_total = data.get("msg_count", {}).get(msg_key, 0)
-    msgs_week = data.get("msg_count_week", {}).get(msg_key, 0)
-    PRAG = 100
-    do_sljedece = PRAG - (msgs_total % PRAG) if msgs_total > 0 else PRAG
-    xp_info = get_xp(korisnik.id)
-    lvl = xp_info.get("level", 0)
-    xp_v = xp_info.get("xp", 0)
-    e = discord.Embed(
-        title=f"{emoji} Vatrice poslane!",
-        description=(
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"{i.user.mention} je dao **+{kolicina}** 🔥 {korisnik.mention}!\n\n"
-            f"🔥 Ukupno vatrica: **{novi}**\n"
-            f"<:e_label:1519363326109417613> Nick ažuriran: `{korisnik.display_name}` 🔥\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━"
-        ),
-        color=_LP, timestamp=datetime.now(timezone.utc),
-    )
-    e.add_field(name="<:e_bubble:1519363307998417148> Napisanih poruka (ukupno)", value=f"`{msgs_total:,}`", inline=True)
-    e.add_field(name="<:e_cal:1519362659676455046> Poruka ove sedmice", value=f"`{msgs_week:,}`", inline=True)
-    e.add_field(name=f"{emoji} Vatrice ukupno", value=f"`{novi}`", inline=True)
-    e.add_field(name="<:e_star2:1519363084253266031> Level", value=f"`{lvl}`", inline=True)
-    e.add_field(name="<:e_sparkles:1519363032185176198> XP", value=f"`{xp_v:,}`", inline=True)
-    e.add_field(name="🎯 Do sljedeće auto-vatrice", value=f"`{do_sljedece}` poruka", inline=True)
-    e.set_thumbnail(url=korisnik.display_avatar.url)
-    e.set_footer(text=f"{BOT_NAME} • /vatrice pup za top listu")
-    await i.response.send_message(embed=e)
-
-@vatrice_group.command(name="kanal", description="🔥 [VLASNIK] Postavi kanal za objave vatrica")
-@app_commands.describe(kanal="Kanal gdje će se slati objave kad neko dobije vatricu")
-async def vatrice_kanal(i: discord.Interaction, kanal: discord.TextChannel):
-    if not _vatrice_owner_only(i):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik može postaviti kanal.", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    cfg = get_guild_config(i.guild.id)
-    cfg["vatrice_channel"] = kanal.id
-    save_data()
-    await i.response.send_message(
-        embed=em("<:icon_check:1519358376268533810> Kanal postavljen", f"Objave vatrica će se slati u {kanal.mention}", color=COLORS["success"]),
-        ephemeral=True,
-    )
-
-@vatrice_group.command(name="pup", description="🔥 Top lista — najpopularniji članovi po vatricama")
-async def vatrice_pup(i: discord.Interaction):
-    store = _vatrice_store()
-    cfg = get_guild_config(i.guild.id)
-    emoji = cfg.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-    gprefix = f"{i.guild.id}:"
-    items = [(int(k.split(":")[1]), int(v)) for k, v in store.items() if k.startswith(gprefix) and int(v) > 0]
-    items.sort(key=lambda x: x[1], reverse=True)
-    if not items:
-        return await i.response.send_message(
-            embed=em(f"{emoji} Top vatrice", "Još niko nema vatrica! Pokreni `/vatrice ember @član`.", color=COLORS["warning"]),
-            ephemeral=True,
-        )
-    sep = "━━━━━━━━━━━━━━━━━━━━━━"
-    medals = ["<:e_star2:1519363084253266031>", "<:icon_rank2:1519358512336212091>", "<:icon_rank3:1519358517633355919>"]
-
-    # PODIJ (top 3) — istaknuto
-    podij_lines = []
-    for idx, (uid, cnt) in enumerate(items[:3]):
-        m = i.guild.get_member(uid)
-        ime = m.mention if m else f"`{uid}`"
-        podij_lines.append(f"{medals[idx]}  {ime}\n     └─ {emoji} **{cnt}** vatrica")
-    podij_block = "\n".join(podij_lines) if podij_lines else "_još niko nije na podiju_"
-
-    # Mjesta 4–10
-    ostali_lines = []
-    for idx, (uid, cnt) in enumerate(items[3:10], start=4):
-        m = i.guild.get_member(uid)
-        ime = m.mention if m else f"`{uid}`"
-        ostali_lines.append(f"`#{idx:>2}`  {ime} — {emoji} **{cnt}**")
-
-    # Moje mjesto
-    moja = _get_vatrice(i.guild.id, i.user.id)
-    moje_mjesto, ukupno = _vatrice_rank(i.guild.id, i.user.id)
-    moje_line = (
-        f"<:e_chart:1519362656568475880> Tvoje mjesto: **#{moje_mjesto}** od **{ukupno}**  •  {emoji} **{moja}**"
-        if moje_mjesto else f"<:e_chart:1519362656568475880> Još nemaš vatrica  •  {emoji} **0**"
-    )
-
-    desc = (
-        f"{sep}\n"
-        f"**<:e_trophy2:1519362624742232146> PODIJ NAJVATRENIJIH** {emoji}\n"
-        f"{sep}\n"
-        f"{podij_block}\n"
-    )
-    if ostali_lines:
-        desc += f"\n{sep}\n**Ostali u top 10:**\n" + "\n".join(ostali_lines) + f"\n{sep}\n"
-    else:
-        desc += f"{sep}\n"
-    desc += f"\n{moje_line}"
-
-    e = discord.Embed(
-        title=f"{emoji} ᴛᴏᴘ ᴠᴀᴛʀɪᴄᴇ — {i.guild.name} {emoji}",
-        description=desc,
-        color=_LP,
-        timestamp=datetime.now(timezone.utc),
-    )
-    if i.guild.icon:
-        e.set_thumbnail(url=i.guild.icon.url)
-    e.set_footer(text=f"<:e_fire2:1519362671491678280> {BOT_NAME} • Vatrice sistem  •  Vatricu zarađuješ svakih 150 poruka")
-    await i.response.send_message(embed=e)
-
-@vatrice_group.command(name="oblik", description="🔥 [VLASNIK] Postavi oblik (emoji) vatrice na serveru")
-@app_commands.describe(emoji="Emoji koji predstavlja vatricu (npr. <:e_fire2:1519362671491678280>, <:e_flask:1519363469013422181>️, <:e_sparkles:1519363032185176198>)")
-async def vatrice_oblik(i: discord.Interaction, emoji: str = None):
-    cfg = get_guild_config(i.guild.id)
-    if emoji is None:
-        cur = cfg.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-        return await i.response.send_message(
-            embed=em("<:e_fire2:1519362671491678280> Trenutni oblik vatrice", f"Trenutno: {cur}\n\nKoristi `/vatrice oblik emoji:<:e_fire2:1519362671491678280>` da promijeniš.", color=COLORS["info"]),
-            ephemeral=True,
-        )
-    if not _vatrice_owner_only(i):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik bota može mijenjati oblik vatrice.", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    novi = emoji.strip()[:8] or "<:e_fire2:1519362671491678280>"
-    cfg["vatrice_emoji"] = novi
-    save_data()
-    await i.response.send_message(
-        embed=em("<:icon_check:1519358376268533810> Oblik postavljen!", f"Novi oblik vatrice: {novi}", color=COLORS["success"]),
-        ephemeral=True,
-    )
-
-@vatrice_group.command(name="start", description="[VLASNIK] Aktiviraj početak — svi članovi dobiju po 1 vatricu + nick")
-async def vatrice_start(i: discord.Interaction):
-    if not _vatrice_owner_only(i):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik bota može pokrenuti početak vatrica.", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    await i.response.defer(ephemeral=False)
-    cfg = get_guild_config(i.guild.id)
-    emoji = cfg.get("vatrice_emoji", "<:e_fire2:1519362671491678280>")
-    store = _vatrice_store()
-    dodano = 0
-    nick_ok = 0
-    skipped_owner = 0
-    for m in i.guild.members:
-        if m.bot: continue
-        key = f"{i.guild.id}:{m.id}"
-        store[key] = 1  # RESET — start uvijek postavlja vatrice na 1 (ne akumulira)
-        dodano += 1
-        if m.id == i.guild.owner_id:
-            skipped_owner += 1
-            continue  # bot ne može mijenjati nick ownera servera
-        nick_ok += 1  # nick se ne mijenja
-        await asyncio.sleep(0.4)  # rate limit zaštita za nick edits
-    save_data()
-    e = discord.Embed(
-        title=f"🔥 Vatrice — START!",
-        description=(
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"<:e_party:1519363028334674070> **Sezona vatrica je započela!**\n\n"
-            f"Svi članovi servera **{i.guild.name}** resetovani su na **1 vatricu** 🔥\n"
-            f"<:e_users:1519363096601301120> Ukupno: **{dodano}** članova\n"
-            f"<:e_label:1519363326109417613> Nickovi ažurirani: **{nick_ok}**\n"
-            f"<:e_crown2:1519363047163166922> Owner servera (preskočen): **{skipped_owner}**\n\n"
-            f"<:e_clipboard:1519363052871614627> Sada članovi automatski dobijaju vatricu **svakih 150 poruka**.\n"
-            f"Vlasnik može i ručno dodijeliti sa `/vatrice ember @član`,\n"
-            f"a `/vatrice pup` prikazuje top listu.\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━"
-        ),
-        color=_LP, timestamp=datetime.now(timezone.utc),
-    )
-    if i.guild.icon:
-        e.set_thumbnail(url=i.guild.icon.url)
-    e.set_footer(text=f"{BOT_NAME} • Pokrenuo: {i.user.display_name}")
-    await i.followup.send(embed=e)
-
-@vatrice_group.command(name="resetnik", description="[VLASNIK] Ukloni vatrice sufiks iz svih nickova — vrati čista imena")
-async def vatrice_resetnik(i: discord.Interaction):
-    if not _vatrice_owner_only(i):
-        return await i.response.send_message(
-            embed=em("<:icon_cross:1519358379917836508> Samo vlasnik", "Samo vlasnik bota može resetovati nickove.", color=COLORS["error"]),
-            ephemeral=True,
-        )
-    await i.response.defer(ephemeral=False)
-    # Briše sufikse oblika:
-    #   " <:e_fire2:1519362671491678280>3"  — pun custom emoji + broj
-    #   " <:e_fire2:15193626714916782"       — odsjekano na 32 znaka (bez > i broja)
-    #   " 🔥3"                               — unicode emoji + broj
-    _vatrice_nick_re = re.compile(
-        r"\s*(?:"
-        r"<a?:[^:>]{1,50}:\d{0,20}>?\s*\d*"   # custom emoji (potpun ili odsjekano)
-        r"|"
-        r"[\U00002600-\U000027BF\U0001F300-\U0001FAFF\U00002702-\U000027B0]+"
-        r"\s*\d*"                               # unicode emoji + opcionalni broj
-        r")\s*$",
-        re.UNICODE,
-    )
-    total   = 0
-    changed = 0
-    errors  = 0
-    for m in i.guild.members:
-        if m.bot:
-            continue
-        total += 1
-        if m.id == i.guild.owner_id:
-            continue  # bot ne može mijenjati nick ownera servera
-        display = m.nick if m.nick else m.name
-        clean   = _vatrice_nick_re.sub("", display).strip() or m.name
-        # Ako je clean == username → nick na None (Discord default), inače postavi clean nick
-        target = None if clean == m.name else clean
-        if m.nick == target:
-            continue  # već čisto, nema promjene
-        try:
-            await m.edit(nick=target, reason="Vatrice resetnik — čišćenje sufiksa")
-            changed += 1
-        except (discord.Forbidden, discord.HTTPException):
-            errors += 1
-        await asyncio.sleep(1.1)  # rate limit zaštita (5 nick edits / 5s po serveru)
-    e = discord.Embed(
-        title="<:icon_check:1519358376268533810> Vatrice — Nickovi resetovani!",
-        description=(
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"<:e_users:1519363096601301120> Ukupno članova: **{total}**\n"
-            f"<:e_label:1519363326109417613> Nickovi očišćeni: **{changed}**\n"
-            f"<:icon_cross:1519358379917836508> Greške (nema permisije): **{errors}**\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"_Svi vatrice sufiksi su uklonjeni. Nick je vraćen na čisto ime._"
-        ),
-        color=_LP,
-        timestamp=datetime.now(timezone.utc),
-    )
-    e.set_footer(text=f"{BOT_NAME} • Pokrenuo: {i.user.display_name}")
-    await i.followup.send(embed=e)
-
-bot.tree.add_command(vatrice_group)
 
 # ═══════════════════════════════════════════
 #    🎯 AUTO BINGO — svakih 3h u chatu
