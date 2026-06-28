@@ -2234,15 +2234,20 @@ async def _kk_handler(message, args_text: str):
         }
         postavljeno = {}
         nije_nadjeno = []
-        guild_channels = {ch.name.lower(): ch for ch in message.guild.text_channels}
+        import re as _re2
+        def _strip2(s):
+            return _re2.sub(r'[^a-z0-9]', '', s.lower())
+        guild_ch_list = [(ch.name.lower(), ch) for ch in message.guild.text_channels]
 
         for naziv, komande in AUTO_MAP.items():
-            # Traži kanal koji sadrži naziv (npr. "casino" nađe "casino-commands" ili "casino")
-            nadjeni_kanal = None
-            for ch_name, ch in guild_channels.items():
-                if naziv in ch_name:
-                    nadjeni_kanal = ch
-                    break
+            key_s = _strip2(naziv)
+            # Tačan match (skinuti emoji/crtice): casino・🎰 → casino = casino ✅
+            nadjeni_kanal = next((ch for ime, ch in guild_ch_list if _strip2(ime) == key_s), None)
+            # Fallback: završava ključem, ali NE staff/mod/admin + ključ
+            if not nadjeni_kanal:
+                nadjeni_kanal = next((ch for ime, ch in guild_ch_list
+                    if _strip2(ime).endswith(key_s)
+                    and _strip2(ime) not in ("staff"+key_s, "mod"+key_s, "admin"+key_s)), None)
             if nadjeni_kanal:
                 for k in komande:
                     per_cmd[k] = nadjeni_kanal.id
@@ -2341,17 +2346,24 @@ async def on_ready():
         for guild in bot.guilds:
             gcfg    = get_guild_config(guild.id)
             per_cmd = gcfg.get("cmd_per_channel", {})
-            # Samo ako još nije postavljeno — ne gazi ručna podešavanja
-            if not per_cmd:
-                ch_map  = {ch.name.lower(): ch for ch in guild.text_channels}
+            if True:  # uvijek osvježi auto-setup pri pokretanju
+                import re as _re
+                def _strip(s):
+                    # Ukloni sve osim slova i brojeva, lowercase
+                    return _re.sub(r'[^a-z0-9]', '', s.lower())
+                ch_list = [(ch.name.lower(), ch) for ch in guild.text_channels]
                 postavljeno = 0
                 for naziv, komande in AUTO_MAP.items():
-                    # Tačno ime prvo, onda "počinje sa" — izbjegava staff-chat, mod-chat itd.
-                    nadjeni = (
-                        ch_map.get(naziv) or
-                        next((ch for ime, ch in ch_map.items() if ime.startswith(naziv + "-") or ime.startswith(naziv + "_")), None) or
-                        next((ch for ime, ch in ch_map.items() if ime == naziv), None)
-                    )
+                    key_s = _strip(naziv)
+                    # Tačan match: stripped ime kanala == ključ (staff-chat → staffchat ≠ chat)
+                    nadjeni = next((ch for ime, ch in ch_list if _strip(ime) == key_s), None)
+                    # Fallback: stripped ime ZAVRŠAVA ključem samo ako je dio cjeline (npr. bot-casino)
+                    if not nadjeni:
+                        nadjeni = next((ch for ime, ch in ch_list
+                                        if _strip(ime).endswith(key_s)
+                                        and _strip(ime) != "staff" + key_s
+                                        and _strip(ime) != "mod" + key_s
+                                        and _strip(ime) != "admin" + key_s), None)
                     if nadjeni:
                         for k in komande:
                             per_cmd[k] = nadjeni.id
