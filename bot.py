@@ -2762,7 +2762,7 @@ async def on_message(message):
                 add_xp(message.author.id, 200)
                 save_data()
                 win_e = discord.Embed(
-                    title=f"<:e_crown2:1519363047163166922>  **KALADONT — POBJEDA!**  {E_FIRE4}",
+                    title=f"<:e_crown2:1519363047163166922> ゛KALADONT — POBJEDA! {E_FIRE4}",
                     description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}  {message.author.mention} je izrekao/la magičnu riječ!  {E_FIRE3}{E_FIRE2}{E_FIRE1}",
                     color=_LP,
                     timestamp=datetime.now(timezone.utc)
@@ -3040,7 +3040,7 @@ async def iq_cmd(ctx, member: discord.Member = None):
         emoji = "<:e_crown2:1519363047163166922>"
 
     e = discord.Embed(
-        title=f"゛🍹 IQ Test — {target.display_name}",
+        title=f"🍹 ゛IQ Test — {target.display_name}",
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
     )
@@ -3097,30 +3097,30 @@ async def simp_cmd(ctx, *, args: str = ""):
         label = "Nema simpa <:e_moon:1519363445466595522>"
         color_key = "info"
         emoji = "<:e_moon:1519363445466595522>"
-        opis = f"**{ctx.author.display_name}** i ne gleda u stranu **{member.display_name}**-a/e. Hladno. 🥶"
+        opis = f"{ctx.author.mention} i ne gleda u stranu {member.mention}-a. Hladno. 🥶"
     elif pct < 35:
         label = "Malo simpa 😏"
         color_key = "success"
         emoji = "<:e_sparkles:1519363032185176198>"
-        opis = f"**{ctx.author.display_name}** bi možda lajkovao/la selfi **{member.display_name}**-a/e. Otprilike. 👀"
+        opis = f"{ctx.author.mention} bi možda lajkovao/la selfi {member.mention}-a. Otprilike. 👀"
     elif pct < 60:
         label = "Solidni simp 💘"
         color_key = "warning"
         emoji = "<:e_heart2:1519362668644012133>"
-        opis = f"**{ctx.author.display_name}** prati sve storije **{member.display_name}**-a/e. Bez komentara. 🫣"
+        opis = f"{ctx.author.mention} prati sve storije {member.mention}-a. Bez komentara. 🫣"
     elif pct < 85:
         label = "Mega simp 😍"
         color_key = "error"
         emoji = "<:e_fire2:1519362671491678280>"
-        opis = f"**{ctx.author.display_name}** bi napisao/la sonet o **{member.display_name}**-u/i. Svaki dan. 📝🔥"
+        opis = f"{ctx.author.mention} bi napisao/la sonet o {member.mention}. Svaki dan. 📝🔥"
     else:
         label = "100% SIMP KING/QUEEN 👑"
         color_key = "error"
         emoji = "<:e_crown2:1519363047163166922>"
-        opis = f"**{ctx.author.display_name}** JE LEGENDARNI SIMP za **{member.display_name}**-a/e. Nema spasa. 💀👑"
+        opis = f"{ctx.author.mention} JE LEGENDARNI SIMP za {member.mention}! Nema spasa. 💀👑"
 
     e = discord.Embed(
-        title=f"゛🍹 Simp Metar",
+        title=f"🍹 ゛Simp Metar",
         description=opis,
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
@@ -3180,30 +3180,30 @@ async def ljubav_cmd(ctx, *, args: str = ""):
         label = "Drugarstvo <:e_shake:1519362947766554737>"
         emoji = "<:e_shake:1519362947766554737>"
         color_key = "info"
-        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** su samo prijatelji. Za sada... 👀"
+        komentar = f"{ctx.author.mention} i {member.mention} su samo prijatelji. Za sada... 👀"
     elif pct < 45:
         label = "Simpatija <:e_sparkles:1519363032185176198>"
         emoji = "<:e_sparkles:1519363032185176198>"
         color_key = "success"
-        komentar = f"Između **{ctx.author.display_name}** i **{member.display_name}** ima iskrica! ✨ Ko će prvi potez?"
+        komentar = f"Između {ctx.author.mention} i {member.mention} ima iskrica! ✨ Ko će prvi potez?"
     elif pct < 70:
         label = "Zaljubljenost 💕"
         emoji = "<:e_heart2:1519362668644012133>"
         color_key = "warning"
-        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** — srca kucaju malo brže! 💓"
+        komentar = f"{ctx.author.mention} i {member.mention} — srca kucaju malo brže! 💓"
     elif pct < 90:
         label = "Velika ljubav 💖"
         emoji = "<:e_rose:1519363697728815175>"
         color_key = "love"
-        komentar = f"**{ctx.author.display_name}** i **{member.display_name}** su match made in heaven! Slatko! 🌹"
+        komentar = f"{ctx.author.mention} i {member.mention} su match made in heaven! Slatko! 🌹"
     else:
         label = "SAVRŠENA LJUBAV 💍"
         emoji = "<:e_ring:1519362941617438750>"
         color_key = "love"
-        komentar = f"**{ctx.author.display_name}** ❤️ **{member.display_name}** = 100% ljubav! Bogu hvala! 💍👑"
+        komentar = f"{ctx.author.mention} ❤️ {member.mention} = 100% ljubav! Bogu hvala! 💍👑"
 
     e = discord.Embed(
-        title=f"゛🍹 Ljubavni Metar",
+        title=f"🍹 ゛Ljubavni Metar",
         description=komentar,
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
@@ -4400,7 +4400,7 @@ def kaladont_start_embed(game: dict, mention: str):
     tezina_label = tezina_map.get(letters, f"**{letters} slova**")
     tezina_icon  = {1: "<:e_green:1519362769047126028>", 2: "<:e_green:1519362769047126028>", 3: "<:e_red:1519362782192210041>"}.get(letters, "<:e_gear:1519362652516782194>")
     e = discord.Embed(
-        title="📝  **KALADONT**",
+        title="📝 ゛KALADONT",
         description=(
             f"Igra je počela! Prva riječ:\n"
             f"## <:e_bubble:1519363307998417148>  **{word}**\n\n"
@@ -4430,7 +4430,7 @@ def kaladont_active_embed(game: dict):
     icon    = KALADONT_ICONS[(count - 1) % len(KALADONT_ICONS)]
     streak_fx = E_FIRE1 if count < 5 else (E_FIRE2 if count < 10 else (E_FIRE3 if count < 20 else E_FIRE4))
     e = discord.Embed(
-        title=f"{E_GAME}  **KALADONT**  {E_GAME}",
+        title=f"{E_GAME} ゛KALADONT",
         description=f"{E_FIRE1}{E_FIRE2}{E_FIRE3}{E_FIRE4}  **aktivna igra**  {E_FIRE4}{E_FIRE3}{E_FIRE2}{E_FIRE1}",
         color=KALADONT_COLOR,
         timestamp=datetime.now(timezone.utc)
@@ -5712,7 +5712,7 @@ async def social_cmd(i: discord.Interaction, target: discord.Member, action: str
     await i.response.defer()
     gif = await get_gif(action)
     opis = txt.replace("{from}", i.user.mention).replace("{to}", target.mention)
-    embed_title = f"゛🍹 {title}" if title else None
+    embed_title = f"🍹 ゛{title}" if title else None
     e = discord.Embed(title=embed_title, description=opis, color=COLORS[color_key], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     if gif: e.set_image(url=gif)
@@ -5750,7 +5750,7 @@ async def srce(i: discord.Interaction, korisnik: discord.Member):
         "<:e_rose:1519363697728815175> {from} poklanja ruže {to}! Romantično! <:e_rose:1519363697728815175>",
         "<:e_heart2:1519362668644012133> {from} šalje ljubav {to}! Neka traje! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(title="゛🍹 Srce", description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🍹 ゛Srce", description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -5763,7 +5763,7 @@ async def brak(i: discord.Interaction, korisnik: discord.Member):
         f"<:e_ring:1519362941617438750> {i.user.mention} klekne pred {korisnik.mention} i kaže: 'Hoćeš li biti moj/moja?' <:e_ring:1519362941617438750>",
         f"<:e_rose:1519363697728815175> {i.user.mention} donosi ruže i prsten {korisnik.mention}! Romantika! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(title="゛🍹 Brak", description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🍹 ゛Brak", description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -9339,7 +9339,8 @@ async def on_voice_state_update(member, before, after):
                 else:
                     raise
             await new_ch.set_permissions(member, manage_channels=True, move_members=True,
-                mute_members=True, deafen_members=True, connect=True, view_channel=True)
+                mute_members=True, deafen_members=True, connect=True, view_channel=True,
+                use_embedded_activities=True, stream=True, speak=True)
             data["private_voices"][str(new_ch.id)] = member.id
             save_data()
             await member.move_to(new_ch)
@@ -10217,7 +10218,8 @@ class VoiceCreateButton(discord.ui.View):
                 else:
                     raise
             await new_ch.set_permissions(member, manage_channels=True, move_members=True,
-                mute_members=True, deafen_members=True, connect=True, view_channel=True)
+                mute_members=True, deafen_members=True, connect=True, view_channel=True,
+                use_embedded_activities=True, stream=True, speak=True)
             data.setdefault("private_voices", {})[str(new_ch.id)] = member.id
             save_data()
             # Ako je već u nekom voice-u, prebaci ga
