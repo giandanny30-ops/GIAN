@@ -2234,10 +2234,13 @@ async def _kk_handler(message, args_text: str):
         }
         postavljeno = {}
         nije_nadjeno = []
-        import re as _re2
+        import re as _re2, unicodedata as _ud2
         def _strip2(s):
-            return _re2.sub(r'[^a-z0-9]', '', s.lower())
-        guild_ch_list = [(ch.name.lower(), ch) for ch in message.guild.text_channels]
+            # Normalizuj unicode italic/bold → ASCII (𝘤𝘢𝘴𝘪𝘯𝘰 → casino)
+            n = _ud2.normalize('NFKD', s.lower())
+            a = n.encode('ascii', 'ignore').decode('ascii')
+            return _re2.sub(r'[^a-z0-9]', '', a)
+        guild_ch_list = [(ch.name, ch) for ch in message.guild.text_channels]
 
         for naziv, komande in AUTO_MAP.items():
             key_s = _strip2(naziv)
@@ -2347,11 +2350,13 @@ async def on_ready():
             gcfg    = get_guild_config(guild.id)
             per_cmd = gcfg.get("cmd_per_channel", {})
             if True:  # uvijek osvježi auto-setup pri pokretanju
-                import re as _re
+                import re as _re, unicodedata as _ud
                 def _strip(s):
-                    # Ukloni sve osim slova i brojeva, lowercase
-                    return _re.sub(r'[^a-z0-9]', '', s.lower())
-                ch_list = [(ch.name.lower(), ch) for ch in guild.text_channels]
+                    # Normalizuj unicode italic/bold → ASCII (𝘤𝘢𝘴𝘪𝘯𝘰 → casino)
+                    n = _ud.normalize('NFKD', s.lower())
+                    a = n.encode('ascii', 'ignore').decode('ascii')
+                    return _re.sub(r'[^a-z0-9]', '', a)
+                ch_list = [(ch.name, ch) for ch in guild.text_channels]
                 postavljeno = 0
                 for naziv, komande in AUTO_MAP.items():
                     key_s = _strip(naziv)
