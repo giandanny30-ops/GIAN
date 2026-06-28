@@ -1262,6 +1262,10 @@ async def try_prefix_command(message):
     cmd_name = parts[0].lower()
     args_text = parts[1] if len(parts) > 1 else ""
     PREFIX_ALIASES = {"i": "invite", "inv": "invite", "h": "help", "p": "ping", "lb": "leaderboard", "np": "spotify", "sp": "spotify",  "tc": "topchatters", "top": "topchatters", "b": "bank", "lot": "lottery", "r": "remind", "qrcode": "qr"}
+    # ── .kk se obrađuje posebno (vlastiti handler) ──
+    if cmd_name == "kk":
+        await _kk_handler(message, args_text)
+        return True
     cmd_name = PREFIX_ALIASES.get(cmd_name, cmd_name)
     cmd = bot.tree.get_command(cmd_name, guild=message.guild) or bot.tree.get_command(cmd_name)
     if cmd is None: return False
@@ -2045,6 +2049,244 @@ async def _validate_app_emojis():
         print(f"  [emoji-check] Greška pri provjeri: {_e}")
 
 @bot.event
+
+# ═══════════════════════════════════════════
+#    .kk — Prefix verzija komanda-kanal sistema
+#    Radi odmah bez slash sync.
+#    .kk lista | .kk postavi <komanda> <#kanal> | .kk ukloni <komanda> | .kk resetuj
+# ═══════════════════════════════════════════
+
+class KKSelectView(discord.ui.View):
+    """Select menu — odaberi komandu za dodjelu kanalu."""
+    def __init__(self, author_id: int, action: str, kanal_id: int = None):
+        super().__init__(timeout=60)
+        self.author_id = author_id
+        self.action    = action   # "postavi" ili "ukloni"
+        self.kanal_id  = kanal_id
+
+        options = [
+            discord.SelectOption(label="slots",        emoji="🎰", description="Slot mašina → #casino"),
+            discord.SelectOption(label="blackjack",    emoji="🃏", description="Blackjack → #casino"),
+            discord.SelectOption(label="poker",        emoji="🂡", description="Poker → #casino"),
+            discord.SelectOption(label="kpm",          emoji="✂️", description="Kamen-Papir-Makaze → #casino"),
+            discord.SelectOption(label="kaladont",     emoji="🔤", description="Kaladont → #kaladont"),
+            discord.SelectOption(label="wordle",       emoji="🟩", description="Wordle → #gaming"),
+            discord.SelectOption(label="kviz",         emoji="❓", description="Kviz → #kviz"),
+            discord.SelectOption(label="geografija",   emoji="🌍", description="Geografija → #kviz"),
+            discord.SelectOption(label="vjasala",      emoji="🪢", description="Vješala → #vjesalo"),
+            discord.SelectOption(label="amogus",       emoji="📮", description="Among Us → #gaming"),
+            discord.SelectOption(label="toplo-hladno", emoji="🌡️", description="Toplo-Hladno → #gaming"),
+            discord.SelectOption(label="hunt",         emoji="🏹", description="Lov → #gaming"),
+            discord.SelectOption(label="fish",         emoji="🎣", description="Ribolov → #gaming"),
+            discord.SelectOption(label="zoo",          emoji="🦁", description="Zoo → #gaming"),
+            discord.SelectOption(label="battle",       emoji="⚔️", description="Battle → #gaming"),
+            discord.SelectOption(label="posao",        emoji="💼", description="Posao → #economics"),
+            discord.SelectOption(label="daily",        emoji="📅", description="Dnevna nagrada → #economics"),
+            discord.SelectOption(label="kradi",        emoji="🦹", description="Krađa → #economics"),
+            discord.SelectOption(label="baki",         emoji="💰", description="Balans → #economics"),
+            discord.SelectOption(label="daj",          emoji="💸", description="Pošalji pare → #economics"),
+            discord.SelectOption(label="lottery",      emoji="🎟️", description="Lutrija → #economics"),
+            discord.SelectOption(label="shop",         emoji="🛒", description="Shop → #economics"),
+            discord.SelectOption(label="ljubav",       emoji="❤️", description="Ljubav → #tinders"),
+            discord.SelectOption(label="brak",         emoji="💍", description="Brak → #tinders"),
+            discord.SelectOption(label="crush",        emoji="💗", description="Crush → #tinders"),
+        ]
+        self.add_item(self._make_select(options))
+
+    def _make_select(self, options):
+        sel = discord.ui.Select(
+            placeholder="Odaberi komandu...",
+            min_values=1, max_values=1,
+            options=options
+        )
+        sel.callback = self._on_select
+        return sel
+
+    async def interaction_check(self, i: discord.Interaction) -> bool:
+        if i.user.id != self.author_id:
+            await i.response.send_message("Ovo nije tvoj meni!", ephemeral=True)
+            return False
+        return True
+
+    async def _on_select(self, i: discord.Interaction):
+        komanda = i.data["values"][0]
+        gcfg    = get_guild_config(i.guild.id)
+        per_cmd = gcfg.get("cmd_per_channel", {})
+
+        if self.action == "postavi" and self.kanal_id:
+            per_cmd[komanda] = self.kanal_id
+            gcfg["cmd_per_channel"] = per_cmd
+            save_data()
+            await i.response.edit_message(
+                embed=em(f"{E_CHECK} Postavljeno",
+                         f"Komanda `{komanda}` → <#{self.kanal_id}>\n\nKoristi `.kk lista` za pregled svih.",
+                         color=COLORS["success"]),
+                view=None
+            )
+        elif self.action == "ukloni":
+            if komanda in per_cmd:
+                del per_cmd[komanda]
+                gcfg["cmd_per_channel"] = per_cmd
+                save_data()
+                await i.response.edit_message(
+                    embed=em(f"{E_CHECK} Uklonjeno",
+                             f"Komanda `{komanda}` sada radi svugdje.",
+                             color=COLORS["success"]),
+                    view=None
+                )
+            else:
+                await i.response.edit_message(
+                    embed=em(f"{E_WARN} Nije postavljeno",
+                             f"Komanda `{komanda}` nije imala ograničenje.",
+                             color=COLORS["warning"]),
+                    view=None
+                )
+
+async def _kk_handler(message, args_text: str):
+    """Obrađuje .kk komande."""
+    # Samo admini
+    is_admin = (
+        hasattr(message.author, "guild_permissions") and
+        (message.author.guild_permissions.administrator or
+         message.author.guild_permissions.manage_guild)
+    )
+    if not is_admin:
+        await message.channel.send(
+            embed=em(f"{E_LOCK} Samo admini", "Ova komanda je samo za admine servera.", color=COLORS["error"]),
+            delete_after=8
+        )
+        return
+
+    gcfg    = get_guild_config(message.guild.id)
+    per_cmd = gcfg.get("cmd_per_channel", {})
+    parts   = args_text.strip().split()
+    sub     = parts[0].lower() if parts else "lista"
+
+    # .kk lista
+    if sub == "lista":
+        if not per_cmd:
+            opis = "Nema per-komanda ograničenja.\n\nKoristi `.kk postavi #kanal` da dodijeliš komandi kanal."
+        else:
+            opis = "\n".join(f"• `{k}` → <#{v}>" for k, v in per_cmd.items())
+            opis += f"\n\n{E_WARN} Admini mogu koristiti komande svugdje."
+        await message.channel.send(embed=em(f"{E_SHIELD} Per-komanda kanali", opis, color=COLORS["info"]))
+
+    # .kk postavi #kanal → select menu
+    elif sub == "postavi":
+        kanal_id = None
+        for part in parts[1:]:
+            m = re.match(r"<#(\d+)>", part)
+            if m:
+                kanal_id = int(m.group(1))
+                break
+        if not kanal_id:
+            await message.channel.send(
+                embed=em(f"{E_WARN} Fali kanal",
+                         "Koristi: `.kk postavi #kanal`\nPrimjer: `.kk postavi #igraonica`",
+                         color=COLORS["warning"]),
+                delete_after=10
+            )
+            return
+        view = KKSelectView(author_id=message.author.id, action="postavi", kanal_id=kanal_id)
+        await message.channel.send(
+            embed=em(f"{E_GAME} Odaberi komandu",
+                     f"Koja komanda se koristi samo u <#{kanal_id}>?\nOdaberi iz menija ispod:",
+                     color=_LP),
+            view=view
+        )
+
+    # .kk ukloni → select menu
+    elif sub in ("ukloni", "ukloni"):
+        if not per_cmd:
+            await message.channel.send(
+                embed=em(f"{E_WARN} Ništa nije postavljeno", "Nema per-komanda ograničenja za uklanjanje.", color=COLORS["warning"]),
+                delete_after=8
+            )
+            return
+        view = KKSelectView(author_id=message.author.id, action="ukloni")
+        await message.channel.send(
+            embed=em(f"{E_WARN} Odaberi komandu za uklanjanje",
+                     "Koja komanda treba biti dostupna svugdje?\nOdaberi iz menija:",
+                     color=_LP),
+            view=view
+        )
+
+    # .kk resetuj
+    elif sub == "resetuj":
+        gcfg["cmd_per_channel"] = {}
+        save_data()
+        await message.channel.send(
+            embed=em(f"{E_CHECK} Resetovano", "Sva per-komanda ograničenja uklonjena.", color=COLORS["success"]),
+            delete_after=10
+        )
+
+    # .kk setup — automatski postavi kanale prema imenima kanala na serveru
+    elif sub == "setup":
+        # Mapa: dio naziva kanala → komande koje tu idu
+        AUTO_MAP = {
+            "tinders":   ["ljubav", "brak", "zagrljaj", "poljubac", "mazi", "tapsi", "high5", "cudan", "srce", "kompli", "fora", "muv", "crush"],
+            "chat":      ["iq", "simp", "meme", "8ball"],
+            "casino":    ["slots", "blackjack", "poker", "kpm"],
+            "kaladont":  ["kaladont", "kaladont-stop"],
+            "vjesalo":   ["vjasala"],
+            "kviz":      ["kviz", "geografija"],
+            "economics": ["posao", "daily", "kradi", "baki", "daj", "lottery", "shop", "kupi", "quests"],
+            "gaming":    ["hunt", "fish", "zoo", "battle", "sell", "animals", "pray", "wordle", "wordle-stop", "toplo-hladno", "amogus", "amogus-stop"],
+            "comanda":   ["rank", "aktivnost", "leaderboard", "spotify", "ping", "serverinfo", "userinfo", "avatar", "invite", "afk"],
+        }
+        postavljeno = {}
+        nije_nadjeno = []
+        guild_channels = {ch.name.lower(): ch for ch in message.guild.text_channels}
+
+        for naziv, komande in AUTO_MAP.items():
+            # Traži kanal koji sadrži naziv (npr. "casino" nađe "casino-commands" ili "casino")
+            nadjeni_kanal = None
+            for ch_name, ch in guild_channels.items():
+                if naziv in ch_name:
+                    nadjeni_kanal = ch
+                    break
+            if nadjeni_kanal:
+                for k in komande:
+                    per_cmd[k] = nadjeni_kanal.id
+                postavljeno[nadjeni_kanal] = komande
+            else:
+                nije_nadjeno.append(naziv)
+
+        gcfg["cmd_per_channel"] = per_cmd
+        save_data()
+
+        # Pravi embed sa rezultatima
+        if postavljeno:
+            lines = []
+            for ch, cmds in postavljeno.items():
+                cmd_str = "  ".join(f"`{c}`" for c in cmds)
+                lines.append(f"{ch.mention}\n> {cmd_str}")
+            opis = "\n\n".join(lines)
+        else:
+            opis = "Nije postavljeno ništa."
+
+        if nije_nadjeno:
+            opis += f"\n\n{E_WARN} Nisu nađeni kanali: " + ", ".join(f"`{n}`" for n in nije_nadjeno)
+
+        await message.channel.send(embed=em(
+            f"{E_CHECK} Auto-setup završen",
+            opis + f"\n\nKoristi `.kk lista` za pregled ili `.kk postavi #kanal` za ručno dodavanje.",
+            color=COLORS["success"]
+        ))
+
+    # .kk help
+    else:
+        await message.channel.send(embed=em(
+            f"{E_HELP} `.kk` — Komanda-Kanal sistem",
+            f"> `.kk setup` — automatski postavi kanale po imenima\n"
+            f"> `.kk lista` — vidi sve komande i kanale\n"
+            f"> `.kk postavi #kanal` — otvori meni, odaberi komandu\n"
+            f"> `.kk ukloni` — otvori meni, ukloni ograničenje\n"
+            f"> `.kk resetuj` — makni sva ograničenja",
+            color=_LP
+        ))
+
+
 async def on_ready():
     print(f"\n{'═'*45}\n  {BOT_NAME} {VERSION} — ONLINE\n{'═'*45}")
     # ── Dupla zaštita: emoji validacija
@@ -11613,16 +11855,14 @@ bot.tree.add_command(kanal_komandi_group)
 # ═══════════════════════════════════════════
 # ── Autocomplete: lista svih bot komandi ──────────────────────────────────
 _ALL_BOT_CMDS = [
-    "slots","blackjack","poker","rulet",
-    "kaladont","wordle","kviz","geografija","vjasala","toplo-hladno","amogus",
-    "rank","aktivnost","leaderboard","profil",
-    "posao","daily","kradi","balans","bank","transfer","lottery",
-    "hunt","fish",
-    "meme","8ball","ljubav","kompatibilnost","iq",
-    "spotify","invite","ping","help","setup",
-    "shop","kupi","poeni",
-    "warn","kick","ban","mute","unmute","clear",
-    "poll","say","remind","qr",
+    "slots","blackjack","poker","kpm",
+    "kaladont","kaladont-stop","wordle","wordle-stop","kviz","geografija","vjasala","toplo-hladno","amogus","amogus-stop",
+    "hunt","fish","zoo","battle","sell","animals","pray",
+    "posao","daily","kradi","baki","daj","lottery","shop","kupi","quests",
+    "rank","aktivnost","leaderboard","spotify","ping","serverinfo","userinfo","avatar","invite","afk",
+    "ljubav","brak","zagrljaj","poljubac","mazi","tapsi","high5","cudan","srce","kompli","fora","muv","crush",
+    "iq","simp","meme","8ball",
+    "warn","kick","ban","timeout","clear","warnings","clearwarnings",
     "kanal-komandi","komanda-kanal",
 ]
 
@@ -11703,6 +11943,49 @@ async def komanda_kanal_lista(i: discord.Interaction):
         embed=em(f"{E_SHIELD} Per-komanda kanali", opis, color=COLORS["info"]),
         ephemeral=True
     )
+
+@komanda_kanal_group.command(name="komande", description="📖 Prikaži sve komande koje možeš dodijeliti kanalu")
+@app_commands.checks.has_permissions(manage_guild=True)
+async def komanda_kanal_komande(i: discord.Interaction):
+    gcfg = get_guild_config(i.guild.id)
+    per_cmd = gcfg.get("cmd_per_channel", {})
+    def _status(k):
+        if k in per_cmd:
+            return f"<#{per_cmd[k]}>"
+        return "svugdje"
+    lines = [
+        f"{E_DICE} **Igre — Casino** → preporučeno: `#casino`",
+        f"> `slots` {_status('slots')}  •  `blackjack` {_status('blackjack')}  •  `poker` {_status('poker')}  •  `kpm` {_status('kpm')}",
+        f"",
+        f"{E_GAME} **Igre — Gaming** → preporučeno: `#gaming`",
+        f"> `hunt` {_status('hunt')}  •  `fish` {_status('fish')}  •  `zoo` {_status('zoo')}  •  `battle` {_status('battle')}",
+        f"> `wordle` {_status('wordle')}  •  `toplo-hladno` {_status('toplo-hladno')}  •  `amogus` {_status('amogus')}",
+        f"",
+        f"🔤 **Igre — Tekst** → svaki u svoj kanal",
+        f"> `kaladont` {_status('kaladont')}  •  `vjasala` {_status('vjasala')}  •  `kviz` {_status('kviz')}  •  `geografija` {_status('geografija')}",
+        f"",
+        f"{E_COINS} **Ekonomija** → preporučeno: `#economics`",
+        f"> `posao` {_status('posao')}  •  `daily` {_status('daily')}  •  `kradi` {_status('kradi')}  •  `baki` {_status('baki')}",
+        f"> `daj` {_status('daj')}  •  `lottery` {_status('lottery')}  •  `shop` {_status('shop')}  •  `kupi` {_status('kupi')}",
+        f"",
+        f"{E_HEART} **Ljubavne** → preporučeno: `#tinders`",
+        f"> `ljubav` {_status('ljubav')}  •  `brak` {_status('brak')}  •  `crush` {_status('crush')}  •  `muv` {_status('muv')}",
+        f"> `zagrljaj` {_status('zagrljaj')}  •  `poljubac` {_status('poljubac')}  •  `srce` {_status('srce')}  •  `kompli` {_status('kompli')}",
+        f"",
+        f"💬 **Chat / Fun** → preporučeno: `#chat`",
+        f"> `iq` {_status('iq')}  •  `simp` {_status('simp')}  •  `meme` {_status('meme')}  •  `8ball` {_status('8ball')}",
+        f"",
+        f"{E_TROPHY} **Profil / Info** → preporučeno: `#comanda`",
+        f"> `rank` {_status('rank')}  •  `aktivnost` {_status('aktivnost')}  •  `leaderboard` {_status('leaderboard')}",
+        f"> `spotify` {_status('spotify')}  •  `avatar` {_status('avatar')}  •  `afk` {_status('afk')}",
+    ]
+    e = discord.Embed(
+        title=f"{E_HELP} Komande bota — dodijeli kanal",
+        description="\n".join(lines) + f"\n\n> Koristi `/komanda-kanal postavi <komanda> <#kanal>` da postaviš.",
+        color=_LP,
+    )
+    e.set_footer(text=f"{BOT_NAME} {VERSION}  •  Admini mogu koristiti komande svugdje")
+    await i.response.send_message(embed=e, ephemeral=True)
 
 @komanda_kanal_group.command(name="resetuj", description="🔄 Ukloni sva per-komanda ograničenja")
 @app_commands.checks.has_permissions(manage_guild=True)
