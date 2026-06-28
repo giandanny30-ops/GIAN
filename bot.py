@@ -2048,8 +2048,6 @@ async def _validate_app_emojis():
     except Exception as _e:
         print(f"  [emoji-check] Greška pri provjeri: {_e}")
 
-@bot.event
-
 # ═══════════════════════════════════════════
 #    .kk — Prefix verzija komanda-kanal sistema
 #    Radi odmah bez slash sync.
@@ -2287,6 +2285,7 @@ async def _kk_handler(message, args_text: str):
         ))
 
 
+@bot.event
 async def on_ready():
     print(f"\n{'═'*45}\n  {BOT_NAME} {VERSION} — ONLINE\n{'═'*45}")
     # ── Dupla zaštita: emoji validacija
