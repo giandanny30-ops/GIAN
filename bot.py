@@ -2995,12 +2995,8 @@ async def iq_cmd(ctx, member: discord.Member = None):
         timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=target.display_avatar.url)
-    e.add_field(name="<:e_search:1519363103064723547> IQ Rezultat", value=f"```fix
-{score} IQ
-```", inline=True)
-    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"```yaml
-{label}
-```", inline=True)
+    e.add_field(name="<:e_search:1519363103064723547> IQ Rezultat", value="```fix\n" + str(score) + " IQ\n```", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value="```yaml\n" + str(label) + "\n```", inline=True)
     e.add_field(name="<:e_chart:1519362656568475880> Skala", value=f"{bar}  `{score}/150`", inline=False)
     e.set_footer(text=f"{BOT_NAME} • IQ Kalkulator • Generisano nasumično")
     await ctx.send(embed=e)
@@ -3053,12 +3049,8 @@ async def simp_cmd(ctx, member: discord.Member = None):
         timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=ctx.author.display_avatar.url)
-    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value=f"```fix
-{pct}%
-```", inline=True)
-    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"```yaml
-{label}
-```", inline=True)
+    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value="```fix\n" + str(pct) + "%\n```", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value="```yaml\n" + str(label) + "\n```", inline=True)
     e.add_field(name="<:e_chart:1519362656568475880> Metar", value=f"{bar}  `{pct}/100`", inline=False)
     e.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
     e.set_footer(text=f"{BOT_NAME} • Simp Detektor • Generisano nasumično")
