@@ -627,6 +627,56 @@ KALADONT_DICT = set([
     "SUH","SUR","SVE","TAJ","TAN","TAS","TIH","TIK","TIM","TIP","TON","TUR","UAL","UKA",
     "ULJ","UMI","UVA","VAL","VAR","VAS","VEC","VEK","VID","VIK","VIR","VOD","VOL","VOZ",
     "VRH","VUK","ZID","ZIK","ZIM","ZNA","ZOR","ZUB","ZUM","ZID","ZIV",
+    # === Dodatne riječi za bolji gameplay ===
+    "ABECEDA","ABDOMEN","AFERA","AJVAR","AJDE","AKACIJA","AKORDEОН","AKTOVKA","ALABASTER","ALARM",
+    "ALAT","ALBATROS","ALEGIJA","ALERGIJA","ALGAE","ALGORITAM","ALIBI","ALIGATOR","ALKEMIJA","ALMANAH",
+    "ALPINIST","ALTRUIST","AMALGAM","AMBER","AMBULANTA","AMEBA","AMFITEATAR","AMONIJAK","AMOR","AMPER",
+    "ANANAS","ANDJEO","ANEMIJA","ANESTEZIJA","ANIMATOR","ANODA","ANTENA","ANTIKA","ANTILOPA","ANTIVIRUS",
+    "AORTA","APAUZA","APEL","APERITIV","APLIKANT","APOTEKA","APSOLVENT","ARANŽMAN","ARBITAR","ARDOV",
+    "ARENA","ARITMIJA","AROGANCIJA","AROMATIKA","ARSENAL","ARTERIJA","ASISTENT","ASTEROИД","ASTMA","ATAR",
+    "ATLETICAR","ATLETA","ATMOSFERA","AZIMUT","AZTEC","BACAČ","BACIL","BADMINTON","BAGREM","BAJKA",
+    "BALADA","BALON","BALTAZAR","BAMBIS","BANANER","BARJAKTAR","BAROMETAR","BARUT","BASIST","BATALJON",
+    "BATINA","BEDEM","BEJZBOL","BENZIN","BERBA","BERBER","BIBLIOTEKA","BICIKL","BIFTEK","BILTEN",
+    "BIOSKOP","BISTRO","BITANGA","BJEKSTVO","BLANKET","BLISTAV","BLOKADA","BLOKIRA","BOGATUN","BORIST",
+    "BOTANIKA","BOZJAK","BRANIK","BRANIČAR","BRAVAR","BRIDŽIST","BRITVA","BRODOGRADNJA","BUDALA","BUNAR",
+    "CABURA","CALCULATOR","CEDULJA","CENZURA","CEREMONIA","CETKA","CIGARA","CINEMA","CIRKUS","CITADELA",
+    "CIVILIZACIJA","CJELINA","ČAĐA","ČAROLIJA","ČESTICA","ČETKA","ČOVJEČANSTVO","DAGNJA","DALEKOVOD",
+    "DALMATINAC","DEBLJINA","DEČAK","DELIJA","DESPOT","DETEKTOR","DIJABETES","DIJAGRAM","DIJALEKT",
+    "DINAMIT","DIPLOMATA","DIREKTOR","DIZALICA","DOBITNIK","DOKTOR","DOLINA","DOMOVINA","DRAMATURG",
+    "DRENAŽA","DUBIOZA","DUBROVACKI","DUGME","DŽUNGLA","EKVILIBRIST","EKSKURZIJA","EKSPANZIJA","ELITA",
+    "EMBRION","ENCIKLOPEDIJA","EPIDEMIJA","EROSIJA","ERUPCIJA","ESTETIKA","ETAŽER","EVOLUCIJA","FABRIKA",
+    "FANTAZIJA","FARMACEUT","FASADA","FAŠIZAM","FAVORIT","FEMINIZAM","FERMENT","FILOZOFIJA","FIRMA",
+    "FIZIOTERAPEUT","FLANELA","FLEKSIBILAN","FLOTILA","FOSIL","FOTOGRAF","FRAKCIJA","FRANKOFON",
+    "GALEБ","GARAŽA","GARNITURA","GEOGRAF","GEOLOGIJA","GEOMETRIJA","GIMNASTIČAR","GLADIJATOR",
+    "GLASNIK","GLAZBENIK","GLOBUS","GLUTONAN","GNOM","GODIŠNJAK","GOLMAN","GRADJANIN","GRAFIKA",
+    "GRAMATIKA","GRANIT","GRB","GROBLJE","GROŽĐE","GUSAR","HIGIJENA","HIMALAJAC","HIPODROM",
+    "HISTORIČAR","HOKEJАŠ","HOLOGRAM","HORIZONT","HOSPITAL","HRONIKA","HUMANIST","IDEJA","IDEOLOG",
+    "IGRAČ","ILUSTRATOR","IMITATOR","IMPERIJA","IMPROVIZACIJA","INCIDENT","INDUSTRIJA","INFARKT",
+    "INJEKCIJA","INSPECTOR","INTEGRACIJA","INVENTAR","ISLEDNIK","ISTRAŽIVAČ","JADRANSKO","JAHAČ",
+    "JANTAR","ЈЕDINSTVO","ЈЕDNOROG","ЈЕZERO","ЈЕZIK","ЈЕZIČAR","ЈЕZIČNOST","ЈУNAK","ЈUPITAR",
+    "KABINET","KAKTUS","KALDERON","KALENDAR","KAMELIJА","KANALIZ","KANGAROO","KANTATA","KAPITALIST",
+    "KAPSUL","KARIKATURA","KARNEVAL","KARTOGRAF","KASARMA","KASTADELA","KATASTROFA","KATEGORIJA",
+    "KATRAN","KAVALET","KAZNIT","KEMIČAR","KIBORG","KIROPRAKT","KLINIČKA","KLONIRAN","KLOVN",
+    "KOBAJAGI","KOLIBRI","KOMETА","KOMPOZITOR","KONDOR","KONFERENCIJA","KONJАNIК","KOORDINAT",
+    "KOPERNIKUS","KORISNIK","KORNЕT","KORUPCIJA","KOSMONAUT","KOSTOBOLJAC","KOTLIĆ","KRIMINAL",
+    "KRISTALIZACIJA","KRSTARICA","KUCALO","KULTIVIST","KUTLAČA","LABORANT","LABIRINT","LADJA",
+    "LAKTAT","LAMPION","LANTERNA","LАZАRET","LEGENDА","LEGITIMACIJA","LEKSIKON","LIBERALAN",
+    "LINGVIST","LIRIČAR","LOGIČAR","LOVIŠTE","LOZINKA","LUBENICA","LUKAR","MAGNETIZAM","MAKIJАŽ",
+    "MАLIА","MANDATAR","MANIFESTACIJA","MARATONAC","MARGINALAC","MATEMATIK","MEDICINAR","MEGALOMAN",
+    "MEKIST","MELODRAMATIČAN","MEMORIJALAC","MENTOR","MERIMAC","METAFIZIKA","METEOROLOG","MIGRANT",
+    "MINISTARSTVO","MISIONАR","MODERATOR","MONARH","MOTOCIKLISTA","MUZIČAR","MUZIKANT","NARATOR",
+    "NATURALISTA","NAVIGATОR","NEGATIVAC","NEUROLOG","NEUTRALAN","NIHILISTA","NOMAD","NOVINAR",
+    "OBAVJEŠTAJAC","OCJENJIVAĈ","OLIMPIJAC","OPERATER","OPTIMISTA","ORGANIZATOR","ORNAMENT","ОРТАК",
+    "OSLOBODILAC","OSVAJAC","OTPADNIK","PALEONTOLOG","PARAZITOLOG","PARLAMENTARAC","PATRIOT","PAUK",
+    "PEDAGOG","PERFORMER","FILOZOF","PIONIR","PLANTAŽA","PLATINAR","PLAVCА","PLESAČ","POETIČAN",
+    "POSREDNIK","PREDSJEDNIŠTVO","PREVARANT","PRODUCENT","PROGRAM","PROMETEJ","PROPAGANDIST",
+    "PSIHIJATAR","PSIHOLOG","PUBLICIST","RAZBOJNIK","RAZVEDENIK","REFORMATOR","REPORTER","REPUBLIKA",
+    "ROMANTIČAR","RUDAR","SATIRIČAR","SCENARIST","SCULPTOR","SIMULATOR","SINDIKALIST","SOCIOLOG",
+    "SOLIST","SPECIJALNOST","SPEKTAKL","SPORTISTA","STOMATOLOG","STRATEG","SUDBINA","SUPERSTITION",
+    "ŠAMPION","TEOLOG","TERAPEUT","TERORIST","TIKVARA","TRANSLATOR","TRIUMFATOR","TURIST",
+    "UTOPIST","UZURPATOR","VATERPOLO","VEGETARIJANAC","VETERINAR","VIOLINISTA","VIROLOG",
+    "VIZIONAR","VJEROVATNO","VODOINSTALATER","VULKANOLOG","ZAKONODAVAC","ZAŠTITNIK","ZOOLOG",
+
     # === Hemija, nauka, medicina ===
     "ACETON","ACETILEN","ACETILSALICILIK","ACID","AGAR","AGENIJUM","ALKOHOL","ALUMINIUM","AMONIJAK",
     "ANALOG","ANALIZA","ANATOMIJA","ANTIBIOTIK","ANTIDOT","ANTIGEN","ANTISEPTIK","APSORPCIJA",
@@ -2990,13 +3040,13 @@ async def iq_cmd(ctx, member: discord.Member = None):
         emoji = "<:e_crown2:1519363047163166922>"
 
     e = discord.Embed(
-        title=f"{emoji} IQ Test — {target.display_name}",
+        title=f"🍹 ゛*IQ Test — {target.display_name}*゛",
         color=COLORS[color_key],
         timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=target.display_avatar.url)
-    e.add_field(name="<:e_search:1519363103064723547> IQ Rezultat", value="```fix\n" + str(score) + " IQ\n```", inline=True)
-    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value="```yaml\n" + str(label) + "\n```", inline=True)
+    e.add_field(name="<:e_search:1519363103064723547> IQ Rezultat", value=f"**{score} IQ**", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"**{label}**", inline=True)
     e.add_field(name="<:e_chart:1519362656568475880> Skala", value=f"{bar}  `{score}/150`", inline=False)
     e.set_footer(text=f"{BOT_NAME} • IQ Kalkulator • Generisano nasumično")
     await ctx.send(embed=e)
@@ -3040,7 +3090,7 @@ async def simp_cmd(ctx, member: discord.Member = None):
         emoji = "<:e_crown2:1519363047163166922>"
 
     e = discord.Embed(
-        title=f"{emoji} Simp Metar",
+        title=f"🍹 ゛*Simp Metar*゛",
         description=(
             f"**{ctx.author.display_name}** je **{pct}%** simp za "
             f"**{member.display_name}** {member.mention}"
@@ -3049,8 +3099,8 @@ async def simp_cmd(ctx, member: discord.Member = None):
         timestamp=datetime.now(timezone.utc)
     )
     e.set_thumbnail(url=ctx.author.display_avatar.url)
-    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value="```fix\n" + str(pct) + "%\n```", inline=True)
-    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value="```yaml\n" + str(label) + "\n```", inline=True)
+    e.add_field(name="<:e_heart2:1519362668644012133> Simp Postotak", value=f"**{pct}%**", inline=True)
+    e.add_field(name="<:e_label:1519363326109417613> Kategorija", value=f"**{label}**", inline=True)
     e.add_field(name="<:e_chart:1519362656568475880> Metar", value=f"{bar}  `{pct}/100`", inline=False)
     e.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
     e.set_footer(text=f"{BOT_NAME} • Simp Detektor • Generisano nasumično")
@@ -5548,38 +5598,39 @@ async def amogus_stop(i: discord.Interaction):
 # ═══════════════════════════════════════════
 #    LJUBAVNE / SOCIJALNE KOMANDE
 # ═══════════════════════════════════════════
-async def social_cmd(i: discord.Interaction, target: discord.Member, action: str, txt: str, color_key: str = "love"):
+async def social_cmd(i: discord.Interaction, target: discord.Member, action: str, txt: str, color_key: str = "love", title: str = ""):
     await i.response.defer()
     gif = await get_gif(action)
     opis = txt.replace("{from}", i.user.mention).replace("{to}", target.mention)
-    e = discord.Embed(description=opis, color=COLORS[color_key], timestamp=datetime.now(timezone.utc))
+    embed_title = f"🍹 ゛*{title}*゛" if title else None
+    e = discord.Embed(title=embed_title, description=opis, color=COLORS[color_key], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     if gif: e.set_image(url=gif)
     await i.followup.send(embed=e)
 
 @bot.tree.command(name="zagrljaj", description="🤝 Zagrli nekog na serveru")
 async def zagrljaj(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "hug", "<:e_shake:1519362947766554737> {from} grli {to}! Aww, tako slatko! <:e_heart2:1519362668644012133>", "love")
+    await social_cmd(i, korisnik, "hug", "<:e_shake:1519362947766554737> {from} grli {to}! Aww, tako slatko! <:e_heart2:1519362668644012133>", "love", title="Zagrljaj")
 
 @bot.tree.command(name="poljubac", description="💗 Pošalji poljubac nekome")
 async def poljubac(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "kiss", "<:e_heart2:1519362668644012133> {from} šalje poljubac {to}! <:e_heart2:1519362668644012133>", "pink")
+    await social_cmd(i, korisnik, "kiss", "<:e_heart2:1519362668644012133> {from} šalje poljubac {to}! <:e_heart2:1519362668644012133>", "pink", title="Poljubac")
 
 @bot.tree.command(name="mazi", description="💗 Pomazi nekoga nježno")
 async def mazi(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "pat", "<:e_heart2:1519362668644012133> {from} mazi {to} po glavi! Predobro! <:e_sparkles:1519363032185176198>", "love")
+    await social_cmd(i, korisnik, "pat", "<:e_heart2:1519362668644012133> {from} mazi {to} po glavi! Predobro! <:e_sparkles:1519363032185176198>", "love", title="Mazanje")
 
 @bot.tree.command(name="tapsi", description="🤝 Tapši nekoga prijateljski")
 async def tapsi(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "handshake", "<:e_shake:1519362947766554737> {from} tapše {to}! Aj, brate! <:e_shake:1519362947766554737>", "teal")
+    await social_cmd(i, korisnik, "handshake", "<:e_shake:1519362947766554737> {from} tapše {to}! Aj, brate! <:e_shake:1519362947766554737>", "teal", title="Tapšanje")
 
 @bot.tree.command(name="high5", description="🤝 Daj peticu nekome")
 async def high5(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "highfive", "<:e_shake:1519362947766554737> {from} daje peticu {to}! Dobra ekipa! <:e_bolt:1519362674717102160>", "success")
+    await social_cmd(i, korisnik, "highfive", "<:e_shake:1519362947766554737> {from} daje peticu {to}! Dobra ekipa! <:e_bolt:1519362674717102160>", "success", title="High Five")
 
 @bot.tree.command(name="cudan", description="😈 Budi ćudan prema nekome")
 async def cudan(i: discord.Interaction, korisnik: discord.Member):
-    await social_cmd(i, korisnik, "poke", "<:e_devil:1519362989470253187> {from} je ćudan prema {to}! Ajde, brate... <:e_muscle:1519362764244652122>", "warning")
+    await social_cmd(i, korisnik, "poke", "<:e_devil:1519362989470253187> {from} je ćudan prema {to}! Ajde, brate... <:e_muscle:1519362764244652122>", "warning", title="Čudno")
 
 @bot.tree.command(name="srce", description="💗 Pošalji srce nekome")
 async def srce(i: discord.Interaction, korisnik: discord.Member):
@@ -5589,7 +5640,7 @@ async def srce(i: discord.Interaction, korisnik: discord.Member):
         "<:e_rose:1519363697728815175> {from} poklanja ruže {to}! Romantično! <:e_rose:1519363697728815175>",
         "<:e_heart2:1519362668644012133> {from} šalje ljubav {to}! Neka traje! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🍹 ゛*Srce*゛", description=random.choice(poruke).replace("{from}", i.user.mention).replace("{to}", korisnik.mention), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
@@ -5602,7 +5653,7 @@ async def brak(i: discord.Interaction, korisnik: discord.Member):
         f"<:e_ring:1519362941617438750> {i.user.mention} klekne pred {korisnik.mention} i kaže: 'Hoćeš li biti moj/moja?' <:e_ring:1519362941617438750>",
         f"<:e_rose:1519363697728815175> {i.user.mention} donosi ruže i prsten {korisnik.mention}! Romantika! <:e_heart2:1519362668644012133>",
     ]
-    e = discord.Embed(description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
+    e = discord.Embed(title="🍹 ゛*Brak*゛", description=random.choice(odgovori), color=COLORS["love"], timestamp=datetime.now(timezone.utc))
     e.set_footer(text=f"{BOT_NAME} {VERSION}")
     await i.response.send_message(embed=e)
 
