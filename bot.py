@@ -2175,7 +2175,7 @@ async def on_guild_join(guild):
     if chan:
         try:
             e = discord.Embed(
-                title=f"<:e_shake:1519362947766554737> Zdravo, {guild.name}!",
+                title=f"<:e_shake:1519362947766554737> ゛Zdravo, {guild.name}!",
                 description=(
                     f"Ja sam **{BOT_NAME}** — Balkan Discord bot!\n\n"
                     f"<:e_help2:1519362723148726534> Ukucaj `/help` da vidiš sve komande.\n"
@@ -2290,7 +2290,7 @@ async def on_member_join(member):
             ms_ch = member.guild.get_channel(cfg.get("welcome_channel") or 1494687347558715543) or member.guild.system_channel
             if ms_ch:
                 ms_e = discord.Embed(
-                    title=f"<:e_confetti2:1519363348288901221> MILESTONE — {cnt} ČLANOVA! <:e_confetti2:1519363348288901221>",
+                    title=f"<:e_confetti2:1519363348288901221> ゛MILESTONE — {cnt} ČLANOVA!",
                     description=(
                         f"<:e_trophy2:1519362624742232146> Upravo smo dostigli **{cnt}** članova!\n"
                         f"<:e_flower:1519362984818901173> Hvala svima koji su dio **× GIAN** porodice!\n"
@@ -2313,13 +2313,38 @@ async def on_member_join(member):
 
     # ── Log ────────────────────────────────────────────
     if log_ch := member.guild.get_channel(cfg.get("log_channel", 0)):
-        le = discord.Embed(title="<:e_inbox:1519363351354937497> Novi Član", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
+        le = discord.Embed(title="<:e_inbox:1519363351354937497> ゛Novi Član", color=COLORS["success"], timestamp=datetime.now(timezone.utc))
         le.set_author(name=str(member), icon_url=member.display_avatar.url)
         le.add_field(name="ID", value=f"`{member.id}`", inline=True)
         le.add_field(name="Nalog kreiran", value=member.created_at.strftime("%d.%m.%Y."), inline=True)
         le.add_field(name="Ukupno članova", value=f"`{member.guild.member_count}`", inline=True)
         await log_ch.send(embed=le)
 
+
+
+    # ── DM Dobrodošlica ─────────────────────────────────────────────────────────
+    try:
+        ch_info_dm   = member.guild.get_channel(cfg.get("info_channel", 1496860023093989475))
+        info_lnk_dm  = ch_info_dm.mention if ch_info_dm else "#informacije"
+        dm_e = discord.Embed(
+            title=f"🌸 ゛Dobrodošao/la na {member.guild.name}!",
+            description=(
+                f"Hej {member.mention}, drago nam je što si tu! <:e_heart2:1519362668644012133>\n\n"
+                f"<:e_right:1519363367712591922> Pogledaj {info_lnk_dm} i upoznaj server\n"
+                f"<:icon_check:1519358376268533810> Prihvati pravila da otključaš sve kanale\n"
+                f"<:e_sparkles:1519363032185176198> Uživaj i budi dio **{member.guild.name}** porodice!\n\n"
+                f"<:e_bolt:1519362674717102160> Pitanja? Slobodno pitaj u chatu!"
+            ),
+            color=_LP,
+            timestamp=datetime.now(timezone.utc)
+        )
+        dm_e.set_thumbnail(url=member.guild.icon.url if member.guild.icon else member.display_avatar.url)
+        dm_e.set_footer(text=f"{member.guild.name} • Automatska dobrodošlica")
+        await member.send(embed=dm_e)
+    except discord.Forbidden:
+        pass
+    except Exception as _dme:
+        print(f"[dm-welcome] {_dme}")
 
     # ── Welcome ────────────────────────────────────────
     ch_id = cfg.get("welcome_channel")
@@ -2580,7 +2605,7 @@ async def on_message(message):
             try: await message.add_reaction("<:e_no:1519363018725658675>")
             except Exception as e: print(f"[brojanje] reaction fail: {e}")
             warn_e = discord.Embed(
-                title="<:e_no:1519363018725658675> OPOMENA — Ne možeš brojati iza sebe!",
+                title="<:e_no:1519363018725658675> ゛OPOMENA — Ne možeš brojati iza sebe!",
                 description=(
                     f"{message.author.mention}, **mora neko drugi nastaviti** prije nego što ti opet brojiš.\n\n"
                     f"<:e_right:1519363367712591922>️ Sljedeći broj je i dalje: **{expected}**"
@@ -2604,7 +2629,7 @@ async def on_message(message):
             user_total = mistakes[uid_str]
             save_data()
             err_e = discord.Embed(
-                title="<:e_bomb:1519363456334168255> OPOMENA — Pogrešan broj!",
+                title="<:e_bomb:1519363456334168255> ゛OPOMENA — Pogrešan broj!",
                 description=(
                     f"{message.author.mention}, **pogriješio/la** si!\n\n"
                     f"<:icon_cross:1519358379917836508> Tvoj odgovor: **{num}**\n"
@@ -3360,7 +3385,7 @@ async def on_member_remove(member):
     # ── Log ────────────────────────────────────────────
     try:
         if log_ch := member.guild.get_channel(cfg.get("log_channel", 0)):
-            le = discord.Embed(title="<:e_box:1519363099478458498> Član Otišao", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
+            le = discord.Embed(title="<:e_box:1519363099478458498> ゛Član Otišao", color=COLORS["warning"], timestamp=datetime.now(timezone.utc))
             le.set_author(name=str(member), icon_url=member.display_avatar.url)
             le.add_field(name="ID", value=f"`{member.id}`", inline=True)
             le.add_field(name="Pridružio se", value=member.joined_at.strftime("%d.%m.%Y.") if member.joined_at else "?", inline=True)
@@ -3388,14 +3413,16 @@ async def on_member_remove(member):
                 if _pl.get("title"): e.title = _ev(_pl["title"], member, member_count_l)
             else:
                 e = discord.Embed(
+                    title=f"<:e_feather:1519363362322907218> ゛{member.display_name} je otišao/la",
                     description=(
-                        f"**bye {member.mention}** <:e_shake:1519362947766554737>\n\n"
-                        f"{VE_L[0]} {member.display_name} **je napustio/la server**\n"
-                        f"<:e_feather:1519363362322907218> **{member_count_l} member**"
+                        f"{member.mention} je napustio/la **{member.guild.name}** <:e_shake:1519362947766554737>\n\n"
+                        f"<:e_sparkles:1519363032185176198> Sretno na putu! Vrata su uvijek otvorena! 🚪\n"
+                        f"<:e_feather:1519363362322907218> Sada nas ima **{member_count_l}** članova."
                     ),
                     color=_LP,
                     timestamp=datetime.now(timezone.utc)
                 )
+                e.set_thumbnail(url=member.display_avatar.url)
             e.set_thumbnail(url=member.display_avatar.url)
             e.set_footer(
                 text=f"{BOT_NAME} • Leave",
@@ -3405,6 +3432,28 @@ async def on_member_remove(member):
     except (discord.NotFound, discord.Forbidden):
         pass
     except Exception as _e: print(f"[on_member_remove leave] {_e}")
+
+    # ── DM Zbogom ──────────────────────────────────────────────────────────
+    try:
+        leave_dm_e = discord.Embed(
+            title=f"🌙 ゛Zbogom od {member.guild.name}!",
+            description=(
+                f"Hej **{member.display_name}**, vidimo se! <:e_feather:1519363362322907218>\n\n"
+                f"<:e_heart2:1519362668644012133> Hvala što si bio/la dio **{member.guild.name}** porodice!\n"
+                f"<:e_sparkles:1519363032185176198> Uvijek si dobrodošao/la natrag. 💫\n\n"
+                f"<:e_shake:1519362947766554737> Čuvaj se i sretno!"
+            ),
+            color=_LP,
+            timestamp=datetime.now(timezone.utc)
+        )
+        leave_dm_e.set_thumbnail(url=member.guild.icon.url if member.guild.icon else None)
+        leave_dm_e.set_footer(text=f"{member.guild.name} • Automatska poruka")
+        await member.send(embed=leave_dm_e)
+    except discord.Forbidden:
+        pass
+    except Exception as _dle:
+        print(f"[dm-leave] {_dle}")
+
     # ── Anti-Nuke kick provjera ─────────────────────────
     try:
         # Provjeri ponovo prije API poziva (guild je možda nestao u međuvremenu)
@@ -3521,7 +3570,7 @@ async def spotify_cmd(i: discord.Interaction, korisnik: discord.Member = None):
     def fmt_t(td):
         s = int(td.total_seconds()); return f"{s//60}:{s%60:02d}"
     e = discord.Embed(
-        title=f"<:e_music2:1519362679310127114> {spotify.title}",
+        title=f"<:e_music2:1519362679310127114> ゛{spotify.title}",
         url=f"https://open.spotify.com/track/{spotify.track_id}",
         description=f"**Izvođač:** {spotify.artist}\n**Album:** {spotify.album}\n\n`{fmt_t(elapsed)}` {bar} `{fmt_t(duration)}`",
         color=_LP,
@@ -4016,7 +4065,7 @@ async def rank(i: discord.Interaction, korisnik: discord.Member = None):
     rank_e.add_field(name="<:e_trophy2:1519362624742232146>  Level",   value=f"**{d['level']}**",           inline=True)
     rank_e.add_field(name="<:e_star2:1519363084253266031>  XP",        value=f"**{d['xp']:,} / {needed:,}**", inline=True)
     rank_e.add_field(name="<:e_chart:1519362656568475880>  Progres",   value=f"**{pct}%**",                 inline=True)
-    rank_e.set_author(name=f"🏆  Rank — {u.display_name}", icon_url=u.display_avatar.url)
+    rank_e.set_author(name=f"🏆 ゛Rank — {u.display_name}", icon_url=u.display_avatar.url)
     rank_e.set_footer(text=f"{BOT_NAME} {VERSION}  •  Rank sistem")
     await i.response.send_message(embed=rank_e)
 
@@ -4108,7 +4157,7 @@ class KPM(discord.ui.View):
         else:                 res, color = "<:e_skull:1519362992502997125> Izgubio si!", COLORS["error"]
         for c in self.children: c.disabled = True
         _kpm_res = discord.Embed(
-            title=f"<:e_ctrl:1519362682296209498>  Kamen — Papir — Makaze",
+            title=f"<:e_ctrl:1519362682296209498> ゛Kamen — Papir — Makaze",
             description=f"{res}",
             color=color,
             timestamp=datetime.now(timezone.utc)
@@ -4198,7 +4247,7 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         if status:
             desc += f"\n\n> {status}"
         e = discord.Embed(
-            title=title or "🎰 | SLOTS | 🎰",
+            title=title or "🎰 ゛SLOTS",
             description=desc,
             color=_LP,
         )
@@ -4209,16 +4258,16 @@ async def slots(i: discord.Interaction, ulog: int = 100):
         return e
 
     # ── Frame 0: svi reelovi se vrte (~0.7s) — status prazan, animacija u reelovima ──
-    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, title="🎰 | SLOTS | 🎰"), wait=True)
+    msg = await i.followup.send(embed=_embed(SPIN, SPIN, SPIN, title="🎰 ゛SLOTS"), wait=True)
     await asyncio.sleep(0.7)
 
     # ── Frame 1: lijevi staje (~0.65s) ───────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, title="🎰 | SLOTS | 🎰"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, SPIN, title="🎰 ゛SLOTS"))
     except: pass
     await asyncio.sleep(0.65)
 
     # ── Frame 2: desni staje (~0.65s) ────────────────────────────────────
-    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], title="🎰 | SLOTS | 🎰"))
+    try: await msg.edit(embed=_embed(reels[0], SPIN, reels[2], title="🎰 ゛SLOTS"))
     except: pass
     await asyncio.sleep(0.65)
 
@@ -9348,7 +9397,7 @@ async def on_voice_state_update(member, before, after):
             # Pošalji panel u kanal (text chat unutar VC-a, Discord 2024+ feature)
             try:
                 e = discord.Embed(
-                    title=f"<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!",
+                    title=f"<:e_speaker:1519363314524881048> ゛Dobrodošao/la u svoj kanal, {member.display_name}!",
                     description=(
                         "**Ti si vlasnik!** <:e_crown2:1519363047163166922> Koristi dugmad ispod:\n\n"
                         "<:e_lock3:1519362717394403432> **Lock** — niko ne može ući\n"
@@ -10230,7 +10279,7 @@ class VoiceCreateButton(discord.ui.View):
             # Pošalji panel u sam voice kanal
             try:
                 ev = discord.Embed(
-                    title=f"<:e_speaker:1519363314524881048> Dobrodošao u svoj kanal, {member.display_name}!",
+                    title=f"<:e_speaker:1519363314524881048> ゛Dobrodošao/la u svoj kanal, {member.display_name}!",
                     description=(
                         "**Ti si vlasnik!** <:e_crown2:1519363047163166922> Koristi dugmad ispod:\n\n"
                         "<:e_lock3:1519362717394403432> **Lock / Unlock** — kontrola ulaza\n"
