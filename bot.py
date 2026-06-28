@@ -2329,7 +2329,7 @@ async def on_member_join(member):
         dm_e = discord.Embed(
             title=f"🌸 ゛Dobrodošao/la na {member.guild.name}!",
             description=(
-                f"Hej {member.mention}, drago nam je što si tu! <:e_heart2:1519362668644012133>
+                f"Hej {member.mention}, drago nam je što si tu! <:e_heart2:1519362668644012133>"
 
 "
                 f"<:e_right:1519363367712591922> Pogledaj {info_lnk_dm} i upoznaj server
